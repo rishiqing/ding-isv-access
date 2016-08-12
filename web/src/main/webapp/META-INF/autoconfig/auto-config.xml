@@ -9,8 +9,8 @@
     <group name="db">
         <property name="jdbc.username" defaultValue="root" description="用户名"/>
         <property name="jdbc.password" defaultValue="root" description="用户密码"/>
-        <property name="jdbc.url" defaultValue="jdbc:mysql://localhost:3306/ding-isv-access?useUnicode=true&amp;characterEncoding=utf8" description="数据库服务器"/>
-        <property name="jdbc.database" defaultValue="ding-isv-access" description="数据库"/>
+        <property name="jdbc.url" defaultValue="jdbc:mysql://localhost:3306/ding_isv_access?useUnicode=true&amp;characterEncoding=utf8" description="数据库服务器"/>
+        <property name="jdbc.database" defaultValue="ding_isv_access" description="数据库"/>
     </group>
 
     <group name="other">
