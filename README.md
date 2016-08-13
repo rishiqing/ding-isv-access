@@ -20,4 +20,19 @@ mvn clean package -Dmaven.test.skip=true
 
 
 
+查看监控
+cat   /home/mint/logs/ding-isv-access/biz/monitor.log
+  "monitor get token faile"
+
+
+
+
+cat   /home/mint/logs/ding-isv-access/biz/task.log
+
+
+
+2016-08-13 14:30:00,070 INFO  SuiteTokenGenerateJob.executeInternal:27 - logEvent:开始traceId:820a54bb-d009-450f-bbb9-afdd8a59ee5d		msg:套件TOKEN生成任务执行开始	nextFireTime:Sat Aug 13 15:00:00 CST 2016
+2016-08-13 14:30:00,075 ERROR SuiteTokenGenerateJob.executeInternal:36 - logEvent:结束traceId:820a54bb-d009-450f-bbb9-afdd8a59ee5d		msg:查询套件信息失败	errCode:-1	errMsg:系统繁忙
+
+
 

@@ -22,7 +22,7 @@
     </group>
 
     <group name="system">
-        <property name="corp.suite.callback" defaultValue="https://oapi.dingtalk.com" description="运行环境"/>
+        <property name="corp.suite.callback" defaultValue="http://139.196.215.81:8080/suite/corp_callback/" description="运行环境"/>
     </group>
 
 

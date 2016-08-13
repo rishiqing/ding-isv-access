@@ -48,6 +48,14 @@ public class SuiteCallBackController{
     @Qualifier("suiteCallBackQueue")
     private Queue suiteCallBackQueue;
 
+    /**
+     * 创建套件的时候,回调地址就填写这个
+     * @param signature
+     * @param timestamp
+     * @param nonce
+     * @param json
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/suite/create", method = {RequestMethod.POST})
     public  Map<String, String> suiteCreate(
@@ -63,7 +71,13 @@ public class SuiteCallBackController{
                     LogFormatter.KeyValue.getNew("nonce", nonce),
                     LogFormatter.KeyValue.getNew("json", json)
             ));
-            DingTalkEncryptor dingTalkEncryptor = new DingTalkEncryptor("crm1qaz2WSX", "dd18qrmc6kg357g8r7itm5pyu5hg8ibe1blhqawhuaz", "suite4xxxxxxxxxxxxxxx");
+            /**
+             * token,aseKey这两个参数在注册套件的时候,填写的。如果不想改代码,那么注册套件的时候也可以填写下面的两个数值
+             * 要注意信息安全哦.
+             */
+            String token = "xxxxqaz2WSX";
+            String aseKey = "dd18qxxxxxx357g8r7itm5pyu5hg8ibe1blhqawhuaz";
+            DingTalkEncryptor dingTalkEncryptor = new DingTalkEncryptor(token, aseKey, "suite4xxxxxxxxxxxxxxx");
             String encryptMsg = json.getString("encrypt");
             String plainText = dingTalkEncryptor.getDecryptMsg(signature, timestamp, nonce, encryptMsg);
             JSONObject callbackMsgJson = JSONObject.parseObject(plainText);
@@ -83,7 +97,20 @@ public class SuiteCallBackController{
     }
 
 
-
+    /**
+     * 当套件创建完毕之后,需要手动修改一下套件的回调地址。在修改套件的回调地址之前,需要在BD中插入一条记录
+     *
+     *  insert into isv_suite(id, gmt_create, gmt_modified, suite_name, suite_key, suite_secret, encoding_aes_key, token, event_receive_url)
+     *  values(1, '2016-03-14 18:08:09', '2016-03-14 18:08:09', '服务报警应用', 'suitexdhgv7mnxxxxxxxx', 'xxxxxxxxxxKBJLLPtmFmwRtKfsuiEHHpBPx8jGlCSp-iznz9gFSpkG0T0KMU9jyB',
+     *  'dd18qxxxxxx357g8r7itm5pyu5hg8ibe1blhqawhuaz', 'xxxxqaz2WSX', '');
+     *
+     * @param suiteKey
+     * @param signature
+     * @param timestamp
+     * @param nonce
+     * @param json
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/suite/callback/{suiteKey}", method = {RequestMethod.POST})
     public  Map<String, String> receiveCallBack(@PathVariable("suiteKey") String suiteKey,
