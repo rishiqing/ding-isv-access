@@ -36,3 +36,5 @@ cat   /home/mint/logs/ding-isv-access/biz/task.log
 
 
 
+更新aoto.conf 注册回调事件
+
