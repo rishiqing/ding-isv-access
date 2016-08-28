@@ -36,6 +36,15 @@ public class CorpSuiteAuthDO {
      * 临时授权码或永久授权码value
      */
     private String permanentCode;
+    /**
+     * 永久授权码类型 1:微应用;2:服务窗
+     */
+    private Integer codeType;
+
+    /**
+     * 服务窗永久授权码
+     */
+    private String chPermanentCode;
 
     public Long getId() {
         return id;
@@ -85,6 +94,23 @@ public class CorpSuiteAuthDO {
         this.permanentCode = permanentCode;
     }
 
+    public Integer getCodeType() {
+        return codeType;
+    }
+
+    public void setCodeType(Integer codeType) {
+        this.codeType = codeType;
+    }
+
+
+    public String getChPermanentCode() {
+        return chPermanentCode;
+    }
+
+    public void setChPermanentCode(String chPermanentCode) {
+        this.chPermanentCode = chPermanentCode;
+    }
+
     @Override
     public String toString() {
         return "CorpSuiteAuthDO{" +
@@ -94,6 +120,8 @@ public class CorpSuiteAuthDO {
                 ", corpId='" + corpId + '\'' +
                 ", suiteKey='" + suiteKey + '\'' +
                 ", permanentCode='" + permanentCode + '\'' +
+                ", codeType=" + codeType +
+                ", chPermanentCode='" + chPermanentCode + '\'' +
                 '}';
     }
 }

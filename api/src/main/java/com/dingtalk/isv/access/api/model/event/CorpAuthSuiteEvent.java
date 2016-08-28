@@ -11,7 +11,7 @@ public class CorpAuthSuiteEvent implements Serializable {
     private String corpId;
     private String suiteKey;
     private String permanentCode;
-
+    private String chPermanentCode;
     public String getSuiteToken() {
         return suiteToken;
     }
@@ -44,6 +44,14 @@ public class CorpAuthSuiteEvent implements Serializable {
         this.permanentCode = permanentCode;
     }
 
+    public String getChPermanentCode() {
+        return chPermanentCode;
+    }
+
+    public void setChPermanentCode(String chPermanentCode) {
+        this.chPermanentCode = chPermanentCode;
+    }
+
     @Override
     public String toString() {
         return "CorpAuthSuiteEvent{" +
@@ -51,6 +59,7 @@ public class CorpAuthSuiteEvent implements Serializable {
                 ", corpId='" + corpId + '\'' +
                 ", suiteKey='" + suiteKey + '\'' +
                 ", permanentCode='" + permanentCode + '\'' +
+                ", chPermanentCode='" + chPermanentCode + '\'' +
                 '}';
     }
 }

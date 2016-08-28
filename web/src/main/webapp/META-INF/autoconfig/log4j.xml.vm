@@ -34,7 +34,7 @@
 
     <!-- suite -->
     <appender name="SUITE_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="$log_dir/biz/suite_manage.log"/>
+        <param name="file" value="${log_dir}/biz/suite_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="${log_level}"/>

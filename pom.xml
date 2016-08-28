@@ -32,8 +32,13 @@
             </dependency>
             <dependency>
                 <groupId>com.dingtalk</groupId>
+                <artifactId>dingtalk.isv.access.api</artifactId>
+                <version>0.0.3-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dingtalk</groupId>
                 <artifactId>dingtalk.isv.access.biz</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.dingtalk</groupId>

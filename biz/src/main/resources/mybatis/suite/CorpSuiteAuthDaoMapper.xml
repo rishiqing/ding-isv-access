@@ -9,6 +9,7 @@
         <result property="suiteKey" column="suite_key" />
         <result property="corpId" column="corp_id" />
         <result property="permanentCode" column="permanent_code" />
+        <result property="chPermanentCode" column="ch_permanent_code" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -17,7 +18,8 @@
         gmt_modified,
         suite_key,
         corp_id,
-        permanent_code
+        permanent_code,
+        ch_permanent_code
     </sql>
 
     <insert id="addOrUpdateCorpSuiteAuth" useGeneratedKeys="true" keyProperty="id">
@@ -26,14 +28,16 @@
                 gmt_modified,
                 suite_key,
                 corp_id,
-                permanent_code
+                permanent_code,
+                ch_permanent_code
         )values(
                 now(),
                 now(),
                 #{suiteKey},
                 #{corpId},
-                #{permanentCode}
-        )ON DUPLICATE KEY UPDATE gmt_modified=now(),permanent_code=#{permanentCode}
+                #{permanentCode},
+                #{chPermanentCode}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now(),permanent_code=#{permanentCode},ch_permanent_code=#{chPermanentCode}
     </insert>
 
     <select id="getCorpSuiteAuth" resultMap="corpSuiteAuthMap">

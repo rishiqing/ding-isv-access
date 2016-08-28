@@ -16,6 +16,7 @@ import com.dingtalk.isv.access.api.model.suite.SuiteVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
+import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
 import com.dingtalk.isv.access.biz.suite.dao.AppDao;
 import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
@@ -77,7 +78,8 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     @Autowired
     @Qualifier("orgAuthSuiteQueue")
     private Queue orgAuthSuiteQueue;
-
+    @Autowired
+    private ConfOapiRequestHelper confOapiRequestHelper;
     @Override
     public ServiceResult<CorpSuiteAuthVO> getCorpSuiteAuth(String corpId, String suiteKey) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -201,13 +203,8 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             ));
             ServiceResult<SuiteTokenVO> suiteTokenSr = suiteManageService.getSuiteToken(suiteKey);
             String suiteToken = suiteTokenSr.getResult().getSuiteToken();
-            CorpAuthSuiteCode corpAuthSuiteCode = isvService.getPermanentCode(suiteToken, tmpAuthCode);
-            String corpId = corpAuthSuiteCode.getAuth_corp_info().getCorpid();
-            String permanentCode = corpAuthSuiteCode.getPermanent_code();
-            CorpSuiteAuthVO corpSuiteAuthVO = new CorpSuiteAuthVO();
-            corpSuiteAuthVO.setCorpId(corpId);
-            corpSuiteAuthVO.setPermanentCode(permanentCode);
-            corpSuiteAuthVO.setSuiteKey(suiteKey);
+            ServiceResult<CorpSuiteAuthVO> sr = confOapiRequestHelper.getPermanentCode(suiteKey,suiteToken,tmpAuthCode);
+            CorpSuiteAuthVO corpSuiteAuthVO = sr.getResult();
             ServiceResult<Void> saveAuthSr = this.saveOrUpdateCorpSuiteAuth(corpSuiteAuthVO);
             if (!saveAuthSr.isSuccess()) {
                 bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
@@ -223,8 +220,9 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             CorpAuthSuiteEvent corpAuthSuiteEvent = new CorpAuthSuiteEvent();
             corpAuthSuiteEvent.setSuiteKey(suiteKey);
             corpAuthSuiteEvent.setSuiteToken(suiteToken);
-            corpAuthSuiteEvent.setCorpId(corpId);
-            corpAuthSuiteEvent.setPermanentCode(permanentCode);
+            corpAuthSuiteEvent.setCorpId(corpSuiteAuthVO.getCorpId());
+            corpAuthSuiteEvent.setPermanentCode(corpSuiteAuthVO.getPermanentCode());
+            corpAuthSuiteEvent.setChPermanentCode(corpSuiteAuthVO.getChPermanentCode());
             corpAuthSuiteEventBus.post(corpAuthSuiteEvent);
             return ServiceResult.success(corpSuiteAuthVO);
         } catch (Exception e) {

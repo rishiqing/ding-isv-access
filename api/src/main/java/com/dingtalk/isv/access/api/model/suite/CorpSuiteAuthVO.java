@@ -38,6 +38,11 @@ public class CorpSuiteAuthVO implements Serializable{
      */
     private String permanentCode;
 
+    /**
+     * 服务窗永久授权码
+     */
+    private String chPermanentCode;
+
     public Long getId() {
         return id;
     }
@@ -86,6 +91,15 @@ public class CorpSuiteAuthVO implements Serializable{
         this.permanentCode = permanentCode;
     }
 
+
+    public String getChPermanentCode() {
+        return chPermanentCode;
+    }
+
+    public void setChPermanentCode(String chPermanentCode) {
+        this.chPermanentCode = chPermanentCode;
+    }
+
     @Override
     public String toString() {
         return "CorpSuiteAuthVO{" +
@@ -95,6 +109,7 @@ public class CorpSuiteAuthVO implements Serializable{
                 ", corpId='" + corpId + '\'' +
                 ", suiteKey='" + suiteKey + '\'' +
                 ", permanentCode='" + permanentCode + '\'' +
+                ", chPermanentCode='" + chPermanentCode + '\'' +
                 '}';
     }
 }

@@ -3,6 +3,7 @@ package com.dingtalk.isv.access.biz.dingutil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
+import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 开放平台取conf或者token相关http接口封装
@@ -67,11 +70,54 @@ public class ConfOapiRequestHelper {
                 return ServiceResult.success(corpJSTicketVO);
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (IOException e) {
+        } catch (Throwable e) {
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("accessToken", accessToken)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
     }
+
+
+
+
+    public ServiceResult<CorpSuiteAuthVO> getPermanentCode(String suiteKey,String tmpAuthCode, String suiteAccessToken) {
+        try {
+            String url = getOapiDomain() + "/service/get_permanent_code?suite_access_token=" + suiteAccessToken;
+            Map<String, Object> parmMap = new HashMap<String, Object>();
+            parmMap.put("tmp_auth_code", tmpAuthCode);
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(parmMap));
+            JSONObject jsonObject = JSON.parseObject(sr);
+            Long errCode = jsonObject.getLong("errcode");
+            if (Long.valueOf(0).equals(errCode)) {
+                JSONObject corpObject = jsonObject.getJSONObject("auth_corp_info");
+                String chPcode = jsonObject.getString("ch_permanent_code");
+                String pCode = jsonObject.getString("permanent_code");
+                String corpId = corpObject.getString("corpid");
+                CorpSuiteAuthVO corpSuiteAuthVO = new CorpSuiteAuthVO();
+                corpSuiteAuthVO.setSuiteKey(suiteKey);
+                corpSuiteAuthVO.setChPermanentCode(chPcode);
+                corpSuiteAuthVO.setPermanentCode(pCode);
+                corpSuiteAuthVO.setCorpId(corpId);
+                return ServiceResult.success(corpSuiteAuthVO);
+            }
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        } catch (Throwable e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("accessToken", suiteAccessToken)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
