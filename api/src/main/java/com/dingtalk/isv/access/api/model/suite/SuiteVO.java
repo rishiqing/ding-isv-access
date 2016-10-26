@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 套件VO
  * Created by lifeng.zlf on 2016/1/15.
  */
 

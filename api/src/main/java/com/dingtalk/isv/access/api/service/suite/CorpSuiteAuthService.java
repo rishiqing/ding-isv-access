@@ -1,6 +1,7 @@
 package com.dingtalk.isv.access.api.service.suite;
 
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
+import com.dingtalk.isv.access.api.model.corp.callback.CorpChannelAppVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -70,6 +71,13 @@ public interface CorpSuiteAuthService {
      * @return
      */
     public ServiceResult<Void> saveOrUpdateCorpApp(CorpAppVO corpAppVO);
+
+    /**
+     * 更新企服务窗应用
+     * @param corpChannelAppVO
+     * @return
+     */
+    public ServiceResult<Void> saveOrUpdateCorpChannelApp(CorpChannelAppVO corpChannelAppVO);
 
     /**
      * 删除企业为应用信息

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 企业对套件授权信息
+ * 企业对套件授权信息VO
  * Created by 浩倡 on 16-1-17.
  */
 public class CorpSuiteAuthVO implements Serializable{

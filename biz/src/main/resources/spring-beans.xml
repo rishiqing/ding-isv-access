@@ -33,6 +33,18 @@
     </bean>
 
 
+    <bean id="channelOapiRequestHelper" class="com.dingtalk.isv.access.biz.dingutil.ChannelOapiRequestHelper">
+        <property name="oapiDomain" value="${oapi.environment}" />
+        <property name="httpRequestHelper" ref="httpRequestHelper"/>
+    </bean>
+
+    <bean id="orgOapiRequestHelper" class="com.dingtalk.isv.access.biz.dingutil.OrgOapiRequestHelper">
+        <property name="oapiDomain" value="${oapi.environment}" />
+        <property name="httpRequestHelper" ref="httpRequestHelper"/>
+    </bean>
+
+
+
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
     <bean id="corpAuthSuiteEventListener" class="com.dingtalk.isv.access.biz.event.CorpAuthSuiteEventListener"/>
     <bean id="ListenerInitService" class="com.dingtalk.isv.common.event.ListenerInitService" init-method="register">
@@ -52,6 +64,9 @@
     <bean id="deptManageService" class="com.dingtalk.isv.access.biz.corp.service.impl.DeptManageServiceImpl"/>
     <bean id="sendMessageService" class="com.dingtalk.isv.access.biz.message.service.impl.SendMessageServiceImpl"/>
     <bean id="reportManageService" class="com.dingtalk.isv.access.biz.microapp.report.ReportManageServiceImpl"/>
+    <bean id="channelManageService" class="com.dingtalk.isv.access.biz.corp.service.impl.ChannelManageServiceImpl"/>
+    <bean id="orgManangerService" class="com.dingtalk.isv.access.biz.org.service.impl.OrgManangerServiceImpl"/>
+
 
     <!-- LOG -->
     <bean id="serviceMethodInterceptor" class="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor"></bean>
@@ -66,6 +81,9 @@
                 <value>formManageService</value>
                 <value>deptManageService</value>
                 <value>sendMessageService</value>
+                <value>reportManageService</value>
+                <value>channelManageService</value>
+                <value>orgManangerService</value>
             </list>
         </property>
         <property name="interceptorNames">

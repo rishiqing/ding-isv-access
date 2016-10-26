@@ -40,7 +40,7 @@ public class CorpAuthSuiteEventListener implements EventListener {
             //激活
             ServiceResult<Void> activeAppSr = corpSuiteAuthService.activeCorpApp(corpAuthSuiteEvent.getSuiteKey(), corpAuthSuiteEvent.getCorpId(),corpAuthSuiteEvent.getPermanentCode());
             if(!activeAppSr.isSuccess()){
-                //加入失败job
+                //加入失败job,失败任务会重试
                 CorpSuiteAuthFaileDO corpSuiteAuthFaileDO = new CorpSuiteAuthFaileDO();
                 corpSuiteAuthFaileDO.setSuiteKey(corpAuthSuiteEvent.getSuiteKey());
                 corpSuiteAuthFaileDO.setCorpId(corpAuthSuiteEvent.getCorpId());

@@ -43,12 +43,12 @@
             <repository>
                 <id>releases</id>
                 <name>Nexus Release Repository</name>
-                <url>http://30.26.118.6:8081/repository/maven-releases/</url>
+                <url>http://danteng.com:8081/repository/maven-releases/</url>
             </repository>
             <snapshotRepository>
                 <id>snapshots</id>
                 <name>Nexus Snapshot Repository</name>
-                <url>http://30.26.118.6:8081/repository/maven-snapshots/</url>
+                <url>http://danteng.com:8081/repository/maven-snapshots/</url>
             </snapshotRepository>
         </distributionManagement>
 </project>

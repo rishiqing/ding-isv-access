@@ -75,6 +75,17 @@
         </layout>
     </appender>
 
+   <!-- org-->
+    <appender name="ORG_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${log_dir}/biz/org_manage.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <param name="threshold" value="${log_level}"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
+
     <!-- staff-->
     <appender name="STAFF_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${log_dir}/biz/staff_manage.log"/>
@@ -189,8 +200,6 @@
 
 
 
-
-
     <logger name="org.springframework.remoting.support" additivity="false">
         <level value="INFO" />
         <appender-ref ref="PROJECT" />
@@ -221,6 +230,12 @@
         <level value="${log_level}"/>
         <appender-ref ref="CORP_MANAGE_LOGGER_APPENDER"/>
     </logger>
+
+    <logger name="ORG_MANAGE_LOGGER" additivity="false">
+        <level value="${log_level}"/>
+        <appender-ref ref="ORG_MANAGE_LOGGER_APPENDER"/>
+    </logger>
+
 
     <logger name="SUITE_MANAGE_LOGGER" additivity="false">
         <level value="${log_level}"/>

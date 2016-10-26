@@ -28,6 +28,7 @@ import java.util.Map;
 
 /**
  * 套件事件回调监听
+ *
  */
 @Controller
 public class SuiteCallBackController{
@@ -200,7 +201,12 @@ public class SuiteCallBackController{
         return null;
     }
 
-
+    /**
+     * 处理各种回调时间的TAG。这个维度的回调是和套件相关的
+     * @param callbackMsg
+     * @param suiteKey
+     * @return
+     */
     private String isvCallbackEvent(String callbackMsg,String suiteKey) {
         JSONObject callbackMsgJson = JSONObject.parseObject(callbackMsg);
         String eventType = callbackMsgJson.getString("EventType");
@@ -259,7 +265,7 @@ public class SuiteCallBackController{
 
 
     /**
-     * 企业接受接受回调时间
+     * 企业接受接受回调事件。这个维度的回调都是和授权企业相关的
      * @param suiteKey
      * @param signature
      * @param timestamp

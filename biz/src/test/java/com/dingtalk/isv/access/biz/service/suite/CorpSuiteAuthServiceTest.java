@@ -5,6 +5,7 @@ import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
+import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.base.BaseTestCase;
 import com.dingtalk.isv.common.model.ServiceResult;
 import org.junit.Test;
@@ -19,7 +20,8 @@ import java.util.Arrays;
 public class CorpSuiteAuthServiceTest extends BaseTestCase {
     @Resource
     private CorpSuiteAuthService corpSuiteAuthService;
-
+    @Resource
+    private SuiteManageService suiteManageService;
     @Test
     public void test_saveOrUpdateCorpSuiteAuth() {
         CorpSuiteAuthVO corpSuiteAuthVO = new CorpSuiteAuthVO();
@@ -59,6 +61,19 @@ public class CorpSuiteAuthServiceTest extends BaseTestCase {
         ServiceResult<CorpSuiteCallBackVO> sr = corpSuiteAuthService.getCorpCallback(suiteKey,corpid);
         System.out.println(JSON.toJSON(sr));
     }
+
+
+
+    @Test
+    public void test_getCorpInfo() {
+        String corpId = "ding4ed6d279061db5e7";//1069022
+        String suiteKey="suite4rkgtvvhr1neumx2";//16001
+        String suiteToken = suiteManageService.getSuiteToken(suiteKey).getResult().getSuiteToken();
+        ServiceResult<Void> sr = corpSuiteAuthService.getCorpInfo(suiteToken,suiteKey,corpId,"");
+        System.err.println(JSON.toJSON(sr));
+    }
+
+
 
 
 

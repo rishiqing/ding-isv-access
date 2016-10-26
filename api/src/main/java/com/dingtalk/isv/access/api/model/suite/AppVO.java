@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 微应用VO
  * Created by mint on 16-1-21.
  */
 public class AppVO implements Serializable {

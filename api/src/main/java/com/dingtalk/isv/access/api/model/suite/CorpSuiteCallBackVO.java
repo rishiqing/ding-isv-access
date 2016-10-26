@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 企业对套件授权信息
+ * 注册监听企业发生变更的回调信息模型
  * Created by 浩倡 on 16-1-17.
  */
 public class CorpSuiteCallBackVO {

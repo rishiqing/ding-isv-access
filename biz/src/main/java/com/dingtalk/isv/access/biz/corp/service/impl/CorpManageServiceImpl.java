@@ -1,29 +1,24 @@
 package com.dingtalk.isv.access.biz.corp.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
-import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
-import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
-import com.dingtalk.isv.access.api.model.corp.CorpVO;
+import com.dingtalk.isv.access.api.model.corp.*;
+import com.dingtalk.isv.access.api.model.corp.callback.CorpChannelAppVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTokenVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
-import com.dingtalk.isv.access.biz.corp.dao.CorpDao;
-import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
-import com.dingtalk.isv.access.biz.corp.dao.CorpTokenDao;
-import com.dingtalk.isv.access.biz.corp.model.CorpDO;
-import com.dingtalk.isv.access.biz.corp.model.CorpJSAPITicketDO;
-import com.dingtalk.isv.access.biz.corp.model.CorpTokenDO;
-import com.dingtalk.isv.access.biz.corp.model.helper.CorpConverter;
-import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
-import com.dingtalk.isv.access.biz.corp.model.helper.CorpTokenConverter;
+import com.dingtalk.isv.access.biz.corp.dao.*;
+import com.dingtalk.isv.access.biz.corp.model.*;
+import com.dingtalk.isv.access.biz.corp.model.helper.*;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
 import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
+import com.dingtalk.isv.access.biz.suite.dao.CorpChannelAppDao;
 import com.dingtalk.isv.access.biz.suite.model.CorpAppDO;
+import com.dingtalk.isv.access.biz.suite.model.CorpChannelAppDO;
 import com.dingtalk.isv.access.biz.suite.model.helper.CorpAppConverter;
+import com.dingtalk.isv.access.biz.suite.model.helper.CorpChannelAppConverter;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -47,10 +42,11 @@ public class CorpManageServiceImpl implements CorpManageService {
     @Autowired
     private CorpTokenDao corpTokenDao;
     @Autowired
+    private CorpChannelTokenDao corpChannelTokenDao;
+    @Autowired
     private CorpJSAPITicketDao corpJSAPITicketDao;
     @Autowired
     private CorpAppDao corpAppDao;
-
     @Autowired
     private SuiteManageService suiteManageService;
     @Autowired
@@ -61,7 +57,10 @@ public class CorpManageServiceImpl implements CorpManageService {
     private CrmOapiRequestHelper crmOapiRequestHelper;
     @Autowired
     private ConfOapiRequestHelper confOapiRequestHelper;
-
+    @Autowired
+    private CorpChannelJSAPITicketDao corpChannelJSAPITicketDao;
+    @Autowired
+    private CorpChannelAppDao corpChannelAppDao;
     @Override
     public ServiceResult<Void> saveOrUpdateCorp(CorpVO corpVO) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -182,6 +181,31 @@ public class CorpManageServiceImpl implements CorpManageService {
         }
     }
 
+
+    @Override
+    public ServiceResult<CorpTokenVO> deleteCorpChannelToken(String suiteKey, String corpId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try{
+            corpChannelTokenDao.deleteCorpChannelToken(suiteKey,corpId);
+            return ServiceResult.success(null);
+        }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
     private ServiceResult<Void> saveOrUpdateCorpJSTicket(CorpJSAPITicketVO corpJSTicketVO) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpJSTicketVO", JSON.toJSONString(corpJSTicketVO))
@@ -242,6 +266,43 @@ public class CorpManageServiceImpl implements CorpManageService {
 
 
     @Override
+    public ServiceResult<CorpChannelJSAPITicketVO> getCorpChannelJSAPITicket(String suiteKey, String corpId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            CorpChannelJSAPITicketDO corpChannelJSAPITicketDO = corpChannelJSAPITicketDao.getCorpChannelJSAPITicket(suiteKey, corpId);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.MINUTE, 10);//为了防止误差,提前10分钟更新jsticket
+            if (null == corpChannelJSAPITicketDO || calendar.getTime().compareTo(corpChannelJSAPITicketDO.getExpiredTime()) != -1) {
+                ServiceResult<CorpChannelTokenVO> corpChannelTokenVoSr = this.getCorpChannelToken(suiteKey, corpId);
+                ServiceResult<CorpChannelJSAPITicketVO> channelJsAPITicketSr = confOapiRequestHelper.getChannelJsapiTicket(suiteKey, corpId, corpChannelTokenVoSr.getResult().getCorpChannelToken());
+                bizLogger.info(LogFormatter.getKVLogData(null,
+                        LogFormatter.KeyValue.getNew("channelJsAPITicketSr", JSON.toJSONString(channelJsAPITicketSr))
+                ));
+                corpChannelJSAPITicketDO = CorpChannelJSAPITicketConverter.corpChannelJSAPITicketVO2CorpChannelJSAPITicketDO(channelJsAPITicketSr.getResult());
+            }
+            corpChannelJSAPITicketDao.saveOrUpdateCorpChannelJSAPITicket(corpChannelJSAPITicketDO);
+            CorpChannelJSAPITicketVO corpChannelJSAPITicketVO = CorpChannelJSAPITicketConverter.corpChannelJSAPITicketDO2CorpChannelJSAPITicketVO(corpChannelJSAPITicketDO);
+            return ServiceResult.success(corpChannelJSAPITicketVO);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    @Override
     public ServiceResult<CorpAppVO> getCorpApp(String corpId, Long appId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpId", corpId),
@@ -254,6 +315,74 @@ public class CorpManageServiceImpl implements CorpManageService {
             }
             CorpAppVO corpAppVO = CorpAppConverter.corpAppDO2CorpAppVO(corpAppDO);
             return ServiceResult.success(corpAppVO);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("appId", appId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("appId", appId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+
+    @Override
+    public ServiceResult<CorpChannelTokenVO> getCorpChannelToken(String suiteKey, String corpId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            CorpChannelTokenDO corpChannelTokenDO = corpChannelTokenDao.getCorpChannelToken(suiteKey, corpId);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.MINUTE, 10);//为了防止误差,提前10分钟更新corptoken
+            if (null == corpChannelTokenDO || calendar.getTime().compareTo(corpChannelTokenDO.getExpiredTime()) != -1) {
+                ServiceResult<SuiteTokenVO> suiteTokenVOSr = suiteManageService.getSuiteToken(suiteKey);
+                String suiteToken = suiteTokenVOSr.getResult().getSuiteToken();
+                ServiceResult<CorpSuiteAuthVO> authSr = corpSuiteAuthService.getCorpSuiteAuth(corpId, suiteKey);
+                String chPermanentCode = authSr.getResult().getChPermanentCode();
+                ServiceResult<CorpChannelTokenVO> sr = confOapiRequestHelper.getCorpChannelToken(suiteKey, corpId, chPermanentCode, suiteToken);
+                corpChannelTokenDO = CorpChannelTokenConverter.corpChTokenVO2CorpChTokenDO(sr.getResult());
+                corpChannelTokenDao.saveOrUpdateCorpChannelToken(corpChannelTokenDO);
+                corpChannelTokenDO = corpChannelTokenDao.getCorpChannelToken(suiteKey,corpId);
+            }
+            CorpChannelTokenVO corpChannelTokenVO = CorpChannelTokenConverter.corpChTokenDO2CorpChTokenVO(corpChannelTokenDO);
+            return ServiceResult.success(corpChannelTokenVO);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+
+    @Override
+    public ServiceResult<CorpChannelAppVO> getCorpChannelApp(String corpId, Long appId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("appId", appId)
+        ));
+        try {
+            CorpChannelAppDO corpChannelAppDO = corpChannelAppDao.getCorpChannelApp(corpId, appId);
+            if (null == corpChannelAppDO) {
+                return ServiceResult.success(null);
+            }
+            CorpChannelAppVO corpChannelAppVO = CorpChannelAppConverter.corpChannelAppDO2CorpChannelAppVO(corpChannelAppDO);
+            return ServiceResult.success(corpChannelAppVO);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常" + e.toString(),

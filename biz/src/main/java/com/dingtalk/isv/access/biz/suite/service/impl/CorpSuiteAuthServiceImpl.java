@@ -3,8 +3,10 @@ package com.dingtalk.isv.access.biz.suite.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
+import com.dingtalk.isv.access.api.model.corp.CorpAuthInfoVO;
 import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
 import com.dingtalk.isv.access.api.model.corp.CorpVO;
+import com.dingtalk.isv.access.api.model.corp.callback.CorpChannelAppVO;
 import com.dingtalk.isv.access.api.model.event.AuthChangeEvent;
 import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
 import com.dingtalk.isv.access.api.model.event.mq.CorpAuthSuiteMessage;
@@ -18,21 +20,14 @@ import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
-import com.dingtalk.isv.access.biz.suite.dao.AppDao;
-import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
-import com.dingtalk.isv.access.biz.suite.dao.CorpSuiteAuthDao;
-import com.dingtalk.isv.access.biz.suite.dao.CorpSuiteAuthFaileDao;
-import com.dingtalk.isv.access.biz.suite.model.AppDO;
-import com.dingtalk.isv.access.biz.suite.model.CorpAppDO;
-import com.dingtalk.isv.access.biz.suite.model.CorpSuiteAuthDO;
+import com.dingtalk.isv.access.biz.suite.dao.*;
+import com.dingtalk.isv.access.biz.suite.model.*;
 import com.dingtalk.isv.access.biz.suite.model.helper.CorpAppConverter;
+import com.dingtalk.isv.access.biz.suite.model.helper.CorpChannelAppConverter;
 import com.dingtalk.isv.access.biz.suite.model.helper.CorpSuiteAuthConverter;
-
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
-import com.dingtalk.open.client.api.model.isv.CorpAuthInfo;
-import com.dingtalk.open.client.api.model.isv.CorpAuthSuiteCode;
 import com.dingtalk.open.client.api.service.isv.IsvService;
 import com.dingtalk.open.client.common.ServiceException;
 import com.google.common.collect.Lists;
@@ -80,6 +75,10 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     private Queue orgAuthSuiteQueue;
     @Autowired
     private ConfOapiRequestHelper confOapiRequestHelper;
+    @Autowired
+    private CorpChannelAppDao corpChannelAppDao;
+    @Autowired
+    private ChannelDao channelDao;
     @Override
     public ServiceResult<CorpSuiteAuthVO> getCorpSuiteAuth(String corpId, String suiteKey) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -170,6 +169,17 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
         return ServiceResult.success(null);
     }
 
+
+    @Override
+    public ServiceResult<Void> saveOrUpdateCorpChannelApp(CorpChannelAppVO corpChannelAppVO) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpChannelAppVO", JSON.toJSONString(corpChannelAppVO))
+        ));
+        CorpChannelAppDO corpChannelAppDO = CorpChannelAppConverter.corpChannelAppVO2CorpChannelAppDO(corpChannelAppVO);
+        corpChannelAppDao.saveOrUpdateCorpChannelApp(corpChannelAppDO);
+        return ServiceResult.success(null);
+    }
+
     @Override
     public ServiceResult<CorpAppVO> getCorpApp(String corpId, Long appId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -203,7 +213,7 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             ));
             ServiceResult<SuiteTokenVO> suiteTokenSr = suiteManageService.getSuiteToken(suiteKey);
             String suiteToken = suiteTokenSr.getResult().getSuiteToken();
-            ServiceResult<CorpSuiteAuthVO> sr = confOapiRequestHelper.getPermanentCode(suiteKey,suiteToken,tmpAuthCode);
+            ServiceResult<CorpSuiteAuthVO> sr = confOapiRequestHelper.getPermanentCode(suiteKey,tmpAuthCode,suiteToken);
             CorpSuiteAuthVO corpSuiteAuthVO = sr.getResult();
             ServiceResult<Void> saveAuthSr = this.saveOrUpdateCorpSuiteAuth(corpSuiteAuthVO);
             if (!saveAuthSr.isSuccess()) {
@@ -216,7 +226,7 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 ));
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            //异步逻辑
+            //异步逻辑,加速套件开通时间.
             CorpAuthSuiteEvent corpAuthSuiteEvent = new CorpAuthSuiteEvent();
             corpAuthSuiteEvent.setSuiteKey(suiteKey);
             corpAuthSuiteEvent.setSuiteToken(suiteToken);
@@ -288,7 +298,6 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             ));
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
         }
-
     }
 
     @Override
@@ -299,20 +308,23 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("permanentCode", permanentCode)
             ));
-            CorpAuthInfo corpAuthInfo = isvService.getAuthInfo(suiteToken, suiteKey, corpId, permanentCode);
+            //1.同步企业信息
+            ServiceResult<CorpAuthInfoVO> sr = confOapiRequestHelper.getAuthInfo(suiteKey,corpId,suiteToken);
+            CorpAuthInfoVO corpAuthInfoVO = sr.getResult();
             CorpVO corpVO = new CorpVO();
             corpVO.setCorpId(corpId);
-            corpVO.setCorpLogoUrl(corpAuthInfo.getAuth_corp_info().getCorp_logo_url());
-            corpVO.setCorpName(corpAuthInfo.getAuth_corp_info().getCorp_name());
-            corpVO.setIndustry(corpAuthInfo.getAuth_corp_info().getIndustry());
-            corpVO.setInviteCode(corpAuthInfo.getAuth_corp_info().getInvite_code());
-            corpVO.setInviteUrl(corpAuthInfo.getAuth_corp_info().getInvite_url());
+            corpVO.setCorpLogoUrl(corpAuthInfoVO.getAuth_corp_info().getCorp_logo_url());
+            corpVO.setCorpName(corpAuthInfoVO.getAuth_corp_info().getCorp_name());
+            corpVO.setIndustry(corpAuthInfoVO.getAuth_corp_info().getIndustry());
+            corpVO.setInviteCode(corpAuthInfoVO.getAuth_corp_info().getInvite_code());
+            corpVO.setInviteUrl(corpAuthInfoVO.getAuth_corp_info().getInvite_url());
             ServiceResult<Void> addCorpSr = corpManageService.saveOrUpdateCorp(corpVO);
             if(!addCorpSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            List<CorpAuthInfo.Agent> agentList = corpAuthInfo.getAuth_info().getAgent();
-            for (CorpAuthInfo.Agent agent : agentList) {
+            //2.同步企业下的微应用信息
+            List<CorpAuthInfoVO.Agent> agentList = corpAuthInfoVO.getAuth_info().getAgent();
+            for (CorpAuthInfoVO.Agent agent : agentList) {
                 CorpAppVO corpAppVO = new CorpAppVO();
                 corpAppVO.setCorpId(corpId);
                 corpAppVO.setAgentId(agent.getAgentid());
@@ -320,6 +332,17 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 corpAppVO.setLogoUrl(agent.getLogo_url());
                 corpAppVO.setAppId(agent.getAppid());
                 this.saveOrUpdateCorpApp(corpAppVO);
+            }
+            //3.同步企业下的服务窗信息
+            List<CorpAuthInfoVO.ChannelAgent> channelAgentList = corpAuthInfoVO.getChannel_auth_info().getChannelAgent();
+            for (CorpAuthInfoVO.ChannelAgent agent : channelAgentList) {
+                CorpChannelAppVO corpChannelAppVO = new CorpChannelAppVO();
+                corpChannelAppVO.setCorpId(corpId);
+                corpChannelAppVO.setAgentId(agent.getAgentid());
+                corpChannelAppVO.setAgentName(agent.getAgent_name());
+                corpChannelAppVO.setLogoUrl(agent.getLogo_url());
+                corpChannelAppVO.setAppId(agent.getAppid());
+                this.saveOrUpdateCorpChannelApp(corpChannelAppVO);
             }
             return ServiceResult.success(null);
         } catch (Exception e) {
@@ -377,19 +400,22 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", corpId)
         ));
-        //ServiceResult<CorpTokenVO> corpTokenSr = corpManageService.getCorpToken(suiteKey, corpId);
-        //删除企业回调,因为解除授权了,所以这个回调用的token已经不可以使用了
-        //crmOapiRequestHelper.deleteCorpSuiteCallback(suiteKey,corpId,corpTokenSr.getResult().getCorpToken());
-
+        //1.删除掉企业对套件的授权信息
         ServiceResult<Void> deleteAuthSr = this.deleteCorpSuiteAuth(corpId, suiteKey);
+        //2.删除掉企业使用的微应用
         List<AppDO> appList = appDao.getAppBySuiteKey(suiteKey);
         for (AppDO appDO : appList) {
-            //TODO
-            ServiceResult<Void> deleteCorpAppSr = this.deleteCorpApp(corpId, appDO.getAppId());
+            corpAppDao.deleteCorpApp(corpId, appDO.getAppId());
         }
-        //删除企业token
+        //3.删除掉企业开通的服务窗应用
+        List<ChannelDO> channelList = channelDao.getAppBySuiteKey(suiteKey);
+        for (ChannelDO channelDO : channelList) {
+            channelDao.deleteCorpApp(corpId,channelDO.getAppId());
+        }
+        //4.删除企业token.这个必须删除,一旦出现解除授权立即授权的情况,之前的token是不可用的
         corpManageService.deleteCorpToken(suiteKey, corpId);
-
+        //5.删除企业的服务窗token.这个必须删除,一旦出现解除授权立即授权的情况,之前的token是不可用的
+        corpManageService.deleteCorpChannelToken(suiteKey, corpId);
         return ServiceResult.success(null);
     }
 

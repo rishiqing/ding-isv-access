@@ -1,7 +1,10 @@
 package com.dingtalk.isv.access.biz.service.corp;
 
 import com.alibaba.fastjson.JSON;
+import com.dingtalk.isv.access.api.model.corp.CorpChannelJSAPITicketVO;
+import com.dingtalk.isv.access.api.model.corp.CorpChannelTokenVO;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
+import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.biz.base.BaseTestCase;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -21,11 +24,9 @@ public class CorpManageServiceTest extends BaseTestCase {
     public void test_getCorpToken() {
         String corpId="ding4ed6d279061db5e7";
         String suiteKey="suiteytzpzchcpug3xpsm";
-        corpManageService.getCorpToken(suiteKey,corpId);
+        ServiceResult<CorpTokenVO> sr = corpManageService.getCorpToken(suiteKey,corpId);
+        System.out.println(JSON.toJSON(sr));
 
-        //ServiceResult<List<SuiteVO>> sr = corpManageService.getCorpToken()
-        //System.out.println(JSON.toJSON(sr));
-        //Assert.isTrue(null!=sr.getResult());
     }
 
     @Test
@@ -40,15 +41,22 @@ public class CorpManageServiceTest extends BaseTestCase {
 
 
     @Test
-    public void test_getCorpJSAPITicket11() {
-//        Long startTime =System.currentTimeMillis();
-//        String corpId="ding4ed6d279061db5e7";
-//        String suiteKey="suiteytzpzchcpug3xpsm";
-//        ServiceResult<CorpJSAPITicketVO> sr = corpManageService.getCorpAppList()
-//        System.err.println(JSON.toJSONString(sr));
-//        System.err.println("rt:"+(System.currentTimeMillis()-startTime));
+    public void test_getCorpChannelToken() {
+        String corpId = "ding4ed6d279061db5e7";//1069022
+        String suiteKey="suite4rkgtvvhr1neumx2";//16001
+        ServiceResult<CorpChannelTokenVO> sr = corpManageService.getCorpChannelToken(suiteKey,corpId);
+        System.err.println(JSON.toJSONString(sr));
     }
 
+
+
+    @Test
+    public void test_getCorpChannelJSAPITicket() {
+        String corpId = "ding4ed6d279061db5e7";//1069022
+        String suiteKey="suite4rkgtvvhr1neumx2";//16001
+        ServiceResult<CorpChannelJSAPITicketVO> sr = corpManageService.getCorpChannelJSAPITicket(suiteKey,corpId);
+        System.err.println(JSON.toJSONString(sr));
+    }
 
 
 
