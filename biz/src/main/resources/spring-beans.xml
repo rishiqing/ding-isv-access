@@ -44,6 +44,12 @@
     </bean>
 
 
+    <bean id="isvRequestHelper" class="com.dingtalk.isv.access.biz.dingutil.ISVRequestHelper">
+        <property name="oapiDomain" value="${oapi.environment}" />
+        <property name="httpRequestHelper" ref="httpRequestHelper"/>
+    </bean>
+
+
 
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
     <bean id="corpAuthSuiteEventListener" class="com.dingtalk.isv.access.biz.event.CorpAuthSuiteEventListener"/>
