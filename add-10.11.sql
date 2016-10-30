@@ -22,6 +22,18 @@ CREATE TABLE `isv_corp_suite_jsapi_channel_ticket` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='企业使用服务窗jsapi的js ticket表';
 
 
+CREATE TABLE `isv_corp_channel_app` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `agent_id` bigint(20) NOT NULL COMMENT '钉钉企业使用的服务窗应用ID',
+  `agent_name` varchar(128) NOT NULL COMMENT '钉钉企业使用的服务窗应用名称',
+  `logo_url` varchar(1024) DEFAULT NULL COMMENT '钉钉企业使用的服务窗应用图标',
+  `app_id` bigint(20) NOT NULL COMMENT '钉钉企业使用的服务窗应用原始ID',
+  `corp_id` varchar(128) NOT NULL COMMENT '使用微应用的企业ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `u_corp_app` (`corp_id`,`app_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COMMENT='企业服务窗应用信息表';
 
 ALTER TABLE `isv_corp_suite_auth`
 MODIFY COLUMN `permanent_code`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '临时授权码或永久授权码value' AFTER `suite_key`,
