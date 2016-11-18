@@ -33,3 +33,5 @@ web/.git/
 web/target/
 web/.settings/
 
+logs/
+

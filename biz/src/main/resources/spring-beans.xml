@@ -63,6 +63,7 @@
 
 
     <bean id="suiteManageService" class="com.dingtalk.isv.access.biz.suite.service.impl.SuiteManageServiceImpl"/>
+    <bean id="appManageService" class="com.dingtalk.isv.access.biz.suite.service.impl.AppManageServiceImpl"/>
     <bean id="corpSuiteAuthService" class="com.dingtalk.isv.access.biz.suite.service.impl.CorpSuiteAuthServiceImpl"/>
     <bean id="corpManageService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpManageServiceImpl"/>
     <bean id="staffManageService" class="com.dingtalk.isv.access.biz.corp.service.impl.StaffManageServiceImpl"/>
@@ -80,6 +81,7 @@
         <property name="beanNames">
             <list>
                 <value>suiteManageService</value>
+                <value>appManageService</value>
                 <value>corpSuiteAuthService</value>
                 <value>corpManageService</value>
                 <value>staffManageService</value>

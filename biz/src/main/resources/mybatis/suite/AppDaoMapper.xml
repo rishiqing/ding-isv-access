@@ -41,6 +41,13 @@
 		 ]]>
     </select>
 
+    <select id="getAppByAppId" resultMap="appMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_app
+        <![CDATA[
+			WHERE app_id=#{appId}
+		 ]]>
+    </select>
+
 
 
 </mapper>

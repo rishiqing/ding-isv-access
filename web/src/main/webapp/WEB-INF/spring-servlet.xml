@@ -51,6 +51,7 @@
         <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView"/>
     </bean>
 
+    <bean id="httpResult" class="com.dingtalk.isv.common.model.HttpResult" />
 
     <!---->
     <bean class="com.dingtalk.isv.access.web.interceptor.ControllorAOP" />

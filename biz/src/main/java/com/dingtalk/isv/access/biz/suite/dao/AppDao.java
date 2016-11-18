@@ -24,5 +24,13 @@ public interface AppDao {
 	public List<AppDO> getAppBySuiteKey(@Param("suiteKey") String suiteKey);
 
 
+    /**
+     * 根据appId查询为应用
+     * @param appId
+     * @return
+     */
+    public AppDO getAppByAppId(@Param("appId") Long appId);
+
+
 }
 
