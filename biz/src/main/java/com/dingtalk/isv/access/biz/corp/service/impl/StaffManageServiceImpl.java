@@ -6,6 +6,8 @@ import com.dingtalk.isv.access.api.model.corp.LoginUserVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
+import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
+import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.CorpOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
@@ -29,6 +31,8 @@ public class StaffManageServiceImpl implements StaffManageService {
     private static final Logger bizLogger = LoggerFactory.getLogger("STAFF_MANAGE_LOGGER");
     private static final Logger mainLogger = LoggerFactory.getLogger(StaffManageServiceImpl.class);
 
+    @Autowired
+    private CorpStaffDao corpStaffDao;
     @Autowired
     private CorpUserService corpUserService;
     @Autowired
@@ -104,16 +108,68 @@ public class StaffManageServiceImpl implements StaffManageService {
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
-                    "成宿异常" + e.toString(),
+                    "系统异常" + e.toString(),
                     LogFormatter.KeyValue.getNew("suitKey", suitKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("code", code)
             ), e);
             mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
-                    "成宿异常" + e.toString(),
+                    "系统异常" + e.toString(),
                     LogFormatter.KeyValue.getNew("suitKey", suitKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("code", code)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    @Override
+    public ServiceResult<Void> saveOrUpdateCorpStaff(StaffVO staffVO) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("staffVO", JSON.toJSONString(staffVO))
+        ));
+        try {
+            StaffDO staffDO = StaffConverter.staffVO2StaffDO(staffVO);
+            corpStaffDao.saveOrUpdateCorpStaff(staffDO);
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("staffVO", JSON.toJSONString(staffVO))
+
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("staffVO", JSON.toJSONString(staffVO))
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    @Override
+    public ServiceResult<StaffVO> getStaffByCorpIdAndUserId(String corpId, String userId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("userId", userId)
+        ));
+        try {
+
+            StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
+            if (null == staffDO) {
+                return ServiceResult.success(null);
+            }
+            StaffVO staffVO = StaffConverter.staffDO2StaffVO(staffDO);
+            return ServiceResult.success(staffVO);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("userId", userId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("userId", userId)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }

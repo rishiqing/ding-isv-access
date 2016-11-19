@@ -1,6 +1,7 @@
 package com.dingtalk.isv.access.api.model.corp;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,10 @@ import java.util.Map;
  * Created by mint on 16-1-22.
  */
 public class StaffVO implements Serializable {
+
+    private Date gmtCreate;
+    private Date gmtModified;
+
     private String corpId;
     private String staffId;
     private String name;
@@ -29,6 +34,25 @@ public class StaffVO implements Serializable {
     private String avatar;
     private String jobnumber;
     private Map<String, String> extattr;
+
+    private Boolean isSys;    //钉钉免登接口使用code换取用户信息时获取到的用户信息
+    private Integer sysLevel;  //钉钉免登接口使用code换取用户信息时获取到的用户信息
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public Date getGmtModified() {
+        return gmtModified;
+    }
+
+    public void setGmtModified(Date gmtModified) {
+        this.gmtModified = gmtModified;
+    }
 
     public String getCorpId() {
         return corpId;
@@ -196,5 +220,21 @@ public class StaffVO implements Serializable {
 
     public void setExtattr(Map<String, String> extattr) {
         this.extattr = extattr;
+    }
+
+    public Boolean getSys() {
+        return isSys;
+    }
+
+    public void setSys(Boolean sys) {
+        isSys = sys;
+    }
+
+    public Integer getSysLevel() {
+        return sysLevel;
+    }
+
+    public void setSysLevel(Integer sysLevel) {
+        this.sysLevel = sysLevel;
     }
 }

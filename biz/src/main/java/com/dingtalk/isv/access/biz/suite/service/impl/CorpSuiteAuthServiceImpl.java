@@ -287,7 +287,7 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             if(!saveCallBackSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            //5.发送mq到各个业务方,告知一个企业对讨价授权了,业务方自己去做对应的业务
+            //5.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
             jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);
         }catch (Exception e){

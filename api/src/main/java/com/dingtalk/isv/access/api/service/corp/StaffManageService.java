@@ -31,4 +31,19 @@ public interface StaffManageService {
      */
     ServiceResult<LoginUserVO> getStaffByAuthCode(String suitKey, String corpId, String code);
 
+    /**
+     * 保存或者更新公司成员信息到第三方授权服务器
+     * @param staffVO
+     * @return
+     */
+    public ServiceResult<Void> saveOrUpdateCorpStaff(StaffVO staffVO);
+
+    /**
+     * 根据corpId和userId从第三方授权服务器本地获取成员
+     * @param corpId
+     * @param userId
+     * @return
+     */
+    public ServiceResult<StaffVO> getStaffByCorpIdAndUserId(String corpId, String userId);
+
 }
