@@ -38,6 +38,11 @@ public class CorpDO {
      */
     private String corpLogoUrl;
 
+    /**
+     * 日事清id
+     */
+    private String rsqId;
+
     public Long getId() {
         return id;
     }
@@ -110,6 +115,14 @@ public class CorpDO {
         this.corpLogoUrl = corpLogoUrl;
     }
 
+    public String getRsqId() {
+        return rsqId;
+    }
+
+    public void setRsqId(String rsqId) {
+        this.rsqId = rsqId;
+    }
+
     @Override
     public String toString() {
         return "CorpDO{" +
@@ -122,6 +135,7 @@ public class CorpDO {
                 ", corpName='" + corpName + '\'' +
                 ", inviteUrl='" + inviteUrl + '\'' +
                 ", corpLogoUrl='" + corpLogoUrl + '\'' +
+                ", rsqId='" + rsqId + '\'' +
                 '}';
     }
 }

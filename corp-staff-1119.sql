@@ -27,3 +27,17 @@ CREATE TABLE `isv_corp_staff` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `u_corp_user` (`corp_id`,`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='isv存储的公司成员信息';
+
+ALTER TABLE `isv_corp_staff`
+  ADD COLUMN `rsq_user_id`  varchar(255) NULL COMMENT '日事清应用用户id',
+  ADD COLUMN `rsq_username`  varchar(255) NULL COMMENT '日事清应用登录用户名id',
+  ADD COLUMN `rsq_password`  varchar(255) NULL COMMENT '日事清应用登录用户密码';
+
+ALTER TABLE `isv_corp`
+  ADD COLUMN `rsq_id`  varchar(255) NULL COMMENT '日事清应用公司id';
+
+ALTER TABLE `isv_suite`
+  ADD COLUMN `rsq_app_name`  varchar(255) NULL COMMENT '日事清应用中显示的本app的名称',
+  ADD COLUMN `rsq_app_token`  varchar(255) NULL COMMENT '日事清应用授权的token，用来访问日事清token授权接口';
+
+

@@ -1,9 +1,14 @@
 package com.dingtalk.isv.access.biz.corp.model.helper;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffResult;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mint on 16-1-22.
@@ -55,19 +60,24 @@ public class StaffConverter {
         staffDO.setMobile(staffVO.getMobile());
         staffDO.setEmail(staffVO.getEmail());
         staffDO.setActive(staffVO.getActive());
-        staffDO.setOrderInDepts(staffVO.getOrderInDepts());
+
+        staffDO.setOrderInDepts(JSON.toJSONString(staffVO.getOrderInDepts()));
         staffDO.setAdmin(staffVO.getIsAdmin());
         staffDO.setBoss(staffVO.getIsBoss());
         staffDO.setDingId(staffVO.getDingId());
-        staffDO.setIsLeaderInDepts(staffVO.getIsLeaderInDepts());
+        staffDO.setIsLeaderInDepts(JSON.toJSONString(staffVO.getIsLeaderInDepts()));
         staffDO.setHide(staffVO.getIsHide());
-        staffDO.setDepartment(staffVO.getDepartment());
+        staffDO.setDepartment(JSON.toJSONString(staffVO.getDepartment()));
         staffDO.setPosition(staffVO.getPosition());
         staffDO.setAvatar(staffVO.getAvatar());
         staffDO.setJobnumber(staffVO.getJobnumber());
-        staffDO.setExtattr(staffVO.getExtattr());
+        staffDO.setExtattr(JSON.toJSONString(staffVO.getExtattr()));
         staffDO.setSys(staffVO.getSys());
         staffDO.setSysLevel(staffVO.getSysLevel());
+
+        staffDO.setRsqUserId(staffVO.getRsqUserId());
+        staffDO.setRsqUsername(staffVO.getRsqUsername());
+        staffDO.setRsqPassword(staffVO.getRsqPassword());
         return staffDO;
     }
     
@@ -87,19 +97,23 @@ public class StaffConverter {
         staffVO.setMobile(staffDO.getMobile());
         staffVO.setEmail(staffDO.getEmail());
         staffVO.setActive(staffDO.getActive());
-        staffVO.setOrderInDepts(staffDO.getOrderInDepts());
+        staffVO.setOrderInDepts((Map<Long, Long>)JSON.parse(staffDO.getOrderInDepts()));
         staffVO.setIsAdmin(staffDO.getAdmin());
         staffVO.setIsBoss(staffDO.getBoss());
         staffVO.setDingId(staffDO.getDingId());
-        staffVO.setIsLeaderInDepts(staffDO.getIsLeaderInDepts());
+        staffVO.setIsLeaderInDepts((Map<Long, Boolean>)JSON.parse(staffDO.getIsLeaderInDepts()));
         staffVO.setIsHide(staffDO.getHide());
-        staffVO.setDepartment(staffDO.getDepartment());
+        staffVO.setDepartment((List<Long>)JSON.parse(staffDO.getDepartment()));
         staffVO.setPosition(staffDO.getPosition());
         staffVO.setAvatar(staffDO.getAvatar());
         staffVO.setJobnumber(staffDO.getJobnumber());
-        staffVO.setExtattr(staffDO.getExtattr());
+        staffVO.setExtattr((Map<String, String>)JSON.parse(staffDO.getExtattr()));
         staffVO.setSys(staffDO.getSys());
         staffVO.setSysLevel(staffDO.getSysLevel());
+
+        staffVO.setRsqUserId(staffDO.getRsqUserId());
+        staffVO.setRsqUsername(staffDO.getRsqUsername());
+        staffVO.setRsqPassword(staffDO.getRsqPassword());
         return staffVO;
     }
 

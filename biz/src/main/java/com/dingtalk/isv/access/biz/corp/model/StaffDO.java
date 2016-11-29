@@ -20,20 +20,24 @@ public class StaffDO {
     private String mobile;
     private String email;
     private Boolean active;
-    private Map<Long, Long> orderInDepts;
+    private String orderInDepts;
     private Boolean isAdmin;
     private Boolean isBoss;
     private String dingId;
-    private Map<Long, Boolean> isLeaderInDepts;
+    private String isLeaderInDepts;
     private Boolean isHide;
-    private List<Long> department;
+    private String department;
     private String position;
     private String avatar;
     private String jobnumber;
-    private Map<String, String> extattr;
+    private String extattr;
 
     private Boolean isSys;    //钉钉免登接口使用code换取用户信息时获取到的用户信息
     private Integer sysLevel;  //钉钉免登接口使用code换取用户信息时获取到的用户信息
+
+    private String rsqUserId;  //日事清中的用户id
+    private String rsqUsername;  //日事清中的用户登录名
+    private String rsqPassword;  //日事清中的用户登录密码
 
     public Date getGmtCreate() {
         return gmtCreate;
@@ -123,14 +127,6 @@ public class StaffDO {
         this.active = active;
     }
 
-    public Map<Long, Long> getOrderInDepts() {
-        return orderInDepts;
-    }
-
-    public void setOrderInDepts(Map<Long, Long> orderInDepts) {
-        this.orderInDepts = orderInDepts;
-    }
-
     public Boolean getAdmin() {
         return isAdmin;
     }
@@ -155,28 +151,12 @@ public class StaffDO {
         this.dingId = dingId;
     }
 
-    public Map<Long, Boolean> getIsLeaderInDepts() {
-        return isLeaderInDepts;
-    }
-
-    public void setIsLeaderInDepts(Map<Long, Boolean> isLeaderInDepts) {
-        this.isLeaderInDepts = isLeaderInDepts;
-    }
-
     public Boolean getHide() {
         return isHide;
     }
 
     public void setHide(Boolean hide) {
         isHide = hide;
-    }
-
-    public List<Long> getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(List<Long> department) {
-        this.department = department;
     }
 
     public String getPosition() {
@@ -203,14 +183,6 @@ public class StaffDO {
         this.jobnumber = jobnumber;
     }
 
-    public Map<String, String> getExtattr() {
-        return extattr;
-    }
-
-    public void setExtattr(Map<String, String> extattr) {
-        this.extattr = extattr;
-    }
-
     public Boolean getSys() {
         return isSys;
     }
@@ -225,6 +197,62 @@ public class StaffDO {
 
     public void setSysLevel(Integer sysLevel) {
         this.sysLevel = sysLevel;
+    }
+
+    public String getOrderInDepts() {
+        return orderInDepts;
+    }
+
+    public void setOrderInDepts(String orderInDepts) {
+        this.orderInDepts = orderInDepts;
+    }
+
+    public String getIsLeaderInDepts() {
+        return isLeaderInDepts;
+    }
+
+    public void setIsLeaderInDepts(String isLeaderInDepts) {
+        this.isLeaderInDepts = isLeaderInDepts;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getExtattr() {
+        return extattr;
+    }
+
+    public void setExtattr(String extattr) {
+        this.extattr = extattr;
+    }
+
+    public String getRsqUserId() {
+        return rsqUserId;
+    }
+
+    public void setRsqUserId(String rsqUserId) {
+        this.rsqUserId = rsqUserId;
+    }
+
+    public String getRsqUsername() {
+        return rsqUsername;
+    }
+
+    public void setRsqUsername(String rsqUsername) {
+        this.rsqUsername = rsqUsername;
+    }
+
+    public String getRsqPassword() {
+        return rsqPassword;
+    }
+
+    public void setRsqPassword(String rsqPassword) {
+        this.rsqPassword = rsqPassword;
     }
 
     @Override

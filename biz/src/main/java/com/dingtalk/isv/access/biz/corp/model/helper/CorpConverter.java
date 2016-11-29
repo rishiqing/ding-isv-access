@@ -23,6 +23,7 @@ public class CorpConverter {
         corpVO.setCorpName(corpDO.getCorpName());
         corpVO.setCorpId(corpDO.getCorpId());
         corpVO.setCorpLogoUrl(corpDO.getCorpLogoUrl());
+        corpVO.setRsqId(corpDO.getRsqId());
         return corpVO;
     }
 
@@ -40,6 +41,7 @@ public class CorpConverter {
         corpDO.setCorpName(corpVO.getCorpName());
         corpDO.setCorpId(corpVO.getCorpId());
         corpDO.setCorpLogoUrl(corpVO.getCorpLogoUrl());
+        corpDO.setRsqId(corpVO.getRsqId());
         return corpDO;
     }
 }

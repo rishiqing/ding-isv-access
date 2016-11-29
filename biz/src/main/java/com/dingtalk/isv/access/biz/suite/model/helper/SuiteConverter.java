@@ -22,6 +22,8 @@ public class SuiteConverter {
        suiteVO.setEventReceiveUrl(suiteDO.getEventReceiveUrl());
        suiteVO.setGmtCreate(suiteDO.getGmtCreate());
        suiteVO.setGmtModified(suiteDO.getGmtModified());
+       suiteVO.setRsqAppName(suiteDO.getRsqAppName());
+       suiteVO.setRsqAppToken(suiteDO.getRsqAppToken());
        return suiteVO;
    }
 
@@ -39,6 +41,8 @@ public class SuiteConverter {
         suiteDO.setEventReceiveUrl(suiteVO.getEventReceiveUrl());
         suiteDO.setGmtCreate(suiteVO.getGmtCreate());
         suiteDO.setGmtModified(suiteVO.getGmtModified());
+        suiteDO.setRsqAppName(suiteVO.getRsqAppName());
+        suiteDO.setRsqAppToken(suiteVO.getRsqAppToken());
         return suiteDO;
     }
 }

@@ -54,6 +54,15 @@ public class SuiteVO implements Serializable{
      */
     private String eventReceiveUrl;
 
+    /**
+     * 与日事清交互需要使用的appName，钉钉应用固定为dingtalk
+     */
+    private String rsqAppName;
+    /**
+     * 与日事清交互需要使用的授权token
+     */
+    private String rsqAppToken;
+
     public Long getId() {
         return id;
     }
@@ -124,6 +133,22 @@ public class SuiteVO implements Serializable{
 
     public void setEventReceiveUrl(String eventReceiveUrl) {
         this.eventReceiveUrl = eventReceiveUrl;
+    }
+
+    public String getRsqAppName() {
+        return rsqAppName;
+    }
+
+    public void setRsqAppName(String rsqAppName) {
+        this.rsqAppName = rsqAppName;
+    }
+
+    public String getRsqAppToken() {
+        return rsqAppToken;
+    }
+
+    public void setRsqAppToken(String rsqAppToken) {
+        this.rsqAppToken = rsqAppToken;
     }
 
     @Override

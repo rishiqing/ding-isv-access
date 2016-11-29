@@ -208,6 +208,17 @@
         </layout>
     </appender>
 
+    <!-- rsq request log appender -->
+    <appender name="RSQ_REQUEST_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="E:\\workspace\\idea_space\\ding-isv-access\\logs\\biz\\rsq_request.log" />
+        <param name="append" value="true" />
+        <param name="encoding" value="UTF-8" />
+        <param name="threshold" value="INFO" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
+
 
 
 
@@ -308,6 +319,12 @@
     <logger name="JSAPI_LOGGER" additivity="false">
         <level value="INFO" />
         <appender-ref ref="JSAPI_LOGGER_APPENDER" />
+    </logger>
+
+    <!--rsq request logger-->
+    <logger name="RSQ_REQUEST_LOGGER" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="RSQ_REQUEST_LOGGER_APPENDER" />
     </logger>
 
 

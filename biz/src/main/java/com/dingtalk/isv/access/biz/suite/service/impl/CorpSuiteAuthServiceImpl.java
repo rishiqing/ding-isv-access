@@ -28,6 +28,7 @@ import com.dingtalk.isv.access.biz.suite.model.helper.CorpSuiteAuthConverter;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.rsq.biz.service.RsqAccountService;
 import com.dingtalk.open.client.api.service.isv.IsvService;
 import com.dingtalk.open.client.common.ServiceException;
 import com.google.common.collect.Lists;
@@ -79,6 +80,10 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     private CorpChannelAppDao corpChannelAppDao;
     @Autowired
     private ChannelDao channelDao;
+
+    @Autowired
+    private RsqAccountService rsqAccountService;
+
     @Override
     public ServiceResult<CorpSuiteAuthVO> getCorpSuiteAuth(String corpId, String suiteKey) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -282,11 +287,18 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             if(!getCorpInfoSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            //4.注册或者更新回调
+            //4.注册或者更新回调，在通讯录或者群会话发生变更时会调用此接口
             ServiceResult<Void> saveCallBackSr = this.saveCorpCallback(suiteKey, corpId, (accessSystemConfig.getCorpSuiteCallBackUrl() + suiteKey), SuiteCallBackMessage.Tag.getAllTag());
             if(!saveCallBackSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
+
+            //  4.1  跟日事清服务器交互，创建日事清公司
+            ServiceResult<CorpVO> corpSr = rsqAccountService.createRsqTeam(suiteKey, corpId);
+            if(!corpSr.isSuccess()){
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+
             //5.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
             jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);

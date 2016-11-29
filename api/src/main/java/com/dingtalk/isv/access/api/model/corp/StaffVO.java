@@ -38,6 +38,10 @@ public class StaffVO implements Serializable {
     private Boolean isSys;    //钉钉免登接口使用code换取用户信息时获取到的用户信息
     private Integer sysLevel;  //钉钉免登接口使用code换取用户信息时获取到的用户信息
 
+    private String rsqUserId;  //日事清中的用户id
+    private String rsqUsername;  //日事清中的用户登录名
+    private String rsqPassword;  //日事清中的用户登录密码
+
     public Date getGmtCreate() {
         return gmtCreate;
     }
@@ -236,5 +240,29 @@ public class StaffVO implements Serializable {
 
     public void setSysLevel(Integer sysLevel) {
         this.sysLevel = sysLevel;
+    }
+
+    public String getRsqUserId() {
+        return rsqUserId;
+    }
+
+    public void setRsqUserId(String rsqUserId) {
+        this.rsqUserId = rsqUserId;
+    }
+
+    public String getRsqUsername() {
+        return rsqUsername;
+    }
+
+    public void setRsqUsername(String rsqUsername) {
+        this.rsqUsername = rsqUsername;
+    }
+
+    public String getRsqPassword() {
+        return rsqPassword;
+    }
+
+    public void setRsqPassword(String rsqPassword) {
+        this.rsqPassword = rsqPassword;
     }
 }

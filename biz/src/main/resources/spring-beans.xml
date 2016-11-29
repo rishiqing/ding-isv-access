@@ -49,6 +49,12 @@
         <property name="httpRequestHelper" ref="httpRequestHelper"/>
     </bean>
 
+    <!--发送日事清相关的request的helper-->
+    <bean id="rsqRequestHelper" class="com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper">
+        <property name="rsqDomain" value="${rsqapi.environment}" />
+        <property name="httpRequestHelper" ref="httpRequestHelper"/>
+    </bean>
+
 
 
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
@@ -74,6 +80,8 @@
     <bean id="channelManageService" class="com.dingtalk.isv.access.biz.corp.service.impl.ChannelManageServiceImpl"/>
     <bean id="orgManangerService" class="com.dingtalk.isv.access.biz.org.service.impl.OrgManangerServiceImpl"/>
 
+    <bean id="rsqAccountService" class="com.dingtalk.isv.rsq.biz.service.RsqAccountService"/>
+
 
     <!-- LOG -->
     <bean id="serviceMethodInterceptor" class="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor"></bean>
@@ -92,6 +100,7 @@
                 <value>reportManageService</value>
                 <value>channelManageService</value>
                 <value>orgManangerService</value>
+                <value>rsqAccountService</value>
             </list>
         </property>
         <property name="interceptorNames">

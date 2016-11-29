@@ -12,6 +12,7 @@
         <result property="corpName" column="corp_name" />
         <result property="inviteUrl" column="invite_url" />
         <result property="corpLogoUrl" column="corp_logo_url" />
+        <result property="rsqId" column="rsq_id" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -35,7 +36,8 @@
                 industry,
                 corp_name,
                 invite_url,
-                corp_logo_url
+                corp_logo_url,
+                rsq_id
         )values(
                 now(),
                 now(),
@@ -44,8 +46,9 @@
                 #{industry},
                 #{corpName},
                 #{inviteUrl},
-                #{corpLogoUrl}
-        )ON DUPLICATE KEY UPDATE gmt_modified=now(),invite_code=#{inviteCode},industry=#{industry},corp_name=#{corpName},invite_url=#{inviteUrl},corp_logo_url=#{corpLogoUrl}
+                #{corpLogoUrl},
+                #{rsqId}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now(),invite_code=#{inviteCode},industry=#{industry},corp_name=#{corpName},invite_url=#{inviteUrl},corp_logo_url=#{corpLogoUrl}, rsq_id=#{rsqId}
     </insert>
 
 

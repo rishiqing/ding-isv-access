@@ -12,6 +12,8 @@
         <result property="encodingAesKey" column="encoding_aes_key" />
         <result property="token" column="token" />
         <result property="eventReceiveUrl" column="event_receive_url" />
+        <result property="rsqAppName" column="rsq_app_name" />
+        <result property="rsqAppToken" column="rsq_app_token" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -23,7 +25,9 @@
         suite_secret,
         encoding_aes_key,
         token,
-        event_receive_url
+        event_receive_url,
+        rsq_app_name,
+        rsq_app_token
     </sql>
 
     <insert id="addSuite" useGeneratedKeys="true" keyProperty="id">
@@ -35,7 +39,9 @@
                 suite_secret,
                 encoding_aes_key,
                 token,
-                event_receive_url
+                event_receive_url,
+                rsq_app_name,
+                rsq_app_token
         )values(
                 now(),
                 now(),
@@ -44,7 +50,9 @@
                 #{suiteSecret},
                 #{encodingAesKey},
                 #{token},
-                #{eventReceiveUrl}
+                #{eventReceiveUrl},
+                #{rsqAppName},
+                #{rsqAppToken}
         )
     </insert>
 

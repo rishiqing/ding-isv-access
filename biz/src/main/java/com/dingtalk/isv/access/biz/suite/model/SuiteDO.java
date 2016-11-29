@@ -53,6 +53,15 @@ public class SuiteDO {
     private String eventReceiveUrl;
 
     /**
+     * 与日事清交互需要使用的appName，钉钉应用固定为dingtalk
+     */
+    private String rsqAppName;
+    /**
+     * 与日事清交互需要使用的授权token
+     */
+    private String rsqAppToken;
+
+    /**
      * setter for column 主键
      */
     public void setId(Long id) {
@@ -176,6 +185,22 @@ public class SuiteDO {
      */
     public String getEventReceiveUrl() {
         return this.eventReceiveUrl;
+    }
+
+    public String getRsqAppName() {
+        return rsqAppName;
+    }
+
+    public void setRsqAppName(String rsqAppName) {
+        this.rsqAppName = rsqAppName;
+    }
+
+    public String getRsqAppToken() {
+        return rsqAppToken;
+    }
+
+    public void setRsqAppToken(String rsqAppToken) {
+        this.rsqAppToken = rsqAppToken;
     }
 
     @Override
