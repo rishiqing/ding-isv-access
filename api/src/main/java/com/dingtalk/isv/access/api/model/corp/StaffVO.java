@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class StaffVO implements Serializable {
 
+    private Long id;
     private Date gmtCreate;
     private Date gmtModified;
 
@@ -41,6 +42,46 @@ public class StaffVO implements Serializable {
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
+
+    public Boolean getSuper() {
+        return isSuper;
+    }
+
+    public void setSuper(Boolean aSuper) {
+        isSuper = aSuper;
+    }
+
+    public Boolean getBoss() {
+        return isBoss;
+    }
+
+    public void setBoss(Boolean boss) {
+        isBoss = boss;
+    }
+
+    public Boolean getHide() {
+        return isHide;
+    }
+
+    public void setHide(Boolean hide) {
+        isHide = hide;
+    }
 
     public Date getGmtCreate() {
         return gmtCreate;
@@ -264,5 +305,33 @@ public class StaffVO implements Serializable {
 
     public void setRsqPassword(String rsqPassword) {
         this.rsqPassword = rsqPassword;
+    }
+
+    @Override
+    public String toString() {
+        return "StaffDO{" +
+                "corpId='" + corpId + '\'' +
+                ", userId='" + staffId + '\'' +
+                ", name='" + name + '\'' +
+                ", tel='" + tel + '\'' +
+                ", workPlace='" + workPlace + '\'' +
+                ", remark='" + remark + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", email='" + email + '\'' +
+                ", active=" + active +
+                ", orderInDepts=" + orderInDepts +
+                ", isAdmin=" + isAdmin +
+                ", isBoss=" + isBoss +
+                ", dingId='" + dingId + '\'' +
+                ", isLeaderInDepts=" + isLeaderInDepts +
+                ", isHide=" + isHide +
+                ", department=" + department +
+                ", position='" + position + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", jobnumber='" + jobnumber + '\'' +
+                ", extattr=" + extattr +
+                ", rsqUserId=" + rsqUserId +
+                ", rsqUsername=" + rsqUsername +
+                '}';
     }
 }

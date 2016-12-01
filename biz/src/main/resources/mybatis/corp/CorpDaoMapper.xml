@@ -24,7 +24,8 @@
             industry,
             corp_name,
             invite_url,
-            corp_logo_url
+            corp_logo_url,
+            rsq_id
     </sql>
 
     <insert id="saveOrUpdateCorp" useGeneratedKeys="true" keyProperty="id">
@@ -36,8 +37,7 @@
                 industry,
                 corp_name,
                 invite_url,
-                corp_logo_url,
-                rsq_id
+                corp_logo_url
         )values(
                 now(),
                 now(),
@@ -46,11 +46,13 @@
                 #{industry},
                 #{corpName},
                 #{inviteUrl},
-                #{corpLogoUrl},
-                #{rsqId}
-        )ON DUPLICATE KEY UPDATE gmt_modified=now(),invite_code=#{inviteCode},industry=#{industry},corp_name=#{corpName},invite_url=#{inviteUrl},corp_logo_url=#{corpLogoUrl}, rsq_id=#{rsqId}
+                #{corpLogoUrl}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now(),invite_code=#{inviteCode},industry=#{industry},corp_name=#{corpName},invite_url=#{inviteUrl},corp_logo_url=#{corpLogoUrl}
     </insert>
 
+    <update id="updateRsqInfo">
+        update isv_corp set rsq_id=#{rsqId} where corp_id=#{corpId}
+    </update>
 
 
     <select id="getCorpByCorpId" resultMap="corpMap">

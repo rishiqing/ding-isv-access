@@ -23,6 +23,9 @@ public class StaffResult {
     private String jobnumber;
     private Map<String, String> extattr;
 
+    private String rsqUsername;
+    private String rsqPassword;
+
     public String getCorpId() {
         return corpId;
     }
@@ -133,6 +136,22 @@ public class StaffResult {
 
     public void setExtattr(Map<String, String> extattr) {
         this.extattr = extattr;
+    }
+
+    public String getRsqUsername() {
+        return rsqUsername;
+    }
+
+    public void setRsqUsername(String rsqUsername) {
+        this.rsqUsername = rsqUsername;
+    }
+
+    public String getRsqPassword() {
+        return rsqPassword;
+    }
+
+    public void setRsqPassword(String rsqPassword) {
+        this.rsqPassword = rsqPassword;
     }
 
     @Override

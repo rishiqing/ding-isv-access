@@ -19,6 +19,7 @@ import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.rsq.biz.exceptions.RsqIntegrationException;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqCorp;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
@@ -55,6 +56,8 @@ public class RsqAccountService {
      * 1  根据corpId查询是否有记录，是否rsqId存在，如果rsqId存在，则直接返回rsqId
      * 2  如果记录不存在或者rsqId不存在，则发送到日事清服务器请求创建
      * 3  保存返回结果
+     * @param suiteKey
+     * @param corpId
      * @return
      */
     public ServiceResult<CorpVO> createRsqTeam(String suiteKey, String corpId){
@@ -76,7 +79,7 @@ public class RsqAccountService {
 
             corpDO.setRsqId(String.valueOf(rsqCorpSr.getResult().getId()));
 
-            corpDao.saveOrUpdateCorp(corpDO);
+            corpDao.updateRsqInfo(corpDO);
 
             CorpVO corpVO = CorpConverter.CorpDO2CorpVO(corpDO);
 
@@ -100,14 +103,14 @@ public class RsqAccountService {
      * 创建公司员工
      * @param suiteKey
      * @param corpId
-     * @param code
+     * @param userId
      * @return
      */
-    public ServiceResult<StaffVO> createRsqTeamStaff(String suiteKey, String corpId, String userId,  String code) {
+    public ServiceResult<StaffVO> createRsqTeamStaff(String suiteKey, String corpId, String userId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", corpId),
-                LogFormatter.KeyValue.getNew("code", code)
+                LogFormatter.KeyValue.getNew("userId", userId)
         ));
 
         try {
@@ -115,6 +118,10 @@ public class RsqAccountService {
             StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
             StaffVO staffVO;
             if(null == staffDO){
+                CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
+                if(null == corpDO || null == corpDO.getRsqId()){
+                    throw new RsqIntegrationException("rsqId not found in corpDO: " + corpDO);
+                }
                 staffVO = staffManageService.getStaff(userId, corpId, suiteKey).getResult();
                 staffDO = StaffConverter.staffVO2StaffDO(staffVO);
 
@@ -126,8 +133,11 @@ public class RsqAccountService {
                 String password = generateRsqPassword();  //TODO 自动生成明文密码
                 staffDO.setRsqUsername(username);
                 staffDO.setRsqPassword(password);
-                ServiceResult<RsqUser> rsqUserSr = rsqAccountRequestHelper.createUser(suiteDO, staffDO);
+                ServiceResult<RsqUser> rsqUserSr = rsqAccountRequestHelper.createUser(suiteDO, staffDO, corpDO);
 
+                if(!rsqUserSr.isSuccess()){
+                    return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+                }
                 RsqUser user = rsqUserSr.getResult();
                 staffDO.setRsqUserId(String.valueOf(user.getId()));
 
@@ -145,13 +155,13 @@ public class RsqAccountService {
                     "系统异常",
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
-                    LogFormatter.KeyValue.getNew("code", code)
+                    LogFormatter.KeyValue.getNew("userId", userId)
             ), e);
             mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常",
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
-                    LogFormatter.KeyValue.getNew("code", code)
+                    LogFormatter.KeyValue.getNew("userId", userId)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
 

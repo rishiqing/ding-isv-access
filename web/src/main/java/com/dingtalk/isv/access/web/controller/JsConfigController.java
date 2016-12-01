@@ -81,6 +81,7 @@ public class JsConfigController {
             jsapiConfig.put("timeStamp",timeStamp);
             jsapiConfig.put("agentId",corpAppVOSr.getResult().getAgentId());
             jsapiConfig.put("corpId",corpId);
+            jsapiConfig.put("appId", appId);
             return httpResult.getSuccess(jsapiConfig);
         }catch (Exception e){
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,

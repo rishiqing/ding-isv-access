@@ -58,11 +58,14 @@
             jobnumber, 
             extattr, 
             is_sys, 
-            sys_level
+            sys_level,
+            rsq_user_id,
+            rsq_username,
+            rsq_password
     </sql>
 
     <insert id="saveOrUpdateCorpStaff" useGeneratedKeys="true" keyProperty="id">
-        insert into isv_corp (
+        insert into isv_corp_staff (
             gmt_create,
             gmt_modified,
             corp_id,
@@ -122,7 +125,7 @@
         gmt_modified=now(),
         `name`=#{name},
         tel=#{tel},
-        work_place#{workPlace},
+        work_place=#{workPlace},
         remark=#{remark},
         mobile=#{mobile},
         email=#{email},

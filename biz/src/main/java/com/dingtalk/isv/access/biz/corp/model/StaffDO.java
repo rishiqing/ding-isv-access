@@ -9,6 +9,7 @@ import java.util.Map;
  * Created by mint on 16-1-22.
  */
 public class StaffDO {
+    private Long id;
     private Date gmtCreate;
     private Date gmtModified;
     private String corpId;
@@ -38,6 +39,14 @@ public class StaffDO {
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Date getGmtCreate() {
         return gmtCreate;
@@ -278,6 +287,8 @@ public class StaffDO {
                 ", avatar='" + avatar + '\'' +
                 ", jobnumber='" + jobnumber + '\'' +
                 ", extattr=" + extattr +
+                ", rsqUserId=" + rsqUserId +
+                ", rsqUsername=" + rsqUsername +
                 '}';
     }
 }

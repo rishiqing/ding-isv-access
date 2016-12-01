@@ -136,6 +136,8 @@ public class StaffConverter {
         staffResult.setAvatar(staffVO.getAvatar());
         staffResult.setJobnumber(staffVO.getJobnumber());
         staffResult.setExtattr(staffVO.getExtattr());
+        staffResult.setRsqUsername(staffVO.getRsqUsername());
+        staffResult.setRsqPassword(staffVO.getRsqPassword());
         return staffResult;
     }
 }

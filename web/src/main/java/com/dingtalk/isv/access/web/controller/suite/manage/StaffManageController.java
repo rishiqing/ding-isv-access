@@ -40,9 +40,9 @@ public class StaffManageController {
     private RsqAccountService rsqAccountService;
 
     @ResponseBody
-    @RequestMapping(value = "/staff/authCode/{appId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/staff/authCode", method = RequestMethod.GET)
     public Map<String, Object> getStaffByAuthCode(
-            @PathVariable("appid") Long appId,
+            @RequestParam("appid") Long appId,
             @RequestParam("corpid") String corpId,
             @RequestParam("code") String code
     ){
@@ -60,8 +60,11 @@ public class StaffManageController {
             ServiceResult<LoginUserVO> loginUserVOSr = staffManageService.getStaffByAuthCode(suiteKey, corpId, code);
             LoginUserVO loginUserVO = loginUserVOSr.getResult();
 
-            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO.getUserId(), code);
+            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO.getUserId());
 
+            if(!staffVOSr.isSuccess()){
+                return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
 
             //  返回用户，只保留必要信息即可
             Map<String,Object> jsapiConfig = new HashMap<String, Object>();
