@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.jms.Queue;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -224,7 +225,14 @@ public class SuiteCallBackController{
         }else if(SuitePushType.TMP_AUTH_CODE.getKey().equals(eventType)){
             String tmpAuthCode = callbackMsgJson.getString("AuthCode");
             ServiceResult<CorpSuiteAuthVO>  sr = corpSuiteAuthService.saveOrUpdateCorpSuiteAuth(suiteKey, tmpAuthCode);
+            System.out.println("-------finish save-----success? " + sr.isSuccess());
             if(!sr.isSuccess()){
+                bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "无效的TMP_AUTH_CODE",
+                        LogFormatter.KeyValue.getNew("tmpAuthCode", tmpAuthCode),
+                        LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                        LogFormatter.KeyValue.getNew("callbackMsg", callbackMsg)
+                ));
                 responseEncryMsg = "faile";
             }
         }else if(SuitePushType.CHANGE_AUTH.getKey().equals(eventType)){

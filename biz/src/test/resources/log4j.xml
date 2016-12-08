@@ -219,6 +219,17 @@
         </layout>
     </appender>
 
+    <!-- corp lock log appender -->
+    <appender name="CORP_LOCK_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="E:\\workspace\\idea_space\\ding-isv-access\\logs\\biz\\corp_lock.log" />
+        <param name="append" value="true" />
+        <param name="encoding" value="UTF-8" />
+        <param name="threshold" value="INFO" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
+
 
 
 
@@ -325,6 +336,12 @@
     <logger name="RSQ_REQUEST_LOGGER" additivity="false">
         <level value="INFO" />
         <appender-ref ref="RSQ_REQUEST_LOGGER_APPENDER" />
+    </logger>
+
+    <!--corp lock logger-->
+    <logger name="CORP_LOCK_LOGGER" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="CORP_LOCK_LOGGER_APPENDER" />
     </logger>
 
 

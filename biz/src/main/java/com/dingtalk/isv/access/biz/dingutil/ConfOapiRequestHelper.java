@@ -77,8 +77,8 @@ public class ConfOapiRequestHelper {
                 return ServiceResult.success(corpJSTicketVO);
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (Throwable e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("accessToken", accessToken)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
@@ -102,6 +102,7 @@ public class ConfOapiRequestHelper {
             JSONObject jsonObject = JSON.parseObject(sr);
             Long errCode = jsonObject.getLong("errcode");
             if (Long.valueOf(0).equals(errCode)) {
+                System.out.println("success getPermanentCode----" + errCode);
                 JSONObject corpObject = jsonObject.getJSONObject("auth_corp_info");
                 String chPcode = StringUtils.isEmpty(jsonObject.getString("ch_permanent_code"))?"":jsonObject.getString("ch_permanent_code");
                 String pCode = StringUtils.isEmpty(jsonObject.getString("permanent_code"))?"":jsonObject.getString("permanent_code");
@@ -112,9 +113,19 @@ public class ConfOapiRequestHelper {
                 corpSuiteAuthVO.setPermanentCode(pCode);
                 corpSuiteAuthVO.setCorpId(corpId);
                 return ServiceResult.success(corpSuiteAuthVO);
+            }else if(Long.valueOf(40078).equals(errCode)){
+                System.out.println("temp auth code request result----" + errCode);
+                //  fffffffffffffffffffuck
+                //  由于钉钉的的原因，企业授权时会同时推送多个tmp_auth_code，而tmp_auth_code使用过一次就会失效
+                //  因此在接受到多个tmp_auth_code做授权时，只能通过40078（不存在的临时授权码）的错误码判断
+                //  收到40078后，不能返回错误，否则钉钉还会继续发送tmp_auth_code，
+                //  而应该直接返回成功！
+
+                //  不存在的临时授权码,不再继续重试
+                return ServiceResult.success(null);
             }
-            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (Throwable e) {
+            return ServiceResult.failure(String.valueOf(errCode), jsonObject.getString("errmsg"));
+        } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("accessToken", suiteAccessToken)
             ), e);
@@ -155,7 +166,7 @@ public class ConfOapiRequestHelper {
                 return ServiceResult.success(corpChannelTokenVO);
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (Throwable e) {
+        } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("accessToken", suiteAccessToken)
             ), e);
@@ -193,8 +204,8 @@ public class ConfOapiRequestHelper {
                 return ServiceResult.success(corpJSTicketVO);
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (Throwable e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("accessToken", accessToken)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
@@ -226,12 +237,12 @@ public class ConfOapiRequestHelper {
                CorpAuthInfoVO corpAuthInfoVO = JSON.parseObject(sr,CorpAuthInfoVO.class);
                return ServiceResult.success(corpAuthInfoVO);
             }
-            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-        } catch (Throwable e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteAccessToken", suiteAccessToken)
             ), e);
-            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
         }
     }
 

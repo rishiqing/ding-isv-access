@@ -9,8 +9,10 @@ import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.*;
+import com.dingtalk.isv.access.biz.corp.enumtype.CorpLockType;
 import com.dingtalk.isv.access.biz.corp.model.*;
 import com.dingtalk.isv.access.biz.corp.model.helper.*;
+import com.dingtalk.isv.access.biz.corp.service.CorpLockService;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
 import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
@@ -53,6 +55,8 @@ public class CorpManageServiceImpl implements CorpManageService {
     private CorpSuiteAuthService corpSuiteAuthService;
     @Autowired
     private IsvService isvService;
+    @Autowired
+    private CorpLockService corpLockService;
     @Autowired
     private CrmOapiRequestHelper crmOapiRequestHelper;
     @Autowired
@@ -119,26 +123,34 @@ public class CorpManageServiceImpl implements CorpManageService {
         ));
         try {
             CorpTokenDO corpTokenDO = corpTokenDao.getCorpToken(suiteKey, corpId);
-            //TODO 如果过期重新请求
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.add(Calendar.MINUTE, 10);//为了防止误差,提前10分钟更新corptoken
+            //如果过期重新请求
             if (null == corpTokenDO || calendar.getTime().compareTo(corpTokenDO.getExpiredTime()) != -1) {
-                ServiceResult<SuiteTokenVO> suiteTokenVOSr = suiteManageService.getSuiteToken(suiteKey);
-                String suiteToken = suiteTokenVOSr.getResult().getSuiteToken();
-                ServiceResult<CorpSuiteAuthVO> authSr = corpSuiteAuthService.getCorpSuiteAuth(corpId, suiteKey);
-                String permanentCode = authSr.getResult().getPermanentCode();
-                CorpAuthToken corpAuthToken = isvService.getCorpToken(suiteToken, corpId, permanentCode);
-                CorpTokenVO corpTokenVO = new CorpTokenVO();
-                corpTokenVO.setCorpId(corpId);
-                corpTokenVO.setSuiteKey(suiteKey);
-                corpTokenVO.setCorpToken(corpAuthToken.getAccess_token());
-                calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.SECOND, (int) corpAuthToken.getExpires_in());
-                corpTokenVO.setExpiredTime(calendar.getTime());
-                this.saveOrUpdateCorpToken(corpTokenVO);
-                corpTokenDO = CorpTokenConverter.CorpTokenVO2CorpTokenDO(corpTokenVO);
+                CorpLockDO lock = corpLockService.requireLock(corpId, CorpLockType.TOKEN);
+                //  如果获取到锁，则更新token
+                if(null != lock){
+                    ServiceResult<SuiteTokenVO> suiteTokenVOSr = suiteManageService.getSuiteToken(suiteKey);
+                    String suiteToken = suiteTokenVOSr.getResult().getSuiteToken();
+                    ServiceResult<CorpSuiteAuthVO> authSr = corpSuiteAuthService.getCorpSuiteAuth(corpId, suiteKey);
+                    String permanentCode = authSr.getResult().getPermanentCode();
+                    CorpAuthToken corpAuthToken = isvService.getCorpToken(suiteToken, corpId, permanentCode);
+                    CorpTokenVO corpTokenVO = new CorpTokenVO();
+                    corpTokenVO.setCorpId(corpId);
+                    corpTokenVO.setSuiteKey(suiteKey);
+                    corpTokenVO.setCorpToken(corpAuthToken.getAccess_token());
+                    calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.SECOND, (int) corpAuthToken.getExpires_in());
+                    corpTokenVO.setExpiredTime(calendar.getTime());
+                    this.saveOrUpdateCorpToken(corpTokenVO);
+                    corpTokenDO = CorpTokenConverter.CorpTokenVO2CorpTokenDO(corpTokenVO);
+
+                    //  释放锁
+                    corpLockService.releaseLock(corpId, CorpLockType.TOKEN);
+                }
+
             }
             CorpTokenVO corpTokenVO = CorpTokenConverter.CorpTokenDO2CorpTokenVO(corpTokenDO);
             return ServiceResult.success(corpTokenVO);
@@ -238,16 +250,24 @@ public class CorpManageServiceImpl implements CorpManageService {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.add(Calendar.MINUTE, 10);//为了防止误差,提前10分钟更新jsticket
+            //TODO 需要做并发控制
             if (null == corpJSTicketDO || calendar.getTime().compareTo(corpJSTicketDO.getExpiredTime()) != -1) {
-                ServiceResult<CorpTokenVO> corpTokenVoSr = this.getCorpToken(suiteKey, corpId);
-                ServiceResult<CorpJSAPITicketVO> jsAPITicketSr = confOapiRequestHelper.getJSTicket(suiteKey, corpId, corpTokenVoSr.getResult().getCorpToken());
-                bizLogger.info(LogFormatter.getKVLogData(null,
-                        LogFormatter.KeyValue.getNew("jsapiticket", JSON.toJSONString(jsAPITicketSr))
-                ));
-                corpJSTicketDO = CorpJSAPITicketConverter.corpJSTicketVO2CorpJSTicketDO(jsAPITicketSr.getResult());
+                CorpLockDO lock = corpLockService.requireLock(corpId, CorpLockType.JSAPI_TICKET);
+                //  如果获取到锁，则更新token
+                if(null != lock){
+                    ServiceResult<CorpTokenVO> corpTokenVoSr = this.getCorpToken(suiteKey, corpId);
+                    ServiceResult<CorpJSAPITicketVO> jsAPITicketSr = confOapiRequestHelper.getJSTicket(suiteKey, corpId, corpTokenVoSr.getResult().getCorpToken());
+                    bizLogger.info(LogFormatter.getKVLogData(null,
+                            LogFormatter.KeyValue.getNew("jsapiticket", JSON.toJSONString(jsAPITicketSr))
+                    ));
+                    CorpJSAPITicketVO corpJSTicketVO = jsAPITicketSr.getResult();
+                    corpJSTicketDO = CorpJSAPITicketConverter.corpJSTicketVO2CorpJSTicketDO(corpJSTicketVO);
+                    this.saveOrUpdateCorpJSTicket(corpJSTicketVO);
+
+                    corpLockService.releaseLock(corpId, CorpLockType.JSAPI_TICKET);
+                }
             }
             CorpJSAPITicketVO corpJSTicketVO = CorpJSAPITicketConverter.corpJSTicketDO2CorpJSTicketVO(corpJSTicketDO);
-            this.saveOrUpdateCorpJSTicket(corpJSTicketVO);
             return ServiceResult.success(corpJSTicketVO);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
@@ -342,6 +362,8 @@ public class CorpManageServiceImpl implements CorpManageService {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
             calendar.add(Calendar.MINUTE, 10);//为了防止误差,提前10分钟更新corptoken
+
+            //TODO 如果要使用该代码，需要做并发控制，参照getCorpToken中相应代码
             if (null == corpChannelTokenDO || calendar.getTime().compareTo(corpChannelTokenDO.getExpiredTime()) != -1) {
                 ServiceResult<SuiteTokenVO> suiteTokenVOSr = suiteManageService.getSuiteToken(suiteKey);
                 String suiteToken = suiteTokenVOSr.getResult().getSuiteToken();

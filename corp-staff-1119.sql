@@ -40,4 +40,14 @@ ALTER TABLE `isv_suite`
   ADD COLUMN `rsq_app_name`  varchar(255) NULL COMMENT '日事清应用中显示的本app的名称',
   ADD COLUMN `rsq_app_token`  varchar(255) NULL COMMENT '日事清应用授权的token，用来访问日事清token授权接口';
 
+# 为防止冲突，不使用钉钉原来的isv_biz_lock，而使用如下isv_con_lock
+CREATE TABLE `isv_con_lock` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `lock_key` varchar(256) NOT NULL COMMENT '锁key',
+  `expire` datetime DEFAULT NULL COMMENT '过期时间,null表示不过期',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `u_lock_key` (`lock_key`(191))
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COMMENT='db锁';
 

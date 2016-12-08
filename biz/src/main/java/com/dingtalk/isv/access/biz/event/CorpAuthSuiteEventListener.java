@@ -37,6 +37,7 @@ public class CorpAuthSuiteEventListener implements EventListener {
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("corpAuthSuiteEvent", JSON.toJSONString(corpAuthSuiteEvent))
             ));
+            System.out.println("-----listenCorpAuthSuiteEvent-----");
             //激活
             ServiceResult<Void> activeAppSr = corpSuiteAuthService.activeCorpApp(corpAuthSuiteEvent.getSuiteKey(), corpAuthSuiteEvent.getCorpId(),corpAuthSuiteEvent.getPermanentCode());
             if(!activeAppSr.isSuccess()){
@@ -63,6 +64,7 @@ public class CorpAuthSuiteEventListener implements EventListener {
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("authChangeEvent", JSON.toJSONString(authChangeEvent))
             ));
+            System.out.println("-----listenAuthChangeEvent-----");
             //激活
             ServiceResult<Void> activeAppSr = corpSuiteAuthService.activeCorpApp(authChangeEvent.getSuiteKey(), authChangeEvent.getCorpId(),authChangeEvent.getPermanentCode());
             if(!activeAppSr.isSuccess()){

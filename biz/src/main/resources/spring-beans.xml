@@ -82,6 +82,8 @@
 
     <bean id="rsqAccountService" class="com.dingtalk.isv.rsq.biz.service.RsqAccountService"/>
 
+    <bean id="corpLockService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpLockServiceImpl" />
+
 
     <!-- LOG -->
     <bean id="serviceMethodInterceptor" class="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor"></bean>

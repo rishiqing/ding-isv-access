@@ -40,6 +40,53 @@ public class StaffManageController {
     private RsqAccountService rsqAccountService;
 
     @ResponseBody
+    @RequestMapping(value = "/staff/userId", method = RequestMethod.GET)
+    public Map<String, Object> getStaffByUserId(
+            @RequestParam("appid") Long appId,
+            @RequestParam("corpid") String corpId,
+            @RequestParam("userid") String userId
+    ){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("appid", appId),
+                LogFormatter.KeyValue.getNew("corpid", corpId),
+                LogFormatter.KeyValue.getNew("userid", userId)
+        ));
+        try {
+
+            //  请求钉钉服务器获取当前登录的staff信息
+            ServiceResult<StaffVO> staffVOSr = staffManageService.getStaffByCorpIdAndUserId(corpId, userId);
+
+            if(!staffVOSr.isSuccess()){
+                return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+
+            StaffVO staffVO = staffVOSr.getResult();
+            if(null == staffVO){
+                return httpResult.getFailure(ServiceResultCode.CUSTOM_NOT_FIND.getErrCode(),ServiceResultCode.CUSTOM_NOT_FIND.getErrMsg());
+            }
+
+            //  返回用户，只保留必要信息即可
+            Map<String,Object> jsapiConfig = new HashMap<String, Object>();
+            jsapiConfig.put("user", StaffConverter.staffVO2StaffResult(staffVOSr.getResult()));
+
+            return httpResult.getSuccess(jsapiConfig);
+        }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("appid", appId),
+                    LogFormatter.KeyValue.getNew("corpid", corpId),
+                    LogFormatter.KeyValue.getNew("userid", userId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("appid", appId),
+                    LogFormatter.KeyValue.getNew("corpid", corpId),
+                    LogFormatter.KeyValue.getNew("userid", userId)
+            ));
+            return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/staff/authCode", method = RequestMethod.GET)
     public Map<String, Object> getStaffByAuthCode(
             @RequestParam("appid") Long appId,
