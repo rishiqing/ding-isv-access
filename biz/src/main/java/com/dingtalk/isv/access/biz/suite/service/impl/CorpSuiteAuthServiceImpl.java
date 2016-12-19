@@ -32,6 +32,7 @@ import com.dingtalk.isv.rsq.biz.service.RsqAccountService;
 import com.dingtalk.open.client.api.service.isv.IsvService;
 import com.dingtalk.open.client.common.ServiceException;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,9 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     private CrmOapiRequestHelper crmOapiRequestHelper;
     @Autowired
     private EventBus corpAuthSuiteEventBus;
+    @Autowired
+    //  使用异步eventBus代替同步eventBus
+    private AsyncEventBus asyncCorpAuthSuiteEventBus;
     @Autowired
     private AccessSystemConfig accessSystemConfig;
     @Autowired
@@ -237,18 +241,21 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 ));
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            System.out.println("corpAuthSuiteEventBus.posted begin.......");
+//            System.out.println(Thread.currentThread().getId() + ":corpAuthSuiteEventBus.posted begin.......");
+
             //异步逻辑,加速套件开通时间.
+            // [Wallace Mao]注：娘西皮！居然坑我，这里的eventBus默认TMD是同步执行！
             CorpAuthSuiteEvent corpAuthSuiteEvent = new CorpAuthSuiteEvent();
-            System.out.println("new corpAuthSuiteEventBus:" + corpAuthSuiteEventBus);
+//            System.out.println(Thread.currentThread().getId() + ":new corpAuthSuiteEventBus:" + corpAuthSuiteEventBus);
             corpAuthSuiteEvent.setSuiteKey(suiteKey);
             corpAuthSuiteEvent.setSuiteToken(suiteToken);
             corpAuthSuiteEvent.setCorpId(corpSuiteAuthVO.getCorpId());
             corpAuthSuiteEvent.setPermanentCode(corpSuiteAuthVO.getPermanentCode());
             corpAuthSuiteEvent.setChPermanentCode(corpSuiteAuthVO.getChPermanentCode());
-            System.out.println("before.posted corpAuthSuiteEventBus:" + corpAuthSuiteEventBus);
-            corpAuthSuiteEventBus.post(corpAuthSuiteEvent);
-            System.out.println("corpAuthSuiteEventBus.posted done!");
+//            System.out.println(Thread.currentThread().getId() + ":before.posted corpAuthSuiteEventBus:" + corpAuthSuiteEventBus);
+//            corpAuthSuiteEventBus.post(corpAuthSuiteEvent);
+            asyncCorpAuthSuiteEventBus.post(corpAuthSuiteEvent);
+//            System.out.println(Thread.currentThread().getId() + ":corpAuthSuiteEventBus.posted done!");
             return ServiceResult.success(corpSuiteAuthVO);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
@@ -273,14 +280,14 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("permanentCode", permanentCode)
             ));
-            System.out.println("before token:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before token:" + corpId);
             ServiceResult<SuiteTokenVO> suiteTokenSr = suiteManageService.getSuiteToken(suiteKey);
             //1.获取套件token
             if(!suiteTokenSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
             String suiteToken = suiteTokenSr.getResult().getSuiteToken();
-            System.out.println("before active:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before active:" + corpId);
 
             //2.激活
             try {
@@ -295,7 +302,7 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                     return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
                 }
             }
-            System.out.println("before getCorpInfo:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before getCorpInfo:" + corpId);
 
             //3.更新企业信息
             ServiceResult<Void> getCorpInfoSr = this.getCorpInfo(suiteToken,suiteKey,corpId, permanentCode);
@@ -303,24 +310,25 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
             //4.注册或者更新回调，在通讯录或者群会话发生变更时会调用此接口
-            System.out.println("before saveCorpCallback:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before saveCorpCallback:" + corpId);
 
             ServiceResult<Void> saveCallBackSr = this.saveCorpCallback(suiteKey, corpId, (accessSystemConfig.getCorpSuiteCallBackUrl() + suiteKey), SuiteCallBackMessage.Tag.getAllTag());
             if(!saveCallBackSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
 
-            System.out.println("before rsqAccountService.createRsqTeam:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before rsqAccountService.createRsqTeam:" + corpId);
 
             //  4.1  跟日事清服务器交互，创建日事清公司
             ServiceResult<CorpVO> corpSr = rsqAccountService.createRsqTeam(suiteKey, corpId);
             if(!corpSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
-            System.out.println("before jmsTemplate:" + corpId);
+//            System.out.println(Thread.currentThread().getId() + ":before jmsTemplate:" + corpId);
 
-            //5.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
-            jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
+//            //5.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
+//            如果Queue尚未实现，此处需要注释掉，否则将会堵塞线程，影响eventBus的！
+//            jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);
         }catch (Exception e){
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -421,7 +429,8 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
         authChangeEvent.setSuiteToken(suiteToken);
         authChangeEvent.setCorpId(corpId);
         authChangeEvent.setPermanentCode(permanentCode);
-        corpAuthSuiteEventBus.post(authChangeEvent);
+//        corpAuthSuiteEventBus.post(authChangeEvent);
+        asyncCorpAuthSuiteEventBus.post(authChangeEvent);
         return ServiceResult.success(null);
     }
 

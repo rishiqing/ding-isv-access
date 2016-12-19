@@ -55,14 +55,21 @@
         <property name="httpRequestHelper" ref="httpRequestHelper"/>
     </bean>
 
-
+    <bean id="asyncCorpAuthSuiteExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncCorpAuthSuiteExecutorFactory" />
+    <bean id="asyncCorpAuthSuiteExecutor" factory-bean="asyncCorpAuthSuiteExecutorFactory" factory-method="getCorpAuthSuiteExecutor" />
+    <bean id="asyncCorpAuthSuiteEventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg ref="asyncCorpAuthSuiteExecutor"/>
+    </bean>
 
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
     <bean id="corpAuthSuiteEventListener" class="com.dingtalk.isv.access.biz.event.CorpAuthSuiteEventListener"/>
-    <bean id="ListenerInitService" class="com.dingtalk.isv.common.event.ListenerInitService" init-method="register">
+
+    <bean id="listenerInitService" class="com.dingtalk.isv.common.event.ListenerInitService" init-method="register">
         <property name="eventListenerMap">
             <map>
-                <entry key-ref="corpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>
+                <!--<entry key-ref="corpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>-->
+                <!--改用eventBus-->
+                <entry key-ref="asyncCorpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>
             </map>
         </property>
     </bean>

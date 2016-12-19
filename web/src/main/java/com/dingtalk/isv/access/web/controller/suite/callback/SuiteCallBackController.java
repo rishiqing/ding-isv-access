@@ -225,7 +225,7 @@ public class SuiteCallBackController{
         }else if(SuitePushType.TMP_AUTH_CODE.getKey().equals(eventType)){
             String tmpAuthCode = callbackMsgJson.getString("AuthCode");
             ServiceResult<CorpSuiteAuthVO>  sr = corpSuiteAuthService.saveOrUpdateCorpSuiteAuth(suiteKey, tmpAuthCode);
-            System.out.println("-------finish save-----success? " + sr.isSuccess());
+//            System.out.println(Thread.currentThread().getId() + ":-------finish save-----success? " + sr.isSuccess());
             if(!sr.isSuccess()){
                 bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         "无效的TMP_AUTH_CODE",
@@ -329,7 +329,8 @@ public class SuiteCallBackController{
                 //通知业务方各种回调事件,业务方实现各自的业务
                 //多加入一个套件Key维度
                 jsonObject.put("suiteKey",suiteKey);
-                jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject,tag));
+                //实现Queue之后才能使用jmsTemplate，否则会发生线程堵塞
+//                jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject,tag));
             }
 
             Map<String, String> encryptedMap = dingTalkEncryptor.getEncryptedMap("success", System.currentTimeMillis(), com.dingtalk.oapi.lib.aes.Utils.getRandomStr(8));

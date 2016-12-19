@@ -4,6 +4,7 @@ import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
 import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
+import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
@@ -15,6 +16,7 @@ import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
+import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,15 +37,17 @@ import java.util.List;
 public class SystemController {
     @Autowired
     private EventBus corpAuthSuiteEventBus;
+    @Autowired
+    private AsyncEventBus asyncCorpAuthSuiteEventBus;
 
 
 
     @RequestMapping("/test")
     @ResponseBody
     public String checkPreload() {
-        corpAuthSuiteEventBus.post(new Integer(100));
-        corpAuthSuiteEventBus.post(new Integer(200));
-        corpAuthSuiteEventBus.post(new Integer(300));
+        asyncCorpAuthSuiteEventBus.post(new Integer(100));
+        asyncCorpAuthSuiteEventBus.post(new Integer(200));
+        asyncCorpAuthSuiteEventBus.post(new Integer(300));
         return "success";
     }
 

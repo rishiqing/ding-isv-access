@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 /**
  * Created by lifeng.zlf on 2016/3/23.
  */
@@ -37,9 +39,10 @@ public class CorpAuthSuiteEventListener implements EventListener {
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("corpAuthSuiteEvent", JSON.toJSONString(corpAuthSuiteEvent))
             ));
-            System.out.println("-----listenCorpAuthSuiteEvent-----");
+//            System.out.println(Thread.currentThread().getId() + ":-----listenCorpAuthSuiteEvent-----" + new Date());
             //激活
             ServiceResult<Void> activeAppSr = corpSuiteAuthService.activeCorpApp(corpAuthSuiteEvent.getSuiteKey(), corpAuthSuiteEvent.getCorpId(),corpAuthSuiteEvent.getPermanentCode());
+//            System.out.println(Thread.currentThread().getId() + ":-----after ---- listenCorpAuthSuiteEvent-----" + new Date() + "," + activeAppSr.getMessage());
             if(!activeAppSr.isSuccess()){
                 //加入失败job,失败任务会重试
                 CorpSuiteAuthFaileDO corpSuiteAuthFaileDO = new CorpSuiteAuthFaileDO();
@@ -56,7 +59,6 @@ public class CorpAuthSuiteEventListener implements EventListener {
         }
 
     }
-
 
     @Subscribe
     public void listenAuthChangeEvent(AuthChangeEvent authChangeEvent) {
@@ -85,5 +87,12 @@ public class CorpAuthSuiteEventListener implements EventListener {
     }
 
 
+    @Subscribe
+    public void listenIntegerTestEvent(Integer num) {
+        System.out.println("num is " + num);
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("num", num)
+        ));
+    }
 
 }
