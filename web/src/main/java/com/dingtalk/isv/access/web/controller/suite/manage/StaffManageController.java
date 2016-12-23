@@ -107,7 +107,7 @@ public class StaffManageController {
             ServiceResult<LoginUserVO> loginUserVOSr = staffManageService.getStaffByAuthCode(suiteKey, corpId, code);
             LoginUserVO loginUserVO = loginUserVOSr.getResult();
 
-            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO.getUserId());
+            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO);
 
             if(!staffVOSr.isSuccess()){
                 return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());

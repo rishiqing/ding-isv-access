@@ -103,17 +103,18 @@ public class RsqAccountService {
      * 创建公司员工
      * @param suiteKey
      * @param corpId
-     * @param userId
+     * @param loginUser
      * @return
      */
-    public ServiceResult<StaffVO> createRsqTeamStaff(String suiteKey, String corpId, String userId) {
+    public ServiceResult<StaffVO> createRsqTeamStaff(String suiteKey, String corpId, LoginUserVO loginUser) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", corpId),
-                LogFormatter.KeyValue.getNew("userId", userId)
+                LogFormatter.KeyValue.getNew("loginUser", loginUser)
         ));
-
+        String userId = "";
         try {
+            userId = loginUser.getUserId();
             //  生成用户信息
             StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
             StaffVO staffVO;
@@ -122,7 +123,17 @@ public class RsqAccountService {
                 if(null == corpDO || null == corpDO.getRsqId()){
                     throw new RsqIntegrationException("rsqId not found in corpDO: " + corpDO);
                 }
-                staffVO = staffManageService.getStaff(userId, corpId, suiteKey).getResult();
+//                作为ISV，默认没有权限直接调用getStaff
+                staffVO = staffManageService.getStaff(userId, corpId , suiteKey).getResult();
+//                如果staff为null，说明未取得管理员权限，只能保存登录相关信息
+                if(null == staffVO){
+                    staffVO = new StaffVO();
+                    staffVO.setCorpId(corpId);
+                    staffVO.setStaffId(userId);
+                    staffVO.setName("钉钉用户");
+                    staffVO.setSysLevel(loginUser.getSysLevel());
+                    staffVO.setSys(loginUser.getIsSys());
+                }
                 staffDO = StaffConverter.staffVO2StaffDO(staffVO);
 
                 SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
