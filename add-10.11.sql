@@ -35,6 +35,18 @@ CREATE TABLE `isv_corp_channel_app` (
   UNIQUE KEY `u_corp_app` (`corp_id`,`app_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COMMENT='企业服务窗应用信息表';
 
+CREATE TABLE `isv_corp_channel_token` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `suite_key` varchar(100) NOT NULL COMMENT '服务窗应用套件key',
+  `corp_id` varchar(128) NOT NULL COMMENT '使用微应用的企业ID',
+  `corp_channel_token` varchar(256) NOT NULL COMMENT '服务窗应用的token',
+  `expired_time` datetime NOT NULL COMMENT '过期时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `u_suite_corp_channel` (`corp_id`,`suite_key`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COMMENT='企业服务窗应用token信息表';
+
 ALTER TABLE `isv_corp_suite_auth`
 MODIFY COLUMN `permanent_code`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '临时授权码或永久授权码value' AFTER `suite_key`,
 ADD COLUMN `ch_permanent_code`  varchar(255) NULL COMMENT '企业服务窗永久授权码' AFTER `permanent_code`;
