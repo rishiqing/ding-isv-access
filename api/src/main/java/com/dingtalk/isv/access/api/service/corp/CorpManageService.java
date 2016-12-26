@@ -64,6 +64,21 @@ public interface CorpManageService {
      */
     public ServiceResult<CorpChannelJSAPITicketVO> getCorpChannelJSAPITicket(String suiteKey, String corpId);
 
+    /**
+     * 删除企业js api ticket
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<CorpTokenVO> deleteCorpJSAPITicket(String suiteKey,String corpId);
+
+    /**
+     * 删除企业服务窗js api ticket
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<CorpTokenVO> deleteCorpChannelJSAPITicket(String suiteKey,String corpId);
 
     /**
      * 获取企业开通的套件下的微应用

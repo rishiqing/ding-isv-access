@@ -455,8 +455,12 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
         }
         //4.删除企业token.这个必须删除,一旦出现解除授权立即授权的情况,之前的token是不可用的
         corpManageService.deleteCorpToken(suiteKey, corpId);
-        //5.删除企业的服务窗token.这个必须删除,一旦出现解除授权立即授权的情况,之前的token是不可用的
+        //5.删除js api ticket.当企业解除isv授权，之前的jsticket也是不可用的
+        corpManageService.deleteCorpJSAPITicket(suiteKey, corpId);
+        //6.删除企业的服务窗token.这个必须删除,一旦出现解除授权立即授权的情况,之前的token是不可用的
         corpManageService.deleteCorpChannelToken(suiteKey, corpId);
+        //7.删除企业的服务窗js api ticket. 当企业解除isv授权，之前是channel js api ticket也是不可用的
+        corpManageService.deleteCorpChannelJSAPITicket(suiteKey, corpId);
         return ServiceResult.success(null);
     }
 

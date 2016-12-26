@@ -193,6 +193,30 @@ public class CorpManageServiceImpl implements CorpManageService {
         }
     }
 
+    @Override
+    public ServiceResult<CorpTokenVO> deleteCorpJSAPITicket(String suiteKey, String corpId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            corpJSAPITicketDao.deleteCorpJSAPITicket(suiteKey, corpId);
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
 
     @Override
     public ServiceResult<CorpTokenVO> deleteCorpChannelToken(String suiteKey, String corpId) {
@@ -204,6 +228,30 @@ public class CorpManageServiceImpl implements CorpManageService {
             corpChannelTokenDao.deleteCorpChannelToken(suiteKey,corpId);
             return ServiceResult.success(null);
         }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    @Override
+    public ServiceResult<CorpTokenVO> deleteCorpChannelJSAPITicket(String suiteKey, String corpId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            corpChannelJSAPITicketDao.deleteCorpChannelJSAPITicket(suiteKey, corpId);
+            return ServiceResult.success(null);
+        } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常" + e.toString(),
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
