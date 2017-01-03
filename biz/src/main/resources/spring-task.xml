@@ -31,6 +31,7 @@
                 <ref bean="suiteTokenTrigger" />
                 <ref bean="corpSuiteAuthFaileTrigger" />
                 <ref bean="reAuthFaileTrigger" />
+                <ref bean="corpOrgFetchFailTrigger" />
             </list>
         </property>
     </bean>
@@ -53,6 +54,16 @@
 
     <bean id="corpSuiteAuthFaileTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="corpSuiteAuthFaileJobDetail" />
+        <property name="cronExpression" value="0 */1 * * * ?" />
+    </bean>
+
+    <bean id="corpOrgFetchFailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.CorpOrgFetchFailJob"/>
+        <property name="durability" value="true" />
+    </bean>
+
+    <bean id="corpOrgFetchFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="corpOrgFetchFailJobDetail" />
         <property name="cronExpression" value="0 */1 * * * ?" />
     </bean>
 

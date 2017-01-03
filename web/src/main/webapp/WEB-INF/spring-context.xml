@@ -11,7 +11,7 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="locations">
             <list>
-                <value>file:${user.home}/.tomcat/ddauth-config.properties</value>
+                <value>file:${user.home}/ddauth-config.properties</value>
             </list>
         </property>
     </bean>

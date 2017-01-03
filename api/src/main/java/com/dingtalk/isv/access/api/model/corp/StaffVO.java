@@ -39,6 +39,8 @@ public class StaffVO implements Serializable {
     private Boolean isSys;    //钉钉免登接口使用code换取用户信息时获取到的用户信息
     private Integer sysLevel;  //钉钉免登接口使用code换取用户信息时获取到的用户信息
 
+    private String unionId;  //钉钉unionId
+
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
@@ -279,6 +281,14 @@ public class StaffVO implements Serializable {
         return sysLevel;
     }
 
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
+    }
+
     public void setSysLevel(Integer sysLevel) {
         this.sysLevel = sysLevel;
     }
@@ -329,6 +339,7 @@ public class StaffVO implements Serializable {
                 ", position='" + position + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", jobnumber='" + jobnumber + '\'' +
+                ", unionId='" + unionId + '\'' +
                 ", extattr=" + extattr +
                 ", rsqUserId=" + rsqUserId +
                 ", rsqUsername=" + rsqUsername +

@@ -36,6 +36,8 @@ public class StaffDO {
     private Boolean isSys;    //钉钉免登接口使用code换取用户信息时获取到的用户信息
     private Integer sysLevel;  //钉钉免登接口使用code换取用户信息时获取到的用户信息
 
+    private String unionId;  //钉钉unionId
+
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
@@ -240,6 +242,14 @@ public class StaffDO {
         this.extattr = extattr;
     }
 
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
+    }
+
     public String getRsqUserId() {
         return rsqUserId;
     }
@@ -287,6 +297,7 @@ public class StaffDO {
                 ", avatar='" + avatar + '\'' +
                 ", jobnumber='" + jobnumber + '\'' +
                 ", extattr=" + extattr +
+                ", unionId=" + unionId +
                 ", rsqUserId=" + rsqUserId +
                 ", rsqUsername=" + rsqUsername +
                 '}';

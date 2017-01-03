@@ -28,6 +28,7 @@
         <result property="extattr" column="extattr" />
         <result property="isSys" column="is_sys" />
         <result property="sysLevel" column="sys_level" />
+        <result property="unionId" column="union_id" />
         <result property="rsqUserId" column="rsq_user_id" />
         <result property="rsqUsername" column="rsq_username" />
         <result property="rsqPassword" column="rsq_password" />
@@ -59,6 +60,7 @@
             extattr, 
             is_sys, 
             sys_level,
+            union_id,
             rsq_user_id,
             rsq_username,
             rsq_password
@@ -90,6 +92,7 @@
             extattr, 
             is_sys, 
             sys_level,
+            union_id,
             rsq_user_id,
             rsq_username,
             rsq_password
@@ -118,6 +121,7 @@
             #{extattr}, 
             #{isSys}, 
             #{sysLevel},
+            #{unionId},
             #{rsqUserId},
             #{rsqUsername},
             #{rsqPassword}
@@ -142,6 +146,7 @@
         extattr=#{extattr},
         is_sys=#{isSys},
         sys_level=#{sysLevel},
+        union_id=#{unionId},
         rsq_user_id=#{rsqUserId},
         rsq_username=#{rsqUsername},
         rsq_password=#{rsqPassword}

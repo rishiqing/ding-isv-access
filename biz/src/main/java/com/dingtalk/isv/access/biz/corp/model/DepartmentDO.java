@@ -1,21 +1,19 @@
-package com.dingtalk.isv.access.api.model.corp;
+package com.dingtalk.isv.access.biz.corp.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 部门对象
- * Created by mint on 16-7-17.
+ * 企业部门对象
+ * Created by wallace 16-12-29.
  */
-public class DepartmentVO implements Serializable{
-    private static final long serialVersionUID = 1L;
+public class DepartmentDO {
 
     private Long id;  //自增长主键，不能为准
 
     private Date gmtCreate;
     private Date gmtModified;
 
-    private String corpId; //存储钉钉部门的公司id
+    private String corpId;  //存储部门的公司id
     private Long deptId;  //存储钉钉返回值中的id
     private String name;
     private Long order;
@@ -26,7 +24,6 @@ public class DepartmentVO implements Serializable{
     private Boolean deptHiding;
 
     private String deptPerimits;
-
     private String userPerimits;
 
     private Boolean outerDept;
@@ -36,10 +33,6 @@ public class DepartmentVO implements Serializable{
     private String deptManagerUseridList;
 
     private String rsqId;  //日事清应用的id
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
 
     public Long getId() {
         return id;

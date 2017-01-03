@@ -6,6 +6,7 @@ import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffResult;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
+import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,37 @@ public class StaffConverter {
         staffVO.setAvatar(corpUserDetail.getAvatar());
         staffVO.setJobnumber(corpUserDetail.getJobnumber());
         staffVO.setExtattr(corpUserDetail.getExtattr());
+        staffVO.setUnionId(corpUserDetail.getUserid());
         return staffVO;
+    }
+
+    public static StaffDO corpUser2StaffDO(CorpUserDetail corpUserDetail, String corpId){
+        if(null==corpUserDetail){
+            return null;
+        }
+        StaffDO staffDO = new StaffDO();
+        staffDO.setCorpId(corpId);
+        staffDO.setUserId(corpUserDetail.getUserid());
+        staffDO.setName(corpUserDetail.getName());
+        staffDO.setTel(corpUserDetail.getTel());
+        staffDO.setWorkPlace(corpUserDetail.getWorkPlace());
+        staffDO.setRemark(corpUserDetail.getRemark());
+        staffDO.setMobile(corpUserDetail.getMobile());
+        staffDO.setEmail(corpUserDetail.getEmail());
+        staffDO.setActive(corpUserDetail.getActive());
+        //staffVO.setOrderInDepts(corpUser.getOrderInDepts());
+        staffDO.setAdmin(corpUserDetail.getIsAdmin());
+        staffDO.setBoss(corpUserDetail.getIsBoss());
+        staffDO.setDingId(corpUserDetail.getDingId());
+        //staffVO.setIsLeaderInDepts(corpUser.getIsLeaderInDepts());
+        staffDO.setHide(corpUserDetail.getIsHide());
+        staffDO.setDepartment(JSON.toJSONString(corpUserDetail.getDepartment()));
+        staffDO.setPosition(corpUserDetail.getPosition());
+        staffDO.setAvatar(corpUserDetail.getAvatar());
+        staffDO.setJobnumber(corpUserDetail.getJobnumber());
+        staffDO.setExtattr(JSON.toJSONString(corpUserDetail.getExtattr()));
+        staffDO.setUnionId(corpUserDetail.getUserid());
+        return staffDO;
     }
 
     public static StaffDO staffVO2StaffDO(StaffVO staffVO){
@@ -78,6 +109,7 @@ public class StaffConverter {
         staffDO.setRsqUserId(staffVO.getRsqUserId());
         staffDO.setRsqUsername(staffVO.getRsqUsername());
         staffDO.setRsqPassword(staffVO.getRsqPassword());
+        staffDO.setUnionId(staffVO.getUnionId());
         return staffDO;
     }
     
@@ -114,6 +146,7 @@ public class StaffConverter {
         staffVO.setRsqUserId(staffDO.getRsqUserId());
         staffVO.setRsqUsername(staffDO.getRsqUsername());
         staffVO.setRsqPassword(staffDO.getRsqPassword());
+        staffVO.setUnionId(staffDO.getUnionId());
         return staffVO;
     }
 
@@ -136,6 +169,7 @@ public class StaffConverter {
         staffResult.setAvatar(staffVO.getAvatar());
         staffResult.setJobnumber(staffVO.getJobnumber());
         staffResult.setExtattr(staffVO.getExtattr());
+        staffResult.setUserId(staffVO.getUnionId());
         staffResult.setRsqUsername(staffVO.getRsqUsername());
         staffResult.setRsqPassword(staffVO.getRsqPassword());
         return staffResult;

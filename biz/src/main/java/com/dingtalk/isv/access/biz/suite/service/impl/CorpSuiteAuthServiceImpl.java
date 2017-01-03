@@ -9,6 +9,7 @@ import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.api.model.corp.callback.CorpChannelAppVO;
 import com.dingtalk.isv.access.api.model.event.AuthChangeEvent;
 import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
+import com.dingtalk.isv.access.api.model.event.CorpOrgFetchEvent;
 import com.dingtalk.isv.access.api.model.event.mq.CorpAuthSuiteMessage;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
@@ -71,6 +72,8 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     @Autowired
     //  使用异步eventBus代替同步eventBus
     private AsyncEventBus asyncCorpAuthSuiteEventBus;
+    @Autowired
+    private AsyncEventBus asyncCorpOrgFetchEventBus;
     @Autowired
     private AccessSystemConfig accessSystemConfig;
     @Autowired
@@ -311,7 +314,6 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
             }
             //4.注册或者更新回调，在通讯录或者群会话发生变更时会调用此接口
 //            System.out.println(Thread.currentThread().getId() + ":before saveCorpCallback:" + corpId);
-
             ServiceResult<Void> saveCallBackSr = this.saveCorpCallback(suiteKey, corpId, (accessSystemConfig.getCorpSuiteCallBackUrl() + suiteKey), SuiteCallBackMessage.Tag.getAllTag());
             if(!saveCallBackSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
@@ -319,14 +321,21 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
 
 //            System.out.println(Thread.currentThread().getId() + ":before rsqAccountService.createRsqTeam:" + corpId);
 
-            //  4.1  跟日事清服务器交互，创建日事清公司
+            //5  跟日事清服务器交互，创建日事清公司
             ServiceResult<CorpVO> corpSr = rsqAccountService.createRsqTeam(suiteKey, corpId);
             if(!corpSr.isSuccess()){
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
+
+            //6.  异步，更新钉钉的组织机构以及用户信息到本地，然后与ISV更新组织机构和人员信息
+            CorpOrgFetchEvent corpOrgFetchEvent = new CorpOrgFetchEvent();
+            corpOrgFetchEvent.setSuiteKey(suiteKey);
+            corpOrgFetchEvent.setCorpId(corpId);
+            asyncCorpOrgFetchEventBus.post(corpOrgFetchEvent);
+
 //            System.out.println(Thread.currentThread().getId() + ":before jmsTemplate:" + corpId);
 
-//            //5.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
+//            //7.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
 //            如果Queue尚未实现，此处需要注释掉，否则将会堵塞线程，影响eventBus的！
 //            jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);

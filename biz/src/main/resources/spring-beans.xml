@@ -60,16 +60,23 @@
     <bean id="asyncCorpAuthSuiteEventBus" class="com.google.common.eventbus.AsyncEventBus">
         <constructor-arg ref="asyncCorpAuthSuiteExecutor"/>
     </bean>
-
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
     <bean id="corpAuthSuiteEventListener" class="com.dingtalk.isv.access.biz.event.CorpAuthSuiteEventListener"/>
+
+    <bean id="asyncCorpOrgFetchExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncCorpOrgFetchExecutorFactory" />
+    <bean id="asyncCorpOrgFetchExecutor" factory-bean="asyncCorpOrgFetchExecutorFactory" factory-method="getCorpOrgFetchExecutor" />
+    <bean id="asyncCorpOrgFetchEventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg ref="asyncCorpOrgFetchExecutor"/>
+    </bean>
+    <bean id="corpOrgFetchEventListener" class="com.dingtalk.isv.access.biz.event.CorpOrgFetchEventListener"/>
 
     <bean id="listenerInitService" class="com.dingtalk.isv.common.event.ListenerInitService" init-method="register">
         <property name="eventListenerMap">
             <map>
                 <!--<entry key-ref="corpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>-->
-                <!--改用eventBus-->
+                <!--改用异步eventBus-->
                 <entry key-ref="asyncCorpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>
+                <entry key-ref="asyncCorpOrgFetchEventBus" value-ref="corpOrgFetchEventListener"></entry>
             </map>
         </property>
     </bean>

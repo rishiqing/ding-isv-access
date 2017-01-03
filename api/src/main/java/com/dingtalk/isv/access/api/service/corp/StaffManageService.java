@@ -3,6 +3,7 @@ import com.dingtalk.isv.access.api.model.corp.LoginUserVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
+import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
 
 import java.util.List;
 
@@ -20,6 +21,15 @@ public interface StaffManageService {
      * @return
      */
     public ServiceResult<StaffVO> getStaff(String staffId, String corpId, String suiteKey);
+
+    /**
+     * 查询一个部门的所有员工详情
+     * @param deptId
+     * @param corpId
+     * @param suiteKey
+     * @return
+     */
+    public ServiceResult<CorpUserDetailList> getStaffByDepartment(Long deptId, String corpId, String suiteKey, Long offset, Integer size, String order);
 
     /**
      * 获取当前登录用户
@@ -46,4 +56,20 @@ public interface StaffManageService {
      */
     public ServiceResult<StaffVO> getStaffByCorpIdAndUserId(String corpId, String userId);
 
+    /**
+     * 获取部门成员，并且保持部门成员到本地
+     * @param deptId
+     * @param corpId
+     * @param suiteKey
+     * @return
+     */
+    public ServiceResult<Void> getAndSaveStaffByDepartment(Long deptId, String corpId, String suiteKey);
+
+    /**
+     * 获取并将钉钉企业的组织结构信息保存到本地
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<Void> getAndSaveAllCorpOrgStaff(String suiteKey, String corpId);
 }
