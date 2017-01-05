@@ -118,4 +118,11 @@
 		 ]]>
     </select>
 
+    <delete id="deleteDepartmentByCorpIdAndDeptId">
+        delete from isv_corp_dept
+        <![CDATA[
+			WHERE corp_id=#{corpId} and dept_id=#{deptId}
+		 ]]>
+    </delete>
+
 </mapper>

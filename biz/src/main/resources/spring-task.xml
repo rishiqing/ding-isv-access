@@ -64,7 +64,7 @@
 
     <bean id="corpOrgFetchFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="corpOrgFetchFailJobDetail" />
-        <property name="cronExpression" value="0 */1 * * * ?" />
+        <property name="cronExpression" value="0 */5 * * * ?" />
     </bean>
 
 
@@ -73,8 +73,8 @@
         <property name="jobClass" value="com.dingtalk.isv.access.biz.scheduler.ReAuthFaileJob"/>
         <property name="jobDataMap">
             <map>
-                <entry key="suiteKey" value="suitexdhgv7mn5ufoi9ui"/>
-                <entry key="appId" value="1949"/>
+                <!--<entry key="suiteKey" value="suitexdhgv7mn5ufoi9ui"/>-->
+                <entry key="appId" value="${isv.app.id}"/>
             </map>
         </property>
         <property name="durability" value="true" />

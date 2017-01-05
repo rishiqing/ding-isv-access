@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.enums.suite.SuitePushType;
+import com.dingtalk.isv.access.api.model.event.CorpCallbackEvent;
+import com.dingtalk.isv.access.api.model.event.CorpOrgFetchEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTicketVO;
@@ -11,10 +13,13 @@ import com.dingtalk.isv.access.api.model.suite.SuiteVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
+import com.dingtalk.isv.access.biz.corp.service.CorpCallbackQueueService;
+import com.dingtalk.isv.access.biz.event.AsyncCorpCallbackExecutorFactory;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.oapi.lib.aes.DingTalkEncryptException;
 import com.dingtalk.oapi.lib.aes.DingTalkEncryptor;
+import com.google.common.eventbus.AsyncEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +46,15 @@ public class SuiteCallBackController{
     @Autowired
     private CorpSuiteAuthService corpSuiteAuthService;
     @Autowired
+    private CorpCallbackQueueService corpCallbackQueueService;
+    @Autowired
     private CorpManageService corpManageService;
     @Autowired
     private AccessSystemConfig accessSystemConfig;
     @Autowired
     private JmsTemplate jmsTemplate;
+    @Autowired
+    private AsyncEventBus asyncCorpCallbackEventBus;
     @Autowired
     @Qualifier("suiteCallBackQueue")
     private Queue suiteCallBackQueue;
@@ -88,7 +97,7 @@ public class SuiteCallBackController{
             Map<String, String> encryptedMap = dingTalkEncryptor.getEncryptedMap(responseEncryMsg, System.currentTimeMillis(), com.dingtalk.oapi.lib.aes.Utils.getRandomStr(8));
             return encryptedMap;
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("signature", signature),
                     LogFormatter.KeyValue.getNew("timestamp", timestamp),
                     LogFormatter.KeyValue.getNew("nonce", nonce),
@@ -317,20 +326,46 @@ public class SuiteCallBackController{
                 tag =  SuiteCallBackMessage.Tag.USER_ADD_ORG;
             }else if(SuiteCallBackMessage.Tag.USER_LEAVE_ORG.getKey().equals(eventType)){
                 tag =  SuiteCallBackMessage.Tag.USER_LEAVE_ORG;
-            }else if(SuiteCallBackMessage.Tag.CRM_CUSTOMER_UPDATE.getKey().equals(eventType)){
-                tag =  SuiteCallBackMessage.Tag.CRM_CUSTOMER_UPDATE;
-            }else if(SuiteCallBackMessage.Tag.CRM_CONTACT_CALL.getKey().equals(eventType)){
-                tag =  SuiteCallBackMessage.Tag.CRM_CONTACT_CALL;
-            }else if(SuiteCallBackMessage.Tag.REPORT_ADD_CRM_REPORT.getKey().equals(eventType)){
-                tag =  SuiteCallBackMessage.Tag.REPORT_ADD_CRM_REPORT;
+            }else if(SuiteCallBackMessage.Tag.USER_MODIFY_ORG.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.USER_MODIFY_ORG;
+            }else if(SuiteCallBackMessage.Tag.ORG_ADMIN_ADD.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.ORG_ADMIN_ADD;
+            }else if(SuiteCallBackMessage.Tag.ORG_ADMIN_REMOVE.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.ORG_ADMIN_REMOVE;
+            }else if(SuiteCallBackMessage.Tag.ORG_DEPT_CREATE.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.ORG_DEPT_CREATE;
+            }else if(SuiteCallBackMessage.Tag.ORG_DEPT_MODIFY.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.ORG_DEPT_MODIFY;
+            }else if(SuiteCallBackMessage.Tag.ORG_DEPT_REMOVE.getKey().equals(eventType)){
+                tag = SuiteCallBackMessage.Tag.ORG_DEPT_REMOVE;
             }
+//            else if(SuiteCallBackMessage.Tag.CRM_CUSTOMER_UPDATE.getKey().equals(eventType)){
+//                tag =  SuiteCallBackMessage.Tag.CRM_CUSTOMER_UPDATE;
+//            }else if(SuiteCallBackMessage.Tag.CRM_CONTACT_CALL.getKey().equals(eventType)){
+//                tag =  SuiteCallBackMessage.Tag.CRM_CONTACT_CALL;
+//            }else if(SuiteCallBackMessage.Tag.REPORT_ADD_CRM_REPORT.getKey().equals(eventType)){
+//                tag =  SuiteCallBackMessage.Tag.REPORT_ADD_CRM_REPORT;
+//            }
 
             if(null!=tag){
                 //通知业务方各种回调事件,业务方实现各自的业务
                 //多加入一个套件Key维度
                 jsonObject.put("suiteKey",suiteKey);
+
+//                CorpCallbackEvent corpCallbackEvent = new CorpCallbackEvent();
+//                corpCallbackEvent.setSuiteKey(suiteKey);
+//                corpCallbackEvent.setTag(tag);
+//                corpCallbackEvent.setEventJSON(jsonObject);
+//
+//                asyncCorpCallbackEventBus.post(corpCallbackEvent);
+                //将消息先记录到MySQL数据库
+                //TODO
+                ServiceResult<Void> queueSr = corpCallbackQueueService.saveCorpCallbackQueue(jsonObject, suiteKey);
+                if(!queueSr.isSuccess()){
+                    return dingTalkEncryptor.getEncryptedMap("fail", System.currentTimeMillis(), com.dingtalk.oapi.lib.aes.Utils.getRandomStr(8));
+                }
                 //实现Queue之后才能使用jmsTemplate，否则会发生线程堵塞
-//                jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject,tag));
+                jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject,tag));
             }
 
             Map<String, String> encryptedMap = dingTalkEncryptor.getEncryptedMap("success", System.currentTimeMillis(), com.dingtalk.oapi.lib.aes.Utils.getRandomStr(8));

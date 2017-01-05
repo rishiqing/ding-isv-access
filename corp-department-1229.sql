@@ -39,5 +39,30 @@ CREATE TABLE `isv_corp_org_fetch_fail` (
   UNIQUE KEY `u_c_s_f_p` (`suite_key`,`corp_id`,`corp_fail_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COMMENT='企业同步组织结构信息失败记录';
 
+CREATE TABLE `isv_corp_callback_queue` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `suite_key` varchar(100) NOT NULL COMMENT '套件key',
+  `corp_id` varchar(100) NOT NULL COMMENT '企业id',
+  `is_success` varchar(1) DEFAULT 0 COMMENT '是否成功执行',
+  `tag` varchar(100) NOT NULL COMMENT '回调标记',
+  `fail_info` varchar(256) DEFAULT NULL COMMENT '错误信息',
+  `event_json` varchar(512) NOT NULL COMMENT '企业回调事件的JSON',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COMMENT='企业通讯录事件回调的记录';
+
+CREATE TABLE `isv_corp_callback_fail` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `suite_key` varchar(100) NOT NULL COMMENT '套件key',
+  `corp_id` varchar(100) NOT NULL COMMENT '企业id',
+  `tag` varchar(100) NOT NULL COMMENT '回调标记',
+  `fail_info` varchar(256) DEFAULT NULL COMMENT '错误信息',
+  `event_json` varchar(512) NOT NULL COMMENT '企业回调事件的JSON',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COMMENT='企业通讯录事件回调失败的记录';
+
 
 

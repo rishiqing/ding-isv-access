@@ -23,5 +23,12 @@ public interface CorpStaffDao {
 	public StaffDO getStaffByCorpIdAndUserId(@Param("corpId") String corpId, @Param("userId") String userId);
 
 
+	/**
+	 * 根据corpId和userId删除用户
+	 * @param corpId
+	 * @param userId
+	 * @return
+	 */
+	public void deleteStaffByCorpIdAndUserId(@Param("corpId") String corpId, @Param("userId") String userId);
 }
 

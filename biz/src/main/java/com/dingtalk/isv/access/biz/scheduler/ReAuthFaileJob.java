@@ -2,15 +2,19 @@ package com.dingtalk.isv.access.biz.scheduler;
 
 import com.alibaba.fastjson.JSON;
 import com.dingtalk.isv.access.api.enums.suite.AuthFaileType;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTokenVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteVO;
 import com.dingtalk.isv.access.api.model.suite.UnActiveCorpVO;
+import com.dingtalk.isv.access.api.service.corp.CorpManageService;
+import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.dingutil.ISVRequestHelper;
 import com.dingtalk.isv.access.biz.suite.dao.AppDao;
 import com.dingtalk.isv.access.biz.suite.dao.CorpSuiteAuthFaileDao;
 import com.dingtalk.isv.access.biz.suite.model.AppDO;
+import com.dingtalk.isv.access.biz.suite.model.CorpAppDO;
 import com.dingtalk.isv.access.biz.suite.model.CorpSuiteAuthFaileDO;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -47,11 +51,14 @@ public class ReAuthFaileJob extends QuartzJobBean {
             try{
                 XmlWebApplicationContext xmlWebApplicationContext = (XmlWebApplicationContext) jobExecutionContext.getScheduler().getContext().get("applicationContextKey");
                 SuiteManageService suiteManageService = (SuiteManageService)xmlWebApplicationContext.getBean("suiteManageService");
+                AppManageService appManageService = (AppManageService)xmlWebApplicationContext.getBean("appManageService");
                 ISVRequestHelper isvRequestHelper = (ISVRequestHelper)xmlWebApplicationContext.getBean("isvRequestHelper");
                 JobDataMap data = jobExecutionContext.getJobDetail().getJobDataMap();
-                String suiteKey = data.getString("suiteKey");
+//                String suiteKey = data.getString("suiteKey");
                 Long appId = data.getLong("appId");
-                ServiceResult<SuiteTokenVO> suiteTokenSr = suiteManageService.getSuiteToken(suiteKey);
+                ServiceResult<AppVO> appSr = appManageService.getAppByAppId(appId);
+                AppVO appVO = appSr.getResult();
+                ServiceResult<SuiteTokenVO> suiteTokenSr = suiteManageService.getSuiteToken(appVO.getSuiteKey());
                 if(!suiteTokenSr.isSuccess() || null==suiteTokenSr.getResult()){
                     bizLogger.warn(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                             "suiteToken获取失败",

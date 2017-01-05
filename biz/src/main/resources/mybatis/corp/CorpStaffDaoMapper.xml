@@ -146,10 +146,7 @@
         extattr=#{extattr},
         is_sys=#{isSys},
         sys_level=#{sysLevel},
-        union_id=#{unionId},
-        rsq_user_id=#{rsqUserId},
-        rsq_username=#{rsqUsername},
-        rsq_password=#{rsqPassword}
+        union_id=#{unionId}
     </insert>
 
 
@@ -160,5 +157,12 @@
 			WHERE corp_id=#{corpId} and user_id=#{userId}
 		 ]]>
     </select>
+
+    <delete id="deleteStaffByCorpIdAndUserId">
+        delete from isv_corp_staff
+        <![CDATA[
+			WHERE corp_id=#{corpId} and user_id=#{userId}
+		 ]]>
+    </delete>
 
 </mapper>

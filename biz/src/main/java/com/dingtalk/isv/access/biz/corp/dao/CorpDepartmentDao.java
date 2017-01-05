@@ -33,6 +33,13 @@ public interface CorpDepartmentDao {
 	 */
 	public List<DepartmentDO> getDepartmentListByCorpId(@Param("corpId") String corpId);
 
+	/**
+	 * 根据corpId和deptId删除部门
+	 * @param corpId
+	 * @param deptId
+	 * @return
+	 */
+	public void deleteDepartmentByCorpIdAndDeptId(@Param("corpId") String corpId, @Param("deptId") Long deptId);
 
 }
 

@@ -230,6 +230,28 @@
         </layout>
     </appender>
 
+    <!-- corp callback queue log appender -->
+    <appender name="CORP_CALLBACK_QUEUE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/mnt/dingtalk/logs/biz/corp_callback_queue.log" />
+        <param name="append" value="true" />
+        <param name="encoding" value="UTF-8" />
+        <param name="threshold" value="INFO" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
+
+    <!-- mq listener log appender -->
+    <appender name="MQ_LISTENER_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/mnt/dingtalk/logs/biz/mq_listener.log" />
+        <param name="append" value="true" />
+        <param name="encoding" value="UTF-8" />
+        <param name="threshold" value="INFO" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
+
 
 
 
@@ -344,6 +366,17 @@
         <appender-ref ref="CORP_LOCK_LOGGER_APPENDER" />
     </logger>
 
+    <!--corp callback event logger-->
+    <logger name="CORP_CALLBACK_QUEUE_LOGGER" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="CORP_CALLBACK_QUEUE_LOGGER_APPENDER" />
+    </logger>
+
+    <!--mq listener logger-->
+    <logger name="MQ_LISTENER_LOGGER" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="MQ_LISTENER_LOGGER_APPENDER" />
+    </logger>
 
     <root>
         <level value="info"/>

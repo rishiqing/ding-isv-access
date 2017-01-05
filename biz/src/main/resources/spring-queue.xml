@@ -15,6 +15,11 @@
     <!-- 开放平台回调mq -->
     <amq:queue id="suiteCallBackQueue" physicalName="suiteCallBack.queue" />
 
+    <!-- corp callback 回调mq -->
+    <bean id="corpCallbackTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="corpCallback.topic"/>
+    </bean>
+
 
     <!-- 自行配置mq的地址 -->
     <amq:connectionFactory id="amqConnectionFactory"
@@ -29,6 +34,17 @@
 
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <constructor-arg ref="connectionFactory" />
+    </bean>
+
+
+    <!-- 消息监听器 -->
+    <bean id="suitCallbackMessageListener" class="com.dingtalk.isv.access.biz.event.mq.SuiteCallbackListener"/>
+    <!-- 消息监听容器 -->
+    <bean id="jmsContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="suiteCallBackQueue" />
+        <property name="messageListener" ref="suitCallbackMessageListener" />
     </bean>
 
 </beans>

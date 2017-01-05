@@ -316,4 +316,65 @@ public class StaffManageServiceImpl implements StaffManageService {
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
     }
+
+    @Override
+    public ServiceResult<Void> getAndSaveStaff(String staffId, String corpId, String suiteKey) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("staffId", staffId)
+        ));
+        try {
+
+            ServiceResult<StaffVO> staffSr = getStaff(staffId, corpId, suiteKey);
+            if(!staffSr.isSuccess()){
+                return ServiceResult.failure(staffSr.getCode(), staffSr.getMessage());
+            }
+            ServiceResult<Void> staffSaveSr = saveOrUpdateCorpStaff(staffSr.getResult());
+            if(!staffSaveSr.isSuccess()){
+                return ServiceResult.failure(staffSaveSr.getCode(), staffSaveSr.getMessage());
+            }
+            return ServiceResult.success(null);
+
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("staffId", staffId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("staffId", staffId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    @Override
+    public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, String userId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("userId", userId)
+        ));
+        try {
+
+            corpStaffDao.deleteStaffByCorpIdAndUserId(corpId, userId);
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("userId", userId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("userId", userId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
 }

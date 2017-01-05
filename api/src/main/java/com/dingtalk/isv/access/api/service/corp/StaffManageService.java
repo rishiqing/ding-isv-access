@@ -72,4 +72,21 @@ public interface StaffManageService {
      * @return
      */
     public ServiceResult<Void> getAndSaveAllCorpOrgStaff(String suiteKey, String corpId);
+
+    /**
+     * 从钉钉服务器获取staff信息并保持或更新到本地
+     * @param staffId
+     * @param corpId
+     * @param suiteKey
+     * @return
+     */
+    public ServiceResult<Void> getAndSaveStaff(String staffId, String corpId, String suiteKey);
+
+    /**
+     * 根据corpId和userId删除用户
+     * @param corpId
+     * @param userId
+     * @return
+     */
+    public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, String userId);
 }

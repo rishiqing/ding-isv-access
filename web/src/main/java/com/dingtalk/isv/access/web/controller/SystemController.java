@@ -1,5 +1,7 @@
 package com.dingtalk.isv.access.web.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
@@ -19,11 +21,14 @@ import com.dingtalk.isv.common.util.HttpUtils;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -39,6 +44,11 @@ public class SystemController {
     private EventBus corpAuthSuiteEventBus;
     @Autowired
     private AsyncEventBus asyncCorpAuthSuiteEventBus;
+    @Autowired
+    private JmsTemplate jmsTemplate;
+    @Autowired
+    @Qualifier("suiteCallBackQueue")
+    private Queue suiteCallBackQueue;
 
 
 
@@ -48,6 +58,17 @@ public class SystemController {
         asyncCorpAuthSuiteEventBus.post(new Integer(100));
         asyncCorpAuthSuiteEventBus.post(new Integer(200));
         asyncCorpAuthSuiteEventBus.post(new Integer(300));
+        return "success";
+    }
+
+    @RequestMapping("/mqtest")
+    @ResponseBody
+    public String mqTest() {
+        System.out.println("--------------/mqtest------------");
+        JSONObject jsonObject = JSON.parseObject("{\"hello\":\"Wallace\"}");
+
+        jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject, SuiteCallBackMessage.Tag.CHAT_ADD_MEMBER));
+
         return "success";
     }
 

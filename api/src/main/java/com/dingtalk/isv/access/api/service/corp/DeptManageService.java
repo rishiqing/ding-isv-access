@@ -66,4 +66,20 @@ public interface DeptManageService {
      */
     public ServiceResult<Void> getAndSaveAllCorpOrg(String suiteKey, String corpId);
 
+    /**
+     * 从钉钉服务器获取department信息并保持或更新到本地
+     * @param deptId
+     * @param corpId
+     * @param suiteKey
+     * @return
+     */
+    public ServiceResult<Void> getAndSaveDepartment(Long deptId, String corpId, String suiteKey);
+
+    /**
+     * 根据corpId和deptId删除部门
+     * @param corpId
+     * @param deptId
+     * @return
+     */
+    public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, Long deptId);
 }
