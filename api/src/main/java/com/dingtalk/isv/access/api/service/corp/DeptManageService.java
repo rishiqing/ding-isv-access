@@ -40,7 +40,7 @@ public interface DeptManageService {
      * @param deptId
      * @return
      */
-    public ServiceResult<DepartmentVO> getDepartmentByCorpIdAndDeptId(String corpId, String deptId);
+    public ServiceResult<DepartmentVO> getDepartmentByCorpIdAndDeptId(String corpId, Long deptId);
 
     /**
      * 根据corpId从本地数据库获取所有部门
@@ -49,6 +49,12 @@ public interface DeptManageService {
      */
     public ServiceResult<List<DepartmentVO>> getDepartmentListByCorpId(String corpId);
 
+    /**
+     * 根据parentId从本地数据库获取所有部门
+     * @param parentId
+     * @return
+     */
+    public ServiceResult<List<DepartmentVO>> getDepartmentListByCorpIdAndParentId(String corpId, Long parentId);
     /**
      * 递归调用获取并保存id为parentId的子部门
      * @param parentId
@@ -81,5 +87,5 @@ public interface DeptManageService {
      * @param deptId
      * @return
      */
-    public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, Long deptId);
+    public ServiceResult<Void> deleteDepartmentByCorpIdAndUserId(String corpId, Long deptId);
 }

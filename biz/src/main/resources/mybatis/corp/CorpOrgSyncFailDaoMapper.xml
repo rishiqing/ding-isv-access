@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dingtalk.isv.access.biz.corp.dao.CorpOrgFetchFailDao">
+<mapper namespace="com.dingtalk.isv.access.biz.corp.dao.CorpOrgSyncFailDao">
 
-    <resultMap type="com.dingtalk.isv.access.biz.corp.model.CorpOrgFetchFailDO" id="corpOrgFetchFailMap">
+    <resultMap type="com.dingtalk.isv.access.biz.corp.model.CorpOrgSyncFailDO" id="corpOrgSyncFailMap">
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
@@ -22,8 +22,8 @@
         corp_fail_type
     </sql>
 
-    <insert id="addOrUpdateCorpOrgFetchFailDO" useGeneratedKeys="true" keyProperty="id">
-        insert into isv_corp_org_fetch_fail (
+    <insert id="addOrUpdateCorpOrgSyncFailDO" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_corp_org_sync_fail (
         gmt_create,
         gmt_modified,
         suite_key,
@@ -40,14 +40,14 @@
         )ON DUPLICATE KEY UPDATE gmt_modified=now(),fail_info=#{failInfo}
     </insert>
 
-    <select id="getCorpOrgFetchFailList" resultMap="corpOrgFetchFailMap">
-        select <include refid="select-all-fields"/> from isv_corp_org_fetch_fail
+    <select id="getCorpOrgSyncFailList" resultMap="corpOrgSyncFailMap">
+        select <include refid="select-all-fields"/> from isv_corp_org_sync_fail
         limit #{offset},#{limit}
     </select>
 
 
     <delete id="deleteById">
-        delete from isv_corp_org_fetch_fail where id=#{id}
+        delete from isv_corp_org_sync_fail where id=#{id}
     </delete>
 
 </mapper>

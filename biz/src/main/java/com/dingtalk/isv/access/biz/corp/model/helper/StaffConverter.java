@@ -8,6 +8,8 @@ import com.dingtalk.isv.access.biz.corp.model.StaffResult;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -173,5 +175,22 @@ public class StaffConverter {
         staffResult.setRsqUsername(staffVO.getRsqUsername());
         staffResult.setRsqPassword(staffVO.getRsqPassword());
         return staffResult;
+    }
+
+    public static List<StaffVO> StaffDOList2StaffVOList(List<StaffDO> staffList){
+
+        if(null==staffList){
+            return null;
+        }
+
+        List<StaffVO> voList = new ArrayList<StaffVO>();
+
+        Iterator<StaffDO> it = staffList.iterator();
+        while (it.hasNext()){
+            StaffDO d = it.next();
+            voList.add(StaffConverter.staffDO2StaffVO(d));
+        }
+
+        return voList;
     }
 }

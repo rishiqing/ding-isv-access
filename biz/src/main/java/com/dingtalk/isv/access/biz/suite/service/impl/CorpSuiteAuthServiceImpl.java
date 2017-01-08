@@ -9,14 +9,15 @@ import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.api.model.corp.callback.CorpChannelAppVO;
 import com.dingtalk.isv.access.api.model.event.AuthChangeEvent;
 import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
-import com.dingtalk.isv.access.api.model.event.CorpOrgFetchEvent;
-import com.dingtalk.isv.access.api.model.event.mq.CorpAuthSuiteMessage;
+import com.dingtalk.isv.access.api.model.event.CorpOrgSyncEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTokenVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
+import com.dingtalk.isv.access.api.service.corp.DeptManageService;
+import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
@@ -64,23 +65,27 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
     @Autowired
     private CorpManageService corpManageService;
     @Autowired
+    private DeptManageService deptManageService;
+    @Autowired
+    private StaffManageService staffManageService;
+    @Autowired
     private IsvService isvService;
     @Autowired
     private CrmOapiRequestHelper crmOapiRequestHelper;
     @Autowired
     private EventBus corpAuthSuiteEventBus;
     @Autowired
+    private EventBus asyncCorpOrgSyncEventBus;
+    @Autowired
     //  使用异步eventBus代替同步eventBus
     private AsyncEventBus asyncCorpAuthSuiteEventBus;
-    @Autowired
-    private AsyncEventBus asyncCorpOrgFetchEventBus;
     @Autowired
     private AccessSystemConfig accessSystemConfig;
     @Autowired
     private JmsTemplate jmsTemplate;
     @Autowired
-    @Qualifier("orgAuthSuiteQueue")
-    private Queue orgAuthSuiteQueue;
+    @Qualifier("corpAuthSuiteQueue")
+    private Queue corpAuthSuiteQueue;
     @Autowired
     private ConfOapiRequestHelper confOapiRequestHelper;
     @Autowired
@@ -321,23 +326,28 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
 
 //            System.out.println(Thread.currentThread().getId() + ":before rsqAccountService.createRsqTeam:" + corpId);
 
-            //5  跟日事清服务器交互，创建日事清公司
-            ServiceResult<CorpVO> corpSr = rsqAccountService.createRsqTeam(suiteKey, corpId);
-            if(!corpSr.isSuccess()){
-                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            //5.  更新部门及人员信息
+            //5.1 同步部门
+            ServiceResult<Void> deptSr = deptManageService.getAndSaveAllCorpOrg(suiteKey, corpId);
+            if(!deptSr.isSuccess()){
+                return ServiceResult.failure(deptSr.getCode(),deptSr.getMessage());
+            }
+
+            //5.2 同步人员
+            ServiceResult<Void> staffSr = staffManageService.getAndSaveAllCorpOrgStaff(suiteKey, corpId);
+            if(!staffSr.isSuccess()){
+                return ServiceResult.failure(deptSr.getCode(),deptSr.getMessage());
             }
 
             //6.  异步，更新钉钉的组织机构以及用户信息到本地，然后与ISV更新组织机构和人员信息
-            CorpOrgFetchEvent corpOrgFetchEvent = new CorpOrgFetchEvent();
-            corpOrgFetchEvent.setSuiteKey(suiteKey);
-            corpOrgFetchEvent.setCorpId(corpId);
-            asyncCorpOrgFetchEventBus.post(corpOrgFetchEvent);
-
-//            System.out.println(Thread.currentThread().getId() + ":before jmsTemplate:" + corpId);
+            CorpOrgSyncEvent corpOrgSyncEvent = new CorpOrgSyncEvent();
+            corpOrgSyncEvent.setSuiteKey(suiteKey);
+            corpOrgSyncEvent.setCorpId(corpId);
+            asyncCorpOrgSyncEventBus.post(corpOrgSyncEvent);
 
 //            //7.发送mq到各个业务方,告知一个企业对套件授权了,业务方自己去做对应的业务
 //            如果Queue尚未实现，此处需要注释掉，否则将会堵塞线程，影响eventBus的！
-//            jmsTemplate.send(orgAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
+//            jmsTemplate.send(corpAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);
         }catch (Exception e){
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,

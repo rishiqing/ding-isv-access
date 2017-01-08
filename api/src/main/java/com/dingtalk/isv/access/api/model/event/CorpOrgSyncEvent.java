@@ -6,7 +6,7 @@ import java.io.Serializable;
  * 企业获取组织结构信息事件
  * Created by Wallace on 2017/1/3.
  */
-public class CorpOrgFetchEvent implements Serializable {
+public class CorpOrgSyncEvent implements Serializable {
     private String corpId;
     private String suiteKey;
 
@@ -27,7 +27,7 @@ public class CorpOrgFetchEvent implements Serializable {
     }
     @Override
     public String toString() {
-        return "CorpOrgFetchEvent{" +
+        return "CorpOrgSyncEvent{" +
                 ", corpId='" + corpId + '\'' +
                 ", suiteKey='" + suiteKey + '\'' +
                 '}';

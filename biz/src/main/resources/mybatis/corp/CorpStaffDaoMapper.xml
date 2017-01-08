@@ -165,4 +165,77 @@
 		 ]]>
     </delete>
 
+    <select id="getStaffListByCorpId" resultMap="corpStaffMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp_staff
+        <![CDATA[
+			WHERE corp_id=#{corpId}
+		 ]]>
+    </select>
+
+    <update id="updateRsqInfo">
+        update isv_corp_staff set rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
+    </update>
+
+    <insert id="saveStaffDeleted" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_corp_staff_deleted (
+        gmt_create,
+        gmt_modified,
+        corp_id,
+        user_id,
+        `name`,
+        tel,
+        work_place,
+        remark,
+        mobile,
+        email,
+        active,
+        order_in_depts,
+        is_admin,
+        is_boss,
+        ding_id,
+        is_leader_in_depts,
+        is_hide,
+        department,
+        `position`,
+        avatar,
+        jobnumber,
+        extattr,
+        is_sys,
+        sys_level,
+        union_id,
+        rsq_user_id,
+        rsq_username,
+        rsq_password
+        )values(
+        now(),
+        now(),
+        #{corpId},
+        #{userId},
+        #{name},
+        #{tel},
+        #{workPlace},
+        #{remark},
+        #{mobile},
+        #{email},
+        #{active},
+        #{orderInDepts},
+        #{isAdmin},
+        #{isBoss},
+        #{dingId},
+        #{isLeaderInDepts},
+        #{isHide},
+        #{department},
+        #{position},
+        #{avatar},
+        #{jobnumber},
+        #{extattr},
+        #{isSys},
+        #{sysLevel},
+        #{unionId},
+        #{rsqUserId},
+        #{rsqUsername},
+        #{rsqPassword}
+        )
+    </insert>
+
 </mapper>

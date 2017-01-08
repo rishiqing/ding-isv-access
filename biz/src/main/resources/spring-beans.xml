@@ -63,12 +63,12 @@
     <bean id="corpAuthSuiteEventBus" class="com.google.common.eventbus.EventBus" />
     <bean id="corpAuthSuiteEventListener" class="com.dingtalk.isv.access.biz.event.CorpAuthSuiteEventListener"/>
 
-    <bean id="asyncCorpOrgFetchExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncCorpOrgFetchExecutorFactory" />
-    <bean id="asyncCorpOrgFetchExecutor" factory-bean="asyncCorpOrgFetchExecutorFactory" factory-method="getCorpOrgFetchExecutor" />
-    <bean id="asyncCorpOrgFetchEventBus" class="com.google.common.eventbus.AsyncEventBus">
-        <constructor-arg ref="asyncCorpOrgFetchExecutor"/>
+    <bean id="asyncCorpOrgSyncExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncCorpOrgSyncExecutorFactory" />
+    <bean id="asyncCorpOrgSyncExecutor" factory-bean="asyncCorpOrgSyncExecutorFactory" factory-method="getCorpOrgSyncExecutor" />
+    <bean id="asyncCorpOrgSyncEventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg ref="asyncCorpOrgSyncExecutor"/>
     </bean>
-    <bean id="corpOrgFetchEventListener" class="com.dingtalk.isv.access.biz.event.CorpOrgFetchEventListener"/>
+    <bean id="corpOrgSyncEventListener" class="com.dingtalk.isv.access.biz.event.CorpOrgSyncEventListener"/>
 
     <bean id="asyncCorpCallbackExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncCorpCallbackExecutorFactory" />
     <bean id="asyncCorpCallbackExecutor" factory-bean="asyncCorpCallbackExecutorFactory" factory-method="getCorpCallbackExecutor" />
@@ -83,7 +83,7 @@
                 <!--<entry key-ref="corpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>-->
                 <!--改用异步eventBus-->
                 <entry key-ref="asyncCorpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>
-                <entry key-ref="asyncCorpOrgFetchEventBus" value-ref="corpOrgFetchEventListener"></entry>
+                <entry key-ref="asyncCorpOrgSyncEventBus" value-ref="corpOrgSyncEventListener"></entry>
                 <entry key-ref="asyncCorpCallbackEventBus" value-ref="corpCallbackEventListener"></entry>
             </map>
         </property>
@@ -103,6 +103,7 @@
     <bean id="orgManangerService" class="com.dingtalk.isv.access.biz.org.service.impl.OrgManangerServiceImpl"/>
 
     <bean id="rsqAccountService" class="com.dingtalk.isv.rsq.biz.service.RsqAccountService"/>
+    <bean id="rsqCorpCallbackService" class="com.dingtalk.isv.rsq.biz.service.RsqCorpCallbackService"/>
 
     <bean id="corpLockService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpLockServiceImpl" />
     <bean id="corpCallbackQueueService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpCallbackQueueServiceImpl" />
@@ -126,6 +127,7 @@
                 <value>channelManageService</value>
                 <value>orgManangerService</value>
                 <value>rsqAccountService</value>
+                <value>rsqCorpCallbackService</value>
                 <value>corpCallbackQueueService</value>
             </list>
         </property>

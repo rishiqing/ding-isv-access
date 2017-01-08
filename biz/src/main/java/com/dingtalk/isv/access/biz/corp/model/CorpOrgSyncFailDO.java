@@ -9,7 +9,7 @@ import java.util.Date;
  * 从钉钉中获取组织结构（部门和人员）信息失败的对象
  * Created by Wallace on 17-1-3.
  */
-public class CorpOrgFetchFailDO {
+public class CorpOrgSyncFailDO {
 
     /**
      * 主键

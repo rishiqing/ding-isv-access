@@ -9,7 +9,9 @@ import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.DeptManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
+import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.corp.model.helper.DepartmentConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.CorpOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
@@ -354,6 +356,9 @@ public class StaffManageServiceImpl implements StaffManageService {
     }
 
     @Override
+    /**
+     * 本地删除后需要移入删除表做备份
+     */
     public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, String userId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpId", corpId),
@@ -361,6 +366,12 @@ public class StaffManageServiceImpl implements StaffManageService {
         ));
         try {
 
+            StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
+            if(null == staffDO){
+                return ServiceResult.success(null);
+            }
+            //本地删除并移入删除表以做备份
+            corpStaffDao.saveStaffDeleted(staffDO);
             corpStaffDao.deleteStaffByCorpIdAndUserId(corpId, userId);
             return ServiceResult.success(null);
         } catch (Exception e) {
@@ -373,6 +384,27 @@ public class StaffManageServiceImpl implements StaffManageService {
                     "系统异常" + e.toString(),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("userId", userId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    public ServiceResult<List<StaffVO>> getStaffListByCorpId(String corpId){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            List<StaffDO> list = corpStaffDao.getStaffListByCorpId(corpId);
+
+            return ServiceResult.success(StaffConverter.StaffDOList2StaffVOList(list));
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }

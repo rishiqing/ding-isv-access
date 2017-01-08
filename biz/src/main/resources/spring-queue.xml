@@ -10,7 +10,7 @@
 
 
     <!-- 企业授权套件mq -->
-    <amq:queue id="orgAuthSuiteQueue" physicalName="orgAuthSuite.queue" />
+    <amq:queue id="corpAuthSuiteQueue" physicalName="corpAuthSuite.queue" />
 
     <!-- 开放平台回调mq -->
     <amq:queue id="suiteCallBackQueue" physicalName="suiteCallBack.queue" />

@@ -61,7 +61,4 @@
 			WHERE corp_id=#{corpId}
 		 ]]>
     </select>
-
-
-
 </mapper>

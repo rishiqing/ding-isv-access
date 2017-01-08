@@ -89,4 +89,12 @@ public interface StaffManageService {
      * @return
      */
     public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, String userId);
-}
+
+    /**
+     * 根据corpId获取一个公司的staff列表
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<List<StaffVO>> getStaffListByCorpId(String corpId);
+
+    }

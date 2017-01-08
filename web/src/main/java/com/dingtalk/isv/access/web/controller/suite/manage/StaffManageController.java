@@ -5,6 +5,7 @@ import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.suite.AppManageService;
+import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
@@ -107,7 +108,8 @@ public class StaffManageController {
             ServiceResult<LoginUserVO> loginUserVOSr = staffManageService.getStaffByAuthCode(suiteKey, corpId, code);
             LoginUserVO loginUserVO = loginUserVOSr.getResult();
 
-            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO);
+//            ServiceResult<StaffVO> staffVOSr = rsqAccountService.createRsqTeamStaff(suiteKey, corpId, loginUserVO);
+            ServiceResult<StaffVO> staffVOSr = staffManageService.getStaffByCorpIdAndUserId(corpId, loginUserVO.getUserId());
 
             if(!staffVOSr.isSuccess()){
                 return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());

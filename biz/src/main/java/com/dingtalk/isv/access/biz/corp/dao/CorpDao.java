@@ -26,7 +26,7 @@ public interface CorpDao {
 	 * @param corpDO
 	 * @return
 	 */
-	public CorpDO updateRsqInfo(CorpDO corpDO);
+	public void updateRsqInfo(CorpDO corpDO);
 
 
 }

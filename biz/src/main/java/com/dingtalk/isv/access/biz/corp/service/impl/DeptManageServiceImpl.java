@@ -231,7 +231,33 @@ public class DeptManageServiceImpl implements DeptManageService {
     }
 
     @Override
-    public ServiceResult<DepartmentVO> getDepartmentByCorpIdAndDeptId(String corpId, String deptId) {
+    public ServiceResult<List<DepartmentVO>> getDepartmentListByCorpIdAndParentId(String corpId, Long parentId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("parentId", parentId)
+        ));
+        try {
+            List<DepartmentDO> list = corpDepartmentDao.getDepartmentListByParentId(corpId, parentId);
+
+            List<DepartmentVO> voList = DepartmentConverter.DepartmentDOList2DepartmentVOList(list);
+            return ServiceResult.success(voList);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("parentId", parentId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("parentId", parentId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    @Override
+    public ServiceResult<DepartmentVO> getDepartmentByCorpIdAndDeptId(String corpId, Long deptId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpId", corpId),
                 LogFormatter.KeyValue.getNew("deptId", deptId)
@@ -343,7 +369,7 @@ public class DeptManageServiceImpl implements DeptManageService {
     }
 
     @Override
-    public ServiceResult<Void> deleteStaffByCorpIdAndUserId(String corpId, Long deptId) {
+    public ServiceResult<Void> deleteDepartmentByCorpIdAndUserId(String corpId, Long deptId) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpId", corpId),
                 LogFormatter.KeyValue.getNew("deptId", deptId)

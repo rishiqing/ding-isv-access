@@ -54,7 +54,11 @@ public class SuiteCallbackListener implements MessageListener {
                 userIdArray = eventJSON.getJSONArray("UserId").toArray(userIdArray);
             }
             if(eventJSON.containsKey("DeptId")){
-                deptIdArray = eventJSON.getJSONArray("DeptId").toArray(deptIdArray);
+                Object[] objArray = eventJSON.getJSONArray("DeptId").toArray();
+                deptIdArray = new Long[objArray.length];
+                for(int i=0;i<objArray.length;i++){
+                    deptIdArray[i] = new Long((Integer)objArray[i]);
+                }
             }
 
             ServiceResult callbackSr = null;

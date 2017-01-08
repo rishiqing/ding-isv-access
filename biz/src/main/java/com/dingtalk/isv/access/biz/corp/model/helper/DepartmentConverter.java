@@ -73,6 +73,8 @@ public class DepartmentConverter {
         departmentVO.setDeptManagerUseridList(departmentDO.getDeptManagerUseridList());
         departmentVO.setOrgDeptOwner(departmentDO.getOrgDeptOwner());
         departmentVO.setOrder(departmentDO.getOrder());
+
+        departmentVO.setRsqId(departmentDO.getRsqId());
         return departmentVO;
     }
 
@@ -97,6 +99,8 @@ public class DepartmentConverter {
         departmentDO.setDeptManagerUseridList(departmentVO.getDeptManagerUseridList());
         departmentDO.setOrgDeptOwner(departmentVO.getOrgDeptOwner());
         departmentDO.setOrder(departmentVO.getOrder());
+
+        departmentDO.setRsqId(departmentVO.getRsqId());
         return departmentDO;
     }
 

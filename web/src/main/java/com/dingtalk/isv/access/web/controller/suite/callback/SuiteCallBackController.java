@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.enums.suite.SuitePushType;
-import com.dingtalk.isv.access.api.model.event.CorpCallbackEvent;
-import com.dingtalk.isv.access.api.model.event.CorpOrgFetchEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTicketVO;
@@ -14,7 +12,6 @@ import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.service.CorpCallbackQueueService;
-import com.dingtalk.isv.access.biz.event.AsyncCorpCallbackExecutorFactory;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.oapi.lib.aes.DingTalkEncryptException;
@@ -29,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.jms.Queue;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -234,7 +230,6 @@ public class SuiteCallBackController{
         }else if(SuitePushType.TMP_AUTH_CODE.getKey().equals(eventType)){
             String tmpAuthCode = callbackMsgJson.getString("AuthCode");
             ServiceResult<CorpSuiteAuthVO>  sr = corpSuiteAuthService.saveOrUpdateCorpSuiteAuth(suiteKey, tmpAuthCode);
-//            System.out.println(Thread.currentThread().getId() + ":-------finish save-----success? " + sr.isSuccess());
             if(!sr.isSuccess()){
                 bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         "无效的TMP_AUTH_CODE",

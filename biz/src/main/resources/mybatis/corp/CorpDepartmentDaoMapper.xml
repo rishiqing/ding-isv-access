@@ -118,11 +118,22 @@
 		 ]]>
     </select>
 
+    <select id="getDepartmentListByParentId" resultMap="corpDepartmentMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp_dept
+        <![CDATA[
+			WHERE corp_id=#{corpId} AND parent_id=#{parentId}
+		 ]]>
+    </select>
+
     <delete id="deleteDepartmentByCorpIdAndDeptId">
         delete from isv_corp_dept
         <![CDATA[
 			WHERE corp_id=#{corpId} and dept_id=#{deptId}
 		 ]]>
     </delete>
+
+    <update id="updateRsqInfo">
+        update isv_corp_dept set rsq_id=#{rsqId} where corp_id=#{corpId} and dept_id=#{deptId}
+    </update>
 
 </mapper>
