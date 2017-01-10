@@ -320,6 +320,12 @@ public class RsqCorpCallbackService {
                 LogFormatter.KeyValue.getNew("staffVO", staffVO.getStaffId())
         ));
         try {
+
+            //  如果staffDO的rsqUserId存在，则不重新发送请求创建
+            if(null != staffVO.getRsqUserId()){
+                return ServiceResult.success(null);
+            }
+
             String userId = staffVO.getStaffId();
             String corpId = staffVO.getCorpId();
             //  生成用户信息

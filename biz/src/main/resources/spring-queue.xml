@@ -23,9 +23,9 @@
 
     <!-- 自行配置mq的地址 -->
     <amq:connectionFactory id="amqConnectionFactory"
-                           brokerURL="failover:(tcp://localhost:61616,tcp://localhost:61616)?randomize=false&amp;jms.useAsyncSend=true"
-                           userName="admin"
-                           password="admin" />
+                           brokerURL="failover:(tcp://${amq.broker.url1},tcp://${amq.broker.url2})?randomize=false&amp;jms.useAsyncSend=true"
+                           userName="${amq.username}"
+                           password="${amq.password}" />
 
     <bean id="connectionFactory"  class="org.springframework.jms.connection.CachingConnectionFactory">
         <constructor-arg ref="amqConnectionFactory" />
@@ -37,15 +37,16 @@
     </bean>
 
 
+    <!--只在job程序中配置监听-->
     <!-- 消息监听器 -->
-    <bean id="suitCallbackMessageListener" class="com.dingtalk.isv.access.biz.event.mq.SuiteCallbackListener"/>
-    <!-- 消息监听容器 -->
-    <bean id="jmsContainer"
-          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory" />
-        <property name="destination" ref="suiteCallBackQueue" />
-        <property name="messageListener" ref="suitCallbackMessageListener" />
-    </bean>
+    <!--<bean id="suitCallbackMessageListener" class="com.dingtalk.isv.access.biz.event.mq.SuiteCallbackListener"/>-->
+    <!--&lt;!&ndash; 消息监听容器 &ndash;&gt;-->
+    <!--<bean id="jmsContainer"-->
+          <!--class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="connectionFactory" />-->
+        <!--<property name="destination" ref="suiteCallBackQueue" />-->
+        <!--<property name="messageListener" ref="suitCallbackMessageListener" />-->
+    <!--</bean>-->
 
 </beans>
 

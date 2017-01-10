@@ -23,8 +23,10 @@ import java.util.Iterator;
 
 /**
  * 接受通讯录变更事件异步调用的listener
+ * 已废弃
  * Created by Wallace on 2017/1/4.
  */
+@Deprecated
 public class CorpCallbackEventListener implements EventListener {
     private static final Logger bizLogger = LoggerFactory.getLogger("EVENT_LOGGER");
     private static final Logger mainLogger = LoggerFactory.getLogger(CorpCallbackEventListener.class);

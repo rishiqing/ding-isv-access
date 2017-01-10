@@ -20,21 +20,22 @@
     </bean>
 
 
-    <bean name="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="dataSource">
-            <ref bean="dataSource" />
-        </property>
-        <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
-        <property name="configLocation" value="classpath:quartz.properties" />
-        <property name="triggers">
-            <list>
-                <ref bean="suiteTokenTrigger" />
-                <ref bean="corpSuiteAuthFaileTrigger" />
-                <ref bean="reAuthFaileTrigger" />
-                <ref bean="corpOrgSyncFailTrigger" />
-            </list>
-        </property>
-    </bean>
+    <!--只在job程序中配置计时任务-->
+    <!--<bean name="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+        <!--<property name="dataSource">-->
+            <!--<ref bean="dataSource" />-->
+        <!--</property>-->
+        <!--<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />-->
+        <!--<property name="configLocation" value="classpath:quartz.properties" />-->
+        <!--<property name="triggers">-->
+            <!--<list>-->
+                <!--<ref bean="suiteTokenTrigger" />-->
+                <!--<ref bean="corpSuiteAuthFaileTrigger" />-->
+                <!--<ref bean="reAuthFaileTrigger" />-->
+                <!--<ref bean="corpOrgSyncFailTrigger" />-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <bean id="suiteTokenJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.SuiteTokenGenerateJob"/>

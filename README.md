@@ -92,3 +92,15 @@
 ## 用户授权访问时集成（用户集成）
 
 由于需要使用用户集成后的返回数据，因此只能使用同步集成
+
+
+# 钉钉主程序和job程序发布说明：
+## 钉钉主程序
+
+- 注释掉spring-task.xml的quartzScheduler bean，不启动quartz计时器
+- 注释掉spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，不配置队列监听器
+
+## 钉钉job程序
+
+- 取消注释spring-task.xml的quartzScheduler bean，启动quartz计时器
+- 取消注释spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，配置队列监听器

@@ -187,6 +187,12 @@ public class RsqAccountService {
                 LogFormatter.KeyValue.getNew("userID", staffDO.getUserId())
         ));
         try {
+
+            //  如果staffDO的rsqUserId存在，则不重新发送请求创建
+            if(null != staffDO.getRsqUserId()){
+                return ServiceResult.success(null);
+            }
+
             String userId = staffDO.getUserId();
             String corpId = staffDO.getCorpId();
             //  生成用户信息
