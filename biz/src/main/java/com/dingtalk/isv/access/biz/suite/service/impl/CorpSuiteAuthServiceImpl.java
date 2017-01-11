@@ -324,6 +324,10 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
 
+//            if(true){
+//                return ServiceResult.success(null);
+//            }
+
 //            System.out.println(Thread.currentThread().getId() + ":before rsqAccountService.createRsqTeam:" + corpId);
 
             //5.  更新部门及人员信息

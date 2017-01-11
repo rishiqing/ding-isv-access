@@ -288,7 +288,13 @@ public class RsqAccountService {
         Iterator it = departmentList.iterator();
 
         while (it.hasNext()){
-            Long orgId = (Long)it.next();
+            Long orgId;
+            Object num = it.next();
+            if(num instanceof Integer){
+                orgId = new Long((Integer)num);
+            }else{
+                orgId = (Long)num;
+            }
             DepartmentDO departmentDO = corpDepartmentDao.getDepartmentByCorpIdAndDeptId(corpId, orgId);
             String rsqId = departmentDO.getRsqId();
             if(null == rsqId){
