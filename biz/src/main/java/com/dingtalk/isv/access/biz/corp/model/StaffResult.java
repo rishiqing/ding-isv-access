@@ -23,6 +23,7 @@ public class StaffResult {
     private String jobnumber;
     private Map<String, String> extattr;
 
+    private String rsqUserId;
     private String rsqUsername;
     private String rsqPassword;
 
@@ -154,6 +155,14 @@ public class StaffResult {
         this.rsqPassword = rsqPassword;
     }
 
+    public String getRsqUserId() {
+        return rsqUserId;
+    }
+
+    public void setRsqUserId(String rsqUserId) {
+        this.rsqUserId = rsqUserId;
+    }
+
     @Override
     public String toString() {
         return "StaffDO{" +
@@ -171,6 +180,7 @@ public class StaffResult {
                 ", avatar='" + avatar + '\'' +
                 ", jobnumber='" + jobnumber + '\'' +
                 ", extattr=" + extattr +
+                ", rsqUserId=" + rsqUserId +
                 '}';
     }
 }

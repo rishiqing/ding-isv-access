@@ -172,6 +172,7 @@ public class StaffConverter {
         staffResult.setJobnumber(staffVO.getJobnumber());
         staffResult.setExtattr(staffVO.getExtattr());
         staffResult.setUserId(staffVO.getUnionId());
+        staffResult.setRsqUserId(staffVO.getRsqUserId());
         staffResult.setRsqUsername(staffVO.getRsqUsername());
         staffResult.setRsqPassword(staffVO.getRsqPassword());
         return staffResult;

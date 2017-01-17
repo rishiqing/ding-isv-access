@@ -1,6 +1,7 @@
 package com.dingtalk.isv.access.biz.corp.dao;
 
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.corp.model.StaffIdsDO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +53,23 @@ public interface CorpStaffDao {
 	 * @param staffDO
 	 */
 	public void saveStaffDeleted(StaffDO staffDO);
+
+	/**
+	 * 根据staff的rsqId获取到userId
+	 * @param rsqIds
+	 * @return
+	 */
+	public List<StaffIdsDO> getUserIdFromRsqId(
+			@Param("corpId") String corpId,
+			@Param("rsqIds") String[] rsqIds);
+	/**
+	 * 根据staff的rsqId获取到userId
+	 * @param userIds
+	 * @return
+	 */
+	public List<StaffIdsDO> getRsqIdFromUserId(
+			@Param("corpId") String corpId,
+			@Param("userIds") String[] userIds);
 
 }
 
