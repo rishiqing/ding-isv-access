@@ -6,11 +6,13 @@ import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
 import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
+import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
+import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,7 +52,6 @@ public class SystemController {
     @Autowired
     @Qualifier("suiteCallBackQueue")
     private Queue suiteCallBackQueue;
-
 
 
     @RequestMapping("/test")
@@ -76,6 +78,8 @@ public class SystemController {
     private CorpSuiteAuthService corpSuiteAuthService;
     @Resource
     private CorpManageService corpManageService;
+    @Autowired
+    private StaffManageService staffManageService;
     @Resource
     SuiteManageService suiteManageService;
     @Resource
@@ -84,6 +88,26 @@ public class SystemController {
     CorpJSAPITicketDao corpJSAPITicketDao;
     @Resource
     ConfOapiRequestHelper confOapiRequestHelper;
+
+    @RequestMapping("/dbtest")
+    @ResponseBody
+    public String checkSomeTest(
+            @RequestParam(value = "username", required = true) String username) {
+        try {
+            StaffVO staff = new StaffVO();
+            staff.setCorpId("hellotest");
+            staff.setStaffId(String.valueOf(new Date().getTime()));
+            staff.setName(username);
+            ServiceResult<Void> staffSaveSr = staffManageService.saveOrUpdateCorpStaff(staff);
+
+            return "success";
+        } catch (Exception e){
+            e.printStackTrace();
+            return "fail";
+        }
+
+    }
+
     @ResponseBody
     @RequestMapping(value = "/token/{suiteKey}", method = {RequestMethod.GET})
     public String genToken( HttpServletRequest request,@PathVariable("suiteKey") String suiteKey ) {

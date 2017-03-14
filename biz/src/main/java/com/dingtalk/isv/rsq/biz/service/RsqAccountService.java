@@ -30,11 +30,14 @@ import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqCorp;
 import com.dingtalk.isv.rsq.biz.model.RsqDepartment;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -44,6 +47,9 @@ import java.util.*;
 public class RsqAccountService {
     private static final Logger bizLogger = LoggerFactory.getLogger("RSQ_REQUEST_LOGGER");
     private static final Logger mainLogger = LoggerFactory.getLogger(RsqAccountService.class);
+
+    //  计算密码需要加的盐值，暂时放在这里，以后放到配置文件中
+    private static final String md5Salt = "3385A05EECE3B086E9369F86CBA4E478";
 
     @Autowired
     private SuiteDao suiteDao;
@@ -206,7 +212,7 @@ public class RsqAccountService {
 
             //  保存用户信息到日事清系统
             String username = generateRsqUsername(suiteDO.getRsqAppName());  //自动生成用户名
-            String password = generateRsqPassword();  //自动生成明文密码
+            String password = generateRsqPassword(username);  //自动生成明文密码
             staffDO.setRsqUsername(username);
             staffDO.setRsqPassword(password);
 
@@ -230,6 +236,9 @@ public class RsqAccountService {
             }
             RsqUser user = rsqUserSr.getResult();
             staffDO.setRsqUserId(String.valueOf(user.getId()));
+            //TODO 为控制并发，保证username和password与日事清系统一致，使用返回值作为rsqUsername和rsqPassword
+            staffDO.setRsqUsername(user.getUsername());
+            staffDO.setRsqPassword(generateRsqPassword(user.getUsername()));
 
             corpStaffDao.updateRsqInfo(staffDO);
             return ServiceResult.success(null);
@@ -262,8 +271,25 @@ public class RsqAccountService {
         return  sb.toString();
     }
 
-    public String generateRsqPassword(){
-        return RandomStringUtils.randomAlphabetic(6);
+    public String generateRsqPassword(String username){
+        MessageDigest md5 = null;
+        String src = username + md5Salt;
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "生成用户密码异常",
+                    LogFormatter.KeyValue.getNew("username", username)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "生成用户密码异常",
+                    LogFormatter.KeyValue.getNew("username", username)
+            ), e);
+            return "123456";
+        }
+        byte[] bs = md5.digest(src.getBytes());
+        return new String(new Hex().encode(bs)).substring(3,9);
+//        return RandomStringUtils.randomAlphabetic(6);
     }
 
     public JSONArray convertRsqDepartment(String corpId, String dingDepartment){

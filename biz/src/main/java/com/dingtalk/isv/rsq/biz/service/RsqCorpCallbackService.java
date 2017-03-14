@@ -339,7 +339,7 @@ public class RsqCorpCallbackService {
 
             //  保存用户信息到日事清系统
             String username = generateRsqUsername(suiteDO.getRsqAppName());  //自动生成用户名
-            String password = generateRsqPassword();  //自动生成明文密码
+            String password = rsqAccountService.generateRsqPassword(username);  //自动生成明文密码
             staffVO.setRsqUsername(username);
             staffVO.setRsqPassword(password);
 
@@ -363,6 +363,9 @@ public class RsqCorpCallbackService {
             }
             RsqUser user = rsqUserSr.getResult();
             staffVO.setRsqUserId(String.valueOf(user.getId()));
+            //TODO 为控制并发，保证username和password与日事清系统一致，使用返回值作为rsqUsername和rsqPassword
+            staffVO.setRsqUsername(user.getUsername());
+            staffVO.setRsqPassword(rsqAccountService.generateRsqPassword(user.getUsername()));
 
             corpStaffDao.updateRsqInfo(StaffConverter.staffVO2StaffDO(staffVO));
             return ServiceResult.success(staffVO);
@@ -576,9 +579,5 @@ public class RsqCorpCallbackService {
                 .append(appName)
                 .append(".rishiqing.com");
         return  sb.toString();
-    }
-
-    public String generateRsqPassword(){
-        return RandomStringUtils.randomAlphabetic(6);
     }
 }
