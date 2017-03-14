@@ -23,6 +23,8 @@ public class StaffResult {
     private String jobnumber;
     private Map<String, String> extattr;
 
+    private String unionId;
+
     private String rsqUserId;
     private String rsqUsername;
     private String rsqPassword;
@@ -161,6 +163,14 @@ public class StaffResult {
 
     public void setRsqUserId(String rsqUserId) {
         this.rsqUserId = rsqUserId;
+    }
+
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * Created by mint on 16-1-22.
  */
+
 public class StaffConverter {
 
 
@@ -171,7 +172,7 @@ public class StaffConverter {
         staffResult.setAvatar(staffVO.getAvatar());
         staffResult.setJobnumber(staffVO.getJobnumber());
         staffResult.setExtattr(staffVO.getExtattr());
-        staffResult.setUserId(staffVO.getUnionId());
+        staffResult.setUnionId(staffVO.getUnionId());
         staffResult.setRsqUserId(staffVO.getRsqUserId());
         staffResult.setRsqUsername(staffVO.getRsqUsername());
         staffResult.setRsqPassword(staffVO.getRsqPassword());
