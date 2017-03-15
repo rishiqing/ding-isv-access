@@ -71,5 +71,12 @@ public interface CorpStaffDao {
 			@Param("corpId") String corpId,
 			@Param("userIds") String[] userIds);
 
+	/**
+	 * 更新unionId
+	 * @param staffDO
+	 * @return
+	 */
+	public void updateUnionId(StaffDO staffDO);
+
 }
 

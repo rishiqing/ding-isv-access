@@ -23,6 +23,7 @@
 /*     */   private String avatar;
 /*     */   private String jobnumber;
 /*     */   private Map<String, String> extattr;
+            private String unionId;
 /*     */   
 /*     */   public String getTel()
 /*     */   {
@@ -152,7 +153,16 @@
 /*     */   public void setExtattr(Map<String, String> extattr) {
 /* 153 */     this.extattr = extattr;
 /*     */   }
-/*     */   
+
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
+    }
+
+    /*     */
 /*     */   public int hashCode()
 /*     */   {
 /* 158 */     int prime = 31;
@@ -173,6 +183,7 @@
 /* 173 */     result = 31 * result + (this.remark == null ? 0 : this.remark.hashCode());
 /* 174 */     result = 31 * result + (this.tel == null ? 0 : this.tel.hashCode());
 /* 175 */     result = 31 * result + (this.workPlace == null ? 0 : this.workPlace.hashCode());
+              result = 31 * result + (this.unionId == null ? 0 : this.unionId.hashCode());
 /* 176 */     return result;
 /*     */   }
 /*     */   
@@ -230,6 +241,9 @@
 /* 230 */     if (this.workPlace == null) {
 /* 231 */       if (other.workPlace != null) return false;
 /* 232 */     } else if (!this.workPlace.equals(other.workPlace)) return false;
+              if (this.unionId == null) {
+                  if (other.unionId != null) return false;
+              } else if (!this.unionId.equals(other.unionId)) return false;
 /* 233 */     return true;
 /*     */   }
 /*     */ }

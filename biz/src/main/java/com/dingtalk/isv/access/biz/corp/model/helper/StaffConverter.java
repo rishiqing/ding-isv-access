@@ -45,7 +45,7 @@ public class StaffConverter {
         staffVO.setAvatar(corpUserDetail.getAvatar());
         staffVO.setJobnumber(corpUserDetail.getJobnumber());
         staffVO.setExtattr(corpUserDetail.getExtattr());
-        staffVO.setUnionId(corpUserDetail.getUserid());
+        staffVO.setUnionId(corpUserDetail.getUnionId());
         return staffVO;
     }
 
@@ -74,7 +74,7 @@ public class StaffConverter {
         staffDO.setAvatar(corpUserDetail.getAvatar());
         staffDO.setJobnumber(corpUserDetail.getJobnumber());
         staffDO.setExtattr(JSON.toJSONString(corpUserDetail.getExtattr()));
-        staffDO.setUnionId(corpUserDetail.getUserid());
+        staffDO.setUnionId(corpUserDetail.getUnionId());
         return staffDO;
     }
 

@@ -16,10 +16,15 @@ import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
+import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
+import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
+import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
+import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
+import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +38,7 @@ import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -78,6 +84,8 @@ public class SystemController {
     private CorpSuiteAuthService corpSuiteAuthService;
     @Resource
     private CorpManageService corpManageService;
+    @Resource
+    private CorpUserService corpUserService;
     @Autowired
     private StaffManageService staffManageService;
     @Resource
@@ -88,6 +96,80 @@ public class SystemController {
     CorpJSAPITicketDao corpJSAPITicketDao;
     @Resource
     ConfOapiRequestHelper confOapiRequestHelper;
+
+    @Resource
+    CorpStaffDao corpStaffDao;
+
+    /**
+     * 更新指定corpId的企业员工的unionId
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    @RequestMapping("/test/updateallunionid/{suiteKey}")
+    @ResponseBody
+    public String testUpdateAllUnionId(
+            @PathVariable("suiteKey") String suiteKey,
+            @RequestParam(value = "corpId", required = true) String corpId
+    ){
+        try {
+            ServiceResult<List<StaffVO>> listSr = staffManageService.getStaffListByCorpId(corpId);
+            if(!listSr.isSuccess()){
+                return "fail get staff list=====" + listSr.getMessage();
+            }
+            List<StaffVO> list = listSr.getResult();
+
+            Iterator it = list.iterator();
+            while(it.hasNext()){
+                StaffVO staffVO = (StaffVO)it.next();
+                ServiceResult<StaffVO> sr = staffManageService.getStaff(staffVO.getStaffId(), corpId, suiteKey);
+                if(!sr.isSuccess()){
+                    return "fail get staff=====" + sr.getMessage();
+                }
+                StaffVO newStaffVO = sr.getResult();
+
+                corpStaffDao.updateUnionId(StaffConverter.staffVO2StaffDO(newStaffVO));
+            }
+
+
+//            ServiceResult<Void> saveSr = staffManageService.saveOrUpdateCorpStaff(staffVO);
+//            if(!saveSr.isSuccess()){
+//                return "fail in saveOrUpdateStaff:" + saveSr.getMessage();
+//            }
+//            CorpUserDetail corpUserDetail = corpUserService.getCorpUser(corpToken, staffId);
+//            return StaffConverter.corpUser2StaffVO(corpUserDetail, corpId).toString();
+            return "successfully executed";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
+
+    @RequestMapping("/test/getcorpuser")
+    @ResponseBody
+    public String testGetCorpUser(){
+        try {
+            String suiteKey = "suitehu9dcew9gmutcbwd";
+            String corpId = "dinga5892228289863f535c2f4657eb6378f";
+            String staffId = "manager5864";
+
+            ServiceResult<StaffVO> sr = staffManageService.getStaff(staffId, corpId, suiteKey);
+            if(!sr.isSuccess()){
+                return "fail=====" + sr.getMessage();
+            }
+            StaffVO staffVO = sr.getResult();
+            ServiceResult<Void> saveSr = staffManageService.saveOrUpdateCorpStaff(staffVO);
+            if(!saveSr.isSuccess()){
+                return "fail in saveOrUpdateStaff:" + saveSr.getMessage();
+            }
+//            CorpUserDetail corpUserDetail = corpUserService.getCorpUser(corpToken, staffId);
+//            return StaffConverter.corpUser2StaffVO(corpUserDetail, corpId).toString();
+            return staffVO.toString() + "-----====aaabbcc";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
 
     @RequestMapping("/dbtest")
     @ResponseBody
