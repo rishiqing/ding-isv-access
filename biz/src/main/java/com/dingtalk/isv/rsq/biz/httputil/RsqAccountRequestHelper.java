@@ -218,6 +218,7 @@ public class RsqAccountRequestHelper {
             params.put("realName", staffDO.getName());
             params.put("outerId", corpDO.getCorpId() + "--" + staffDO.getUserId());
             params.put("teamId", corpDO.getRsqId());
+            params.put("unionId", staffDO.getUnionId());
             params.put("department", others.get("rsqDepartment"));
 
             String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
@@ -252,6 +253,7 @@ public class RsqAccountRequestHelper {
             Map params = new HashMap<String, String>();
             params.put("id", staffDO.getRsqUserId());
             params.put("realName", staffDO.getName());
+            params.put("unionId", staffDO.getUnionId());
 
             if(others.containsKey("rsqDepartment")){
                 params.put("department", others.get("rsqDepartment"));

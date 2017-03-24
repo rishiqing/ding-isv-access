@@ -21,8 +21,12 @@ import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
+import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
+import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
+import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
+import com.dingtalk.isv.rsq.biz.model.RsqUser;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.google.common.eventbus.AsyncEventBus;
@@ -37,9 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 这个controller功能如下
@@ -100,6 +102,12 @@ public class SystemController {
     @Resource
     CorpStaffDao corpStaffDao;
 
+    @Autowired
+    private SuiteDao suiteDao;
+
+    @Autowired
+    private RsqAccountRequestHelper rsqAccountRequestHelper;
+
     /**
      * 更新指定corpId的企业员工的unionId
      * @param suiteKey
@@ -130,19 +138,46 @@ public class SystemController {
 
                 corpStaffDao.updateUnionId(StaffConverter.staffVO2StaffDO(newStaffVO));
             }
-
-
-//            ServiceResult<Void> saveSr = staffManageService.saveOrUpdateCorpStaff(staffVO);
-//            if(!saveSr.isSuccess()){
-//                return "fail in saveOrUpdateStaff:" + saveSr.getMessage();
-//            }
-//            CorpUserDetail corpUserDetail = corpUserService.getCorpUser(corpToken, staffId);
-//            return StaffConverter.corpUser2StaffVO(corpUserDetail, corpId).toString();
             return "successfully executed";
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";
         }
+    }
+
+    @RequestMapping("/test/postrsqupdateuser/{suiteKey}")
+    @ResponseBody
+    public String testPostRsqUpdateUser(
+            @PathVariable("suiteKey") String suiteKey,
+            @RequestParam(value = "corpId", required = true) String corpId
+    ){
+        try {
+            //  suiteKey
+            SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+
+            ServiceResult<List<StaffVO>> listSr = staffManageService.getStaffListByCorpId(corpId);
+            if(!listSr.isSuccess()){
+                return "fail get staff list=====" + listSr.getMessage();
+            }
+            List<StaffVO> list = listSr.getResult();
+
+            Map params = new HashMap<String, Object>();
+
+            Iterator it = list.iterator();
+            while(it.hasNext()){
+                StaffVO staffVO = (StaffVO)it.next();
+                ServiceResult<RsqUser> rsqUserSr = rsqAccountRequestHelper.updateUser(suiteDO, StaffConverter.staffVO2StaffDO(staffVO), params);
+
+                if(!rsqUserSr.isSuccess()){
+                    return "fail post staff=====" + rsqUserSr.getMessage();
+                }
+            }
+            return "successfully executed";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+
     }
 
     @RequestMapping("/test/getcorpuser")
