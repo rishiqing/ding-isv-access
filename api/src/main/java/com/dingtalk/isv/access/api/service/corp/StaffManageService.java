@@ -97,4 +97,11 @@ public interface StaffManageService {
      */
     public ServiceResult<List<StaffVO>> getStaffListByCorpId(String corpId);
 
+    /**
+     * 根据corpId获取一个公司的staff的userId列表
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<List<String>> getStaffUserIdListByCorpId(String corpId);
+
     }

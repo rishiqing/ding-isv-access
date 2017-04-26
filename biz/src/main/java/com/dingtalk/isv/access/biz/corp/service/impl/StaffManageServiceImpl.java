@@ -409,4 +409,25 @@ public class StaffManageServiceImpl implements StaffManageService {
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
     }
+
+    public ServiceResult<List<String>> getStaffUserIdListByCorpId(String corpId){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            List<String> list = corpStaffDao.getStaffUserIdListByCorpId(corpId);
+
+            return ServiceResult.success(list);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
 }

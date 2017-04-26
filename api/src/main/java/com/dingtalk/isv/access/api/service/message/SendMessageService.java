@@ -19,4 +19,17 @@ public interface SendMessageService {
      * @return
      */
     public ServiceResult<Void> sendOAMessageToUser(String suiteKey, String corpId, Long appId, String msgType, List<String> staffIdList, List<Long> deptIdList, MessageBody message);
+
+    /**
+     * 发送文字消息
+     * @param suiteKey
+     * @param corpId
+     * @param appId
+     * @param msgType
+     * @param staffIdList
+     * @param deptIdList
+     * @param message
+     * @return
+     */
+    public ServiceResult<Void> sendMessageToUser(String suiteKey, String corpId, Long appId, String msgType, List<String> staffIdList, List<Long> deptIdList, MessageBody message);
 }

@@ -42,6 +42,13 @@ public interface CorpStaffDao {
 	public List<StaffDO> getStaffListByCorpId(@Param("corpId") String corpId);
 
 	/**
+	 * 根据corpId查询用户id列表
+	 * @param corpId
+	 * @return
+	 */
+	public List<String> getStaffUserIdListByCorpId(@Param("corpId") String corpId);
+
+	/**
 	 * 更新第三方应用id的信息
 	 * @param staffDO
 	 * @return

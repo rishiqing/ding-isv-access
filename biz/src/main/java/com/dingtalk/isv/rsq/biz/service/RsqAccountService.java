@@ -25,6 +25,7 @@ import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.exceptions.RsqIntegrationException;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqCorp;
@@ -35,7 +36,10 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.core.JmsTemplate;
 
+import javax.jms.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -65,6 +69,12 @@ public class RsqAccountService {
     private StaffManageService staffManageService;
     @Autowired
     private DeptManageService deptManageService;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+    @Autowired
+    @Qualifier("rsqSyncCallBackQueue")
+    private javax.jms.Queue rsqSyncCallBackQueue;
 
     /**
      * 创建公司，分为以下几步：
@@ -500,6 +510,9 @@ public class RsqAccountService {
             if(!rsqDeptStaffSr.isSuccess()){
                 return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
             }
+
+            //4  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
+            jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
             return ServiceResult.success(null);
 
         } catch (Exception e) {

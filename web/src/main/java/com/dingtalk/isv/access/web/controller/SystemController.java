@@ -13,6 +13,7 @@ import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
+import com.dingtalk.isv.access.api.service.message.SendMessageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
@@ -25,9 +26,11 @@ import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
+import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
+import com.dingtalk.open.client.api.model.corp.MessageBody;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -60,6 +63,9 @@ public class SystemController {
     @Autowired
     @Qualifier("suiteCallBackQueue")
     private Queue suiteCallBackQueue;
+    @Autowired
+    @Qualifier("rsqSyncCallBackQueue")
+    private Queue rsqSyncCallBackQueue;
 
 
     @RequestMapping("/test")
@@ -68,7 +74,7 @@ public class SystemController {
         asyncCorpAuthSuiteEventBus.post(new Integer(100));
         asyncCorpAuthSuiteEventBus.post(new Integer(200));
         asyncCorpAuthSuiteEventBus.post(new Integer(300));
-        return "success";
+        return "success......0000";
     }
 
     @RequestMapping("/mqtest")
@@ -77,8 +83,7 @@ public class SystemController {
         System.out.println("--------------/mqtest------------");
         JSONObject jsonObject = JSON.parseObject("{\"hello\":\"Wallace\"}");
 
-        jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject, SuiteCallBackMessage.Tag.CHAT_ADD_MEMBER));
-
+//        jmsTemplate.send(suiteCallBackQueue,new SuiteCallBackMessage(jsonObject, SuiteCallBackMessage.Tag.CHAT_ADD_MEMBER));
         return "success";
     }
 
@@ -107,6 +112,35 @@ public class SystemController {
 
     @Autowired
     private RsqAccountRequestHelper rsqAccountRequestHelper;
+
+    @Resource
+    SendMessageService sendMessageService;
+
+    @RequestMapping("/test/sendCorpMessage/{suiteKey}")
+    @ResponseBody
+    public String testSendCorpMessage(
+            @PathVariable("suiteKey") String suiteKey,
+            @RequestParam(value = "corpId", required = true) String corpId
+    ){
+        try {
+            List<String> staffList = new ArrayList<String>();
+            staffList.add("manager5864");
+            MessageBody.TextBody messageBody = new MessageBody.TextBody();
+            messageBody.setContent("hello wallace!");
+            Long appId = 2585L;
+
+            jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
+
+//            ServiceResult sendSr = sendMessageService.sendMessageToUser(suiteKey, corpId, appId, "text", staffList, null, messageBody);
+//            if(!sendSr.isSuccess()){
+//                return "send failed:" + sendSr.getMessage();
+//            }
+            return "success";
+        }catch (Exception e){
+            e.printStackTrace();
+            return "fail";
+        }
+    }
 
     /**
      * 更新指定corpId的企业员工的unionId
