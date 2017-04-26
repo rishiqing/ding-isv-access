@@ -15,6 +15,9 @@
     <!-- 开放平台回调mq -->
     <amq:queue id="suiteCallBackQueue" physicalName="suiteCallBack.queue" />
 
+    <!-- 当部门和用户数据与第三方同步成功之后回调mq -->
+    <amq:queue id="rsqSyncCallBackQueue" physicalName="rsqSyncCallBack.queue" />
+
     <!-- corp callback 回调mq -->
     <bean id="corpCallbackTopic" class="org.apache.activemq.command.ActiveMQTopic">
         <constructor-arg value="corpCallback.topic"/>
@@ -46,6 +49,19 @@
         <!--<property name="connectionFactory" ref="connectionFactory" />-->
         <!--<property name="destination" ref="suiteCallBackQueue" />-->
         <!--<property name="messageListener" ref="suitCallbackMessageListener" />-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; 与日事清同步成功消息监听器 &ndash;&gt;-->
+    <!--<bean id="rsqSyncCallbackMessageListener" class="com.dingtalk.isv.rsq.biz.event.mq.RsqSyncCallbackListener">-->
+        <!--<property name="appId" value="${isv.app.id}" />-->
+        <!--<property name="sendMessageBody" value="${rsqapi.message.body}" />-->
+    <!--</bean>-->
+    <!--&lt;!&ndash; 与日事清同步成功消息监听容器 &ndash;&gt;-->
+    <!--<bean id="rsqJmsContainer"-->
+          <!--class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="connectionFactory" />-->
+        <!--<property name="destination" ref="rsqSyncCallBackQueue" />-->
+        <!--<property name="messageListener" ref="rsqSyncCallbackMessageListener" />-->
     <!--</bean>-->
 
 </beans>
