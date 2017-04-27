@@ -164,6 +164,11 @@ public class SystemController {
             Iterator it = list.iterator();
             while(it.hasNext()){
                 StaffVO staffVO = (StaffVO)it.next();
+                String staffId = staffVO.getStaffId();
+                //  只处理不一致的情况
+                if(staffId == null || !staffId.equals(staffVO.getUnionId())){
+                    continue;
+                }
                 ServiceResult<StaffVO> sr = staffManageService.getStaff(staffVO.getStaffId(), corpId, suiteKey);
                 if(!sr.isSuccess()){
                     return "fail get staff=====" + sr.getMessage();
@@ -186,6 +191,7 @@ public class SystemController {
             @RequestParam(value = "corpId", required = true) String corpId
     ){
         try {
+            StringBuffer result = new StringBuffer();
             //  suiteKey
             SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
 
@@ -200,13 +206,22 @@ public class SystemController {
             Iterator it = list.iterator();
             while(it.hasNext()){
                 StaffVO staffVO = (StaffVO)it.next();
+
                 ServiceResult<RsqUser> rsqUserSr = rsqAccountRequestHelper.updateUser(suiteDO, StaffConverter.staffVO2StaffDO(staffVO), params);
 
                 if(!rsqUserSr.isSuccess()){
                     return "fail post staff=====" + rsqUserSr.getMessage();
                 }
+                if(list.size() < 10){
+                    result.append("--start-- suiteDO is ");
+                    result.append(suiteDO.getSuiteKey());
+                    result.append(",");
+                    result.append(StaffConverter.staffVO2StaffDO(staffVO));
+                    result.append("--end--");
+                }
             }
-            return "successfully executed";
+            result.append("successfully executed");
+            return result.toString();
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";
