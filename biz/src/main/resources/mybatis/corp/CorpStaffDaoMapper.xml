@@ -191,6 +191,10 @@
         update isv_corp_staff set rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
+    <update id="updateUnionId">
+        update isv_corp_staff set union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
+    </update>
+
     <insert id="saveStaffDeleted" useGeneratedKeys="true" keyProperty="id">
         insert into isv_corp_staff_deleted (
         gmt_create,
