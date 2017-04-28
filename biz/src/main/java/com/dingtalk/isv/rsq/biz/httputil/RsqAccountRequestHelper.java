@@ -259,7 +259,13 @@ public class RsqAccountRequestHelper {
                 params.put("department", others.get("rsqDepartment"));
             }
 
+            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                    LogFormatter.KeyValue.getNew("=======post json:", JSON.toJSONString(params))
+            ));
             String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                    LogFormatter.KeyValue.getNew("=======post json result:", sr)
+            ));
             JSONObject jsonObject = JSON.parseObject(sr);
 
             if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {

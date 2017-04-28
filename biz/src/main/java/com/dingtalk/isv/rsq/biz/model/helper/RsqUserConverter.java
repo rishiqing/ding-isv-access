@@ -23,6 +23,9 @@ public class RsqUserConverter {
         if(json.containsKey("fromClient")){
             user.setFromClient(json.getString("fromClient"));
         }
+        if(json.containsKey("unionId")){
+            user.setUnionId(json.getString("unionId"));
+        }
         return user;
     }
 }

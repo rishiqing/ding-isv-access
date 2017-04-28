@@ -21,6 +21,7 @@ public class RsqUser {
     private String realName;
     private String outerId;
     private String fromClient;
+    private String unionId;
 
     public Long getId() {
         return id;
@@ -68,5 +69,13 @@ public class RsqUser {
 
     public void setFromClient(String fromClient) {
         this.fromClient = fromClient;
+    }
+
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
     }
 }

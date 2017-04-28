@@ -213,10 +213,17 @@ public class SystemController {
                     return "fail post staff=====" + rsqUserSr.getMessage();
                 }
                 if(list.size() < 10){
+                    RsqUser rsqUser = rsqUserSr.getResult();
                     result.append("--start-- suiteDO is ");
                     result.append(suiteDO.getSuiteKey());
                     result.append(",");
-                    result.append(StaffConverter.staffVO2StaffDO(staffVO));
+                    result.append(rsqUser.getId()).append(",");
+                    result.append(rsqUser.getUsername()).append(",");
+                    result.append(rsqUser.getPassword()).append(",");
+                    result.append(rsqUser.getOuterId()).append(",");
+                    result.append(rsqUser.getFromClient()).append(",");
+                    result.append(rsqUser.getRealName()).append(",");
+                    result.append(rsqUser.getUnionId()).append(",");
                     result.append("--end--");
                 }
             }
