@@ -51,6 +51,13 @@
             <systemPath>${project.basedir}/lib/client-sdk.core-1.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.dingtalk.open</groupId>
+            <artifactId>taobao-sdk-java-rsq</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/taobao-sdk-java-auto_1479188381469-20170926.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.dingtalk</groupId>
             <artifactId>dingtalk.isv.access.api</artifactId>
         </dependency>

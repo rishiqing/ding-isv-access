@@ -1,5 +1,6 @@
 package com.dingtalk.isv.access.web.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
@@ -83,5 +84,11 @@ public class MessageUtil {
         }
 
         return oaBody;
+    }
+
+    public static void main(String[] args) {
+        JSONObject json = JSON.parseObject("{message_url: \"aaaaaaa\", head: {text: 'ttttext',bgcolor:'FFAAAAAA'}}");
+        MessageBody body = parseOAMessage(json);
+        System.out.println(JSON.toJSONString(body));
     }
 }

@@ -44,7 +44,7 @@ public class MessageController {
     private SendMessageService sendMessageService;
 
     @ResponseBody
-    @RequestMapping(value = "/msg/sendtoconversation/oa", method = {RequestMethod.POST})
+    @RequestMapping(value = "/msg/sendtoconversation", method = {RequestMethod.POST})
     public Map<String, Object> sendToConversation(HttpServletRequest request,
                                                   @RequestParam("corpid") String corpId,
                                                   @RequestParam("appid") String appId,
@@ -62,11 +62,63 @@ public class MessageController {
 
             String sender = json.getString("sender");
             String cid = json.getString("cid");
-            String oaType = "oa";
-            JSONObject data = json.getJSONObject("data");
+            String msgtype = json.getString("msgtype");
+            JSONObject data = json.getJSONObject(msgtype);
 
             MessageBody message = MessageUtil.parseOAMessage(data);
-            ServiceResult sr = sendMessageService.sendNormalMessage(suiteKey, corpId, sender, cid, oaType, message);
+            ServiceResult sr = sendMessageService.sendNormalMessage(suiteKey, corpId, sender, cid, msgtype, message);
+            if(!sr.isSuccess()){
+                return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("errcode", 0);
+
+            return httpResult.getSuccess(map);
+        }catch(Exception e){
+            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统错误",
+                    LogFormatter.KeyValue.getNew("json", json),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ),e);
+            return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+    @ResponseBody
+    @RequestMapping(value = "/msg/sendasynccorpmessage", method = {RequestMethod.POST})
+    public Map<String, Object> sendAsyncCorpMessage(HttpServletRequest request,
+                                                    @RequestParam("corpid") String corpId,
+                                                    @RequestBody JSONObject json
+    ) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpid", corpId),
+                LogFormatter.KeyValue.getNew("json", json)
+        ));
+        try{
+            String msgType = json.getString("msgtype");
+            Long appId = json.getLong("agent_id");
+
+            List<String> userIdList = null;
+            if(json.containsKey("userid_list")){
+                String[] userArray  = json.getString("userid_list").split(",");
+                userIdList = Arrays.asList(userArray);
+            }
+            List<Long> deptIdList = new ArrayList<Long>();
+            if(json.containsKey("dept_id_list")){
+                String[] strDeptIdArray = json.getString("dept_id_list").split(",");
+                for (int i = 0; i < strDeptIdArray.length; i++){
+                    deptIdList.add(Long.valueOf(strDeptIdArray[i]));
+                }
+            }
+            //  安全起见，toAllUser接口不开放
+            Boolean toAllUser = false;
+            JSONObject msgcontent = json.getJSONObject("msgcontent");
+
+            //  根据appId查询到suiteKey
+            ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(appId);
+            String suiteKey = appVOSr.getResult().getSuiteKey();
+
+            MessageBody message = MessageUtil.parseOAMessage(msgcontent);
+            ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, deptIdList, message);
             if(!sr.isSuccess()){
                 return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }

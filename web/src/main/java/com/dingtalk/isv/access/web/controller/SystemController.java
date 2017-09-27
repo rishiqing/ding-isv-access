@@ -465,9 +465,13 @@ public class SystemController {
             return "fail";
         }
     }
-
-
-
-
-
+    @RequestMapping(value = "/test/sendAsyncCorpConversation", method = {RequestMethod.GET})
+    @ResponseBody
+    public String testSendAsyncCorpMessage(HttpServletRequest request,
+                                         @RequestParam("corpid") String corpId,
+                                         @RequestParam("appid") String appId,
+                                         @RequestBody JSONObject json
+    ) {
+        return null;
+    }
 }

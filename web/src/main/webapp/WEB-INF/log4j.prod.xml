@@ -262,6 +262,16 @@
             <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
         </layout>
     </appender>
+    <!--isv message logger-->
+    <appender name="CONTROLLER_ISV_MESSAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/acs/log/biz/controller_isv_message.log" />
+        <param name="append" value="true" />
+        <param name="encoding" value="UTF-8" />
+        <param name="threshold" value="INFO" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %C{1}.%M:%L - %m%n"/>
+        </layout>
+    </appender>
 
 
 
@@ -393,6 +403,11 @@
     <logger name="CONTROLLER_ISV_ID_MAP_LOGGER" additivity="false">
         <level value="INFO" />
         <appender-ref ref="CONTROLLER_ISV_ID_MAP_LOGGER_APPENDER" />
+    </logger>
+    <!--isv message logger-->
+    <logger name="CONTROLLER_ISV_MESSAGE_LOGGER" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="CONTROLLER_ISV_MESSAGE_LOGGER_APPENDER" />
     </logger>
 
     <root>
