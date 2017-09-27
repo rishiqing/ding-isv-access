@@ -1,6 +1,7 @@
 package com.dingtalk.isv.access.web.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
@@ -9,11 +10,13 @@ import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.message.SendMessageService;
+import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
@@ -24,6 +27,8 @@ import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
+import com.dingtalk.isv.access.web.util.MessageUtil;
+import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
@@ -31,7 +36,9 @@ import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
+import com.dingtalk.open.client.api.model.corp.MessageSendResult;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
+import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +73,8 @@ public class SystemController {
     @Autowired
     @Qualifier("rsqSyncCallBackQueue")
     private Queue rsqSyncCallBackQueue;
+
+
 
 
     @RequestMapping("/test")
@@ -115,6 +124,11 @@ public class SystemController {
 
     @Resource
     SendMessageService sendMessageService;
+
+    @Autowired
+    private AppManageService appManageService;
+    @Autowired
+    private MessageService messageService;
 
     @RequestMapping("/test/sendCorpMessage/{suiteKey}")
     @ResponseBody
@@ -383,8 +397,74 @@ public class SystemController {
         }
         return "is not 127.0.0.1";
     }
+    /**
+     * 更新企业回调地址
+     * @return
+     * messagUrl
+     * json.headTitle
+     * json.headBgColor
+     * json.bodyTitle
+     * json.bodyContent
+     * json.form: {key: '', value: ''}
+     * json.fileCount
+     * json.author
+     */
+    @RequestMapping(value = "/test/sendToConversation", method = {RequestMethod.POST})
+    @ResponseBody
+    public String testSendToConversation(HttpServletRequest request,
+                                         @RequestParam("corpid") String corpId,
+                                         @RequestParam("appid") String appId,
+                                         @RequestBody JSONObject json
+    ) {
+        try {
+            System.out.println("-------corpid is " + corpId + "--------json is " + json);
+            //  根据appId查询到suiteKey
+            ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(Long.valueOf(appId));
+            String suiteKey = appVOSr.getResult().getSuiteKey();
+            ServiceResult<CorpTokenVO> sr = corpManageService.getCorpToken(suiteKey, corpId);
+
+            if(!sr.isSuccess()){
+                return "fail";
+            }
+            CorpTokenVO corpTokenVO = sr.getResult();
+
+            String token = corpTokenVO.getCorpToken();
+
+            String sender = json.getString("sender");
+            String cid = json.getString("cid");
+            String oaType = "oa";
+            MessageBody oaBody = MessageUtil.parseOAMessage(json);
 
 
+            //String textType = "text";
+            //MessageBody.TextBody textBody = new MessageBody.TextBody();
+            //textBody.setContent("hello------");
+            //
+            //String imgType = "image";
+            //MessageBody.ImageBody imageBody = new MessageBody.ImageBody();
+            //imageBody.setMedia_id("kkkkkkk");
+            //
+            ////  link是可以实现的
+            //String linkType = "link";
+            //MessageBody.LinkBody linkBody = new MessageBody.LinkBody();
+            //linkBody.setTitle("this is a link body");
+            //linkBody.setMessageUrl("https://www.rishiqing.com");
+            //linkBody.setText("hello link.......");
+            //linkBody.setPicUrl("fffffff");
+
+            String msgtype = oaType;
+            MessageBody msgbody = oaBody;
+
+            System.out.println("----token is " + token + ", sender: " + sender + ", cid: " + cid + ", msgtype: " + msgtype + ", msgbody: " + msgbody);
+            String result = messageService.sendToNormalConversation(token, sender, cid, msgtype, msgbody);
+            System.out.println("result from send to conversation:" + result);
+
+            return "successfully executed";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
 
 
 
