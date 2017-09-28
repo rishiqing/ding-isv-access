@@ -47,7 +47,7 @@ public class MessageController {
     @RequestMapping(value = "/msg/sendtoconversation", method = {RequestMethod.POST})
     public Map<String, Object> sendToConversation(HttpServletRequest request,
                                                   @RequestParam("corpid") String corpId,
-                                                  @RequestParam("appid") String appId,
+                                                  @RequestParam("appid") Long appId,
                                                   @RequestBody JSONObject json
     ) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -87,15 +87,17 @@ public class MessageController {
     @RequestMapping(value = "/msg/sendasynccorpmessage", method = {RequestMethod.POST})
     public Map<String, Object> sendAsyncCorpMessage(HttpServletRequest request,
                                                     @RequestParam("corpid") String corpId,
+                                                    @RequestParam("appid") Long appId,
                                                     @RequestBody JSONObject json
     ) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpid", corpId),
+                LogFormatter.KeyValue.getNew("appid", appId),
                 LogFormatter.KeyValue.getNew("json", json)
         ));
         try{
             String msgType = json.getString("msgtype");
-            Long appId = json.getLong("agent_id");
+            //Long appId = json.getLong("agent_id");
 
             List<String> userIdList = null;
             if(json.containsKey("userid_list")){
@@ -130,6 +132,7 @@ public class MessageController {
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("json", json),
+                    LogFormatter.KeyValue.getNew("appid", appId),
                     LogFormatter.KeyValue.getNew("corpId", corpId)
             ),e);
             return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
