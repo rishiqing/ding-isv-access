@@ -1,14 +1,11 @@
 package com.dingtalk.isv.access.web.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
-import com.dingtalk.isv.access.api.model.corp.CorpAppVO;
 import com.dingtalk.isv.access.api.model.corp.CorpJSAPITicketVO;
 import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
-import com.dingtalk.isv.access.api.model.event.CorpAuthSuiteEvent;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
@@ -21,26 +18,24 @@ import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpJSAPITicketDao;
 import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
-import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
+import com.dingtalk.isv.access.biz.scheduler.SendCorpMessageJob;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
-import com.dingtalk.isv.access.web.util.MessageUtil;
-import com.dingtalk.isv.common.log.format.LogFormatter;
+import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.common.util.HttpUtils;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
-import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
-import com.dingtalk.open.client.api.model.corp.MessageSendResult;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -52,6 +47,9 @@ import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static org.quartz.SimpleScheduleBuilder.*;
+import static org.quartz.impl.matchers.GroupMatcher.*;
 
 /**
  * 这个controller功能如下
@@ -473,5 +471,72 @@ public class SystemController {
                                          @RequestBody JSONObject json
     ) {
         return null;
+    }
+
+    /**
+     * 测试提醒功能
+     * @param request
+     * @return
+     */
+    @Autowired
+    private Scheduler scheduler;
+    @RequestMapping(value = "/test/remind", method = {RequestMethod.GET})
+    @ResponseBody
+    public String testRemind(HttpServletRequest request){
+
+        try {
+            JobDetail job = JobBuilder.newJob(SendCorpMessageJob.class)
+                    .withIdentity("wallaceJob-")
+                    .build();
+
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("wallaceTrigger-")
+                    .withSchedule(simpleSchedule()
+                            .withIntervalInSeconds(10)
+                            .repeatForever())
+                    .build();
+            scheduler.scheduleJob(job, trigger);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return "success";
+    }
+    @RequestMapping(value = "/test/remind/remove", method = {RequestMethod.GET})
+    @ResponseBody
+    public String testRemindRemove(HttpServletRequest request){
+
+        try {
+            // enumerate each job group
+            for(String group: scheduler.getJobGroupNames()) {
+                // enumerate each job in group
+                for(JobKey jobKey : scheduler.getJobKeys(jobGroupEquals(group))) {
+                    System.out.println("delete job identified by: " + jobKey);
+                    scheduler.deleteJob(jobKey);
+                }
+            }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return "<<<<<<delete success>>>>>";
+    }
+    @RequestMapping(value = "/test/remind/list", method = {RequestMethod.GET})
+    @ResponseBody
+    public String testRemindList(HttpServletRequest request){
+        StringBuilder keys = new StringBuilder("<<<<<<find success>>>>>\n");
+        try {
+            // enumerate each job group
+            for(String group: scheduler.getJobGroupNames()) {
+                // enumerate each job in group
+                for(JobKey jobKey : scheduler.getJobKeys(jobGroupEquals(group))) {
+                    System.out.println("find job identified by: " + jobKey);
+                    keys.append("----")
+                            .append(jobKey)
+                            .append("\n");
+                }
+            }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return keys.toString();
     }
 }

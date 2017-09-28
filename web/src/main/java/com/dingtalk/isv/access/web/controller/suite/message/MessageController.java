@@ -1,27 +1,30 @@
 package com.dingtalk.isv.access.web.controller.suite.message;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dingtalk.isv.access.api.model.corp.CorpTokenVO;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.message.SendMessageService;
 import com.dingtalk.isv.access.api.service.suite.AppManageService;
-import com.dingtalk.isv.access.biz.corp.model.StaffIdsDO;
-import com.dingtalk.isv.access.web.controller.IdMapController;
-import com.dingtalk.isv.access.web.util.MessageUtil;
+import com.dingtalk.isv.access.biz.scheduler.SendCorpMessageJob;
+import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.HttpResult;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 
 /**
  * 发送消息的Controller
@@ -42,6 +45,8 @@ public class MessageController {
     private AppManageService appManageService;
     @Resource
     private SendMessageService sendMessageService;
+    @Autowired
+    private Scheduler scheduler;
 
     @ResponseBody
     @RequestMapping(value = "/msg/sendtoconversation", method = {RequestMethod.POST})
@@ -75,7 +80,7 @@ public class MessageController {
 
             return httpResult.getSuccess(map);
         }catch(Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("json", json),
                     LogFormatter.KeyValue.getNew("corpId", corpId)
@@ -129,7 +134,74 @@ public class MessageController {
 
             return httpResult.getSuccess(map);
         }catch(Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统错误",
+                    LogFormatter.KeyValue.getNew("json", json),
+                    LogFormatter.KeyValue.getNew("appid", appId),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ),e);
+            return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+    @ResponseBody
+    @RequestMapping(value = "/msg/remind", method = {RequestMethod.POST})
+    public Map<String, Object> setRemind(HttpServletRequest request,
+                                                    @RequestParam("corpid") String corpId,
+                                                    @RequestParam("appid") Long appId,
+                                                    @RequestBody JSONObject json
+    ) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpid", corpId),
+                LogFormatter.KeyValue.getNew("appid", appId),
+                LogFormatter.KeyValue.getNew("json", json)
+        ));
+        try{
+            System.out.println(">>>>>>>>1>>>>>>>>>");
+            String todoId = json.getString("todo_id");
+            //  定时的时间列表
+            JSONArray millsArray = json.getJSONArray("mills_array");
+            //  定时的规则列表
+            JSONArray remindArray = json.getJSONArray("remind_array");
+            String userList = json.getString("userid_list");
+            String msgType = json.getString("msgtype");
+            JSONObject jsonContent = json.getJSONObject("msgcontent");
+
+            //  暂定一次不超过5个
+            if (millsArray.size() > 5) {
+                return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+            Iterator it = millsArray.iterator();
+            Iterator itRule = remindArray.iterator();
+            System.out.println("00000000");
+            while (it.hasNext()) {
+                Long mills = (Long)it.next();
+                String remind = (String)itRule.next();
+                System.out.println("============remind========" + remind);
+                String msgContent = MessageUtil.remindText(jsonContent, remind);
+
+                //JobDetail job = JobBuilder.newJob(SendCorpMessageJob.class)
+                //        .withIdentity("J-" + corpId + "-" + todoId)
+                //        .usingJobData("corpId", corpId)
+                //        .usingJobData("appId", appId)
+                //        .usingJobData("userList", userList)
+                //        .usingJobData("msgType", msgType)
+                //        .usingJobData("msgContent", msgContent)
+                //        .build();
+                //
+                //Trigger trigger = TriggerBuilder.newTrigger()
+                //        .withIdentity("T-" + corpId + "-" + todoId)
+                //        .startAt(new Date(mills))
+                //        .forJob(job)
+                //        .build();
+                //scheduler.scheduleJob(job, trigger);
+            }
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("errcode", 0);
+
+            return httpResult.getSuccess(map);
+        }catch(Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("json", json),
                     LogFormatter.KeyValue.getNew("appid", appId),

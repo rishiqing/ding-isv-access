@@ -35,3 +35,10 @@ E:\workspace\idea_space\ding-isv-access\web\src\main\webapp\WEB-INF\log4j.xml
 
 ## IEDA中启动tomcat7
 
+# 更新说
+
+## todo-alert版本
+提醒功能，由于需要使用quartz来实现，需要配置多数据源，因此此版本为独立的tomcat应用
+
+### 1 配置多数据源
+

@@ -1,4 +1,4 @@
-package com.dingtalk.isv.access.web.util;
+package com.dingtalk.isv.access.biz.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -84,6 +84,20 @@ public class MessageUtil {
         }
 
         return oaBody;
+    }
+
+    /**
+     * 将orgContent加上时间提醒的参数，并转换成String返回
+     * @param orgContent
+     * @return
+     */
+    public static String remindText(JSONObject orgContent, String remind) {
+        JSONObject body = orgContent.getJSONObject("body");
+        if (body.containsKey("content")) {
+            body.remove("content");
+        }
+        body.put("content", remind);
+        return JSON.toJSONString(orgContent);
     }
 
     public static void main(String[] args) {
