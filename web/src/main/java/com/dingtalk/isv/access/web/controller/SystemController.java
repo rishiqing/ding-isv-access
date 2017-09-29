@@ -531,7 +531,7 @@ public class SystemController {
                     System.out.println("find job identified by: " + jobKey);
                     keys.append("----")
                             .append(jobKey)
-                            .append("\n");
+                            .append("----\n");
                 }
             }
         } catch (SchedulerException e) {

@@ -34,8 +34,8 @@ public class SendCorpMessageJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        System.out.println("=============================");
         JobDetail detail  = jobExecutionContext.getJobDetail();
+        Trigger trigger = jobExecutionContext.getTrigger();
         JobKey key = detail.getKey();
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("execute job key:", key)
@@ -44,8 +44,8 @@ public class SendCorpMessageJob implements Job {
             XmlWebApplicationContext xmlWebApplicationContext = (XmlWebApplicationContext) jobExecutionContext.getScheduler().getContext().get("applicationContextKey");
             AppManageService appManageService = (AppManageService) xmlWebApplicationContext.getBean("appManageService");
             SendMessageService sendMessageService = (SendMessageService) xmlWebApplicationContext.getBean("sendMessageService");
+            Scheduler scheduler = (Scheduler) xmlWebApplicationContext.getBean("quartzRemindScheduler");
 
-            System.out.println("-----------SendCorpMessageJob called--------" + new Date() + "----" + key);
             JobDataMap dataMap = detail.getJobDataMap();
             String corpId = dataMap.getString("corpId");
             Long appId = dataMap.getLong("appId");
@@ -61,6 +61,12 @@ public class SendCorpMessageJob implements Job {
             if(!sr.isSuccess()){
                 throw new ApiException("err send async corp message: " + sr.getMessage());
             }
+            //  如果不会再触发了，那么就删除jobDetail和trigger
+            Boolean isAgain = trigger.mayFireAgain();
+            System.out.println("......may fire again......" + isAgain);
+            if(!isAgain){
+                scheduler.deleteJob(key);
+            }
         }catch (Exception e){
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("execute job key:", key)
@@ -68,6 +74,7 @@ public class SendCorpMessageJob implements Job {
             mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("execute job key:", key)
             ),e);
+            throw new RuntimeException(e);
         }
     }
 }

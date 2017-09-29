@@ -101,6 +101,7 @@
         </property>
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
         <property name="configLocation" value="classpath:quartz-remind.properties" />
+        <property name="overwriteExistingJobs" value="true" />
     </bean>
 </beans>
 

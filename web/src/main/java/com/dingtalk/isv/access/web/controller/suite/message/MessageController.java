@@ -156,7 +156,6 @@ public class MessageController {
                 LogFormatter.KeyValue.getNew("json", json)
         ));
         try{
-            System.out.println(">>>>>>>>1>>>>>>>>>");
             String todoId = json.getString("todo_id");
             //  定时的时间列表
             JSONArray millsArray = json.getJSONArray("mills_array");
@@ -172,28 +171,31 @@ public class MessageController {
             }
             Iterator it = millsArray.iterator();
             Iterator itRule = remindArray.iterator();
-            System.out.println("00000000");
             while (it.hasNext()) {
+                JobKey jobKey = new JobKey("J-" + corpId + "-" + todoId, "J-rsq-remind");
+                JobDetail currentDetail = scheduler.getJobDetail(jobKey);
+                if(currentDetail != null){
+                    scheduler.deleteJob(jobKey);
+                }
                 Long mills = (Long)it.next();
                 String remind = (String)itRule.next();
-                System.out.println("============remind========" + remind);
                 String msgContent = MessageUtil.remindText(jsonContent, remind);
 
-                //JobDetail job = JobBuilder.newJob(SendCorpMessageJob.class)
-                //        .withIdentity("J-" + corpId + "-" + todoId)
-                //        .usingJobData("corpId", corpId)
-                //        .usingJobData("appId", appId)
-                //        .usingJobData("userList", userList)
-                //        .usingJobData("msgType", msgType)
-                //        .usingJobData("msgContent", msgContent)
-                //        .build();
-                //
-                //Trigger trigger = TriggerBuilder.newTrigger()
-                //        .withIdentity("T-" + corpId + "-" + todoId)
-                //        .startAt(new Date(mills))
-                //        .forJob(job)
-                //        .build();
-                //scheduler.scheduleJob(job, trigger);
+                JobDetail job = JobBuilder.newJob(SendCorpMessageJob.class)
+                        .withIdentity(jobKey)
+                        .usingJobData("corpId", corpId)
+                        .usingJobData("appId", appId)
+                        .usingJobData("userIdList", userList)
+                        .usingJobData("msgType", msgType)
+                        .usingJobData("msgContent", msgContent)
+                        .build();
+
+                Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity("T-" + corpId + "-" + todoId, "T-rsq-remind")
+                        .startAt(new Date(mills))
+                        .forJob(job)
+                        .build();
+                scheduler.scheduleJob(job, trigger);
             }
 
             Map<String, Object> map = new HashMap<String, Object>();
