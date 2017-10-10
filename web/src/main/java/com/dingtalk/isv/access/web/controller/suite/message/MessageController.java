@@ -14,6 +14,7 @@ import com.dingtalk.isv.common.model.HttpResult;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.impl.matchers.GroupMatcher.groupEquals;
 
 /**
  * 发送消息的Controller
@@ -169,16 +171,24 @@ public class MessageController {
             if (millsArray.size() > 5) {
                 return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
+
+            String groupKeyString = "rsq-remind-" + corpId + "-" + todoId;
+            //  先根据corpId和todoId，查出是否已经有计时任务存在，如果有，先统一删除
+            GroupMatcher<JobKey> matcher = GroupMatcher.groupEquals("J-" + groupKeyString);
+            for(JobKey jobKey : scheduler.getJobKeys(matcher)) {
+                System.out.println("Found job identified by: " + jobKey);
+                scheduler.deleteJob(jobKey);
+            }
             Iterator it = millsArray.iterator();
             Iterator itRule = remindArray.iterator();
             while (it.hasNext()) {
-                JobKey jobKey = new JobKey("J-" + corpId + "-" + todoId, "J-rsq-remind");
-                JobDetail currentDetail = scheduler.getJobDetail(jobKey);
-                if(currentDetail != null){
-                    scheduler.deleteJob(jobKey);
-                }
                 Long mills = (Long)it.next();
                 String remind = (String)itRule.next();
+                JobKey jobKey = new JobKey("J-" + mills, "J-" + groupKeyString);
+                //JobDetail currentDetail = scheduler.getJobDetail(jobKey);
+                //if(currentDetail != null){
+                //    scheduler.deleteJob(jobKey);
+                //}
                 String msgContent = MessageUtil.remindText(jsonContent, remind);
 
                 JobDetail job = JobBuilder.newJob(SendCorpMessageJob.class)
@@ -191,7 +201,7 @@ public class MessageController {
                         .build();
 
                 Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity("T-" + corpId + "-" + todoId, "T-rsq-remind")
+                        .withIdentity("T-" + mills, "T-" + groupKeyString)
                         .startAt(new Date(mills))
                         .forJob(job)
                         .build();
