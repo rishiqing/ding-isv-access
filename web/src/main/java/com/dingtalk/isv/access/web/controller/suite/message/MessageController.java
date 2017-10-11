@@ -48,7 +48,7 @@ public class MessageController {
     @Resource
     private SendMessageService sendMessageService;
     @Autowired
-    private Scheduler scheduler;
+    private Scheduler quartzRemindScheduler;
 
     @ResponseBody
     @RequestMapping(value = "/msg/sendtoconversation", method = {RequestMethod.POST})
@@ -175,9 +175,9 @@ public class MessageController {
             String groupKeyString = "rsq-remind-" + corpId + "-" + todoId;
             //  先根据corpId和todoId，查出是否已经有计时任务存在，如果有，先统一删除
             GroupMatcher<JobKey> matcher = GroupMatcher.groupEquals("J-" + groupKeyString);
-            for(JobKey jobKey : scheduler.getJobKeys(matcher)) {
+            for(JobKey jobKey : quartzRemindScheduler.getJobKeys(matcher)) {
                 System.out.println("Found job identified by: " + jobKey);
-                scheduler.deleteJob(jobKey);
+                quartzRemindScheduler.deleteJob(jobKey);
             }
             Iterator it = millsArray.iterator();
             Iterator itRule = remindArray.iterator();
@@ -185,9 +185,9 @@ public class MessageController {
                 Long mills = (Long)it.next();
                 String remind = (String)itRule.next();
                 JobKey jobKey = new JobKey("J-" + mills, "J-" + groupKeyString);
-                //JobDetail currentDetail = scheduler.getJobDetail(jobKey);
+                //JobDetail currentDetail = quartzRemindScheduler.getJobDetail(jobKey);
                 //if(currentDetail != null){
-                //    scheduler.deleteJob(jobKey);
+                //    quartzRemindScheduler.deleteJob(jobKey);
                 //}
                 String msgContent = MessageUtil.remindText(jsonContent, remind);
 
@@ -205,7 +205,7 @@ public class MessageController {
                         .startAt(new Date(mills))
                         .forJob(job)
                         .build();
-                scheduler.scheduleJob(job, trigger);
+                quartzRemindScheduler.scheduleJob(job, trigger);
             }
 
             Map<String, Object> map = new HashMap<String, Object>();
