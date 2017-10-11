@@ -21,72 +21,72 @@
 
 
     <!--只在job程序中配置计时任务-->
-    <!--<bean name="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
-        <!--<property name="dataSource">-->
-            <!--<ref bean="dataSource" />-->
-        <!--</property>-->
-        <!--<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />-->
-        <!--<property name="configLocation" value="classpath:quartz.properties" />-->
-        <!--<property name="triggers">-->
-            <!--<list>-->
-                <!--<ref bean="suiteTokenTrigger" />-->
-                <!--<ref bean="corpSuiteAuthFaileTrigger" />-->
-                <!--<ref bean="reAuthFaileTrigger" />-->
-                <!--<ref bean="corpOrgSyncFailTrigger" />-->
-            <!--</list>-->
-        <!--</property>-->
-    <!--</bean>-->
+    <bean name="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
+        <property name="configLocation" value="classpath:quartz.properties" />
+        <property name="triggers">
+            <list>
+                <ref bean="suiteTokenTrigger" />
+                <ref bean="corpSuiteAuthFaileTrigger" />
+                <ref bean="reAuthFaileTrigger" />
+                <ref bean="corpOrgSyncFailTrigger" />
+            </list>
+        </property>
+    </bean>
 
-    <!--<bean id="suiteTokenJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.SuiteTokenGenerateJob"/>-->
-        <!--<property name="durability" value="true" />-->
-    <!--</bean>-->
+    <bean id="suiteTokenJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.SuiteTokenGenerateJob"/>
+        <property name="durability" value="true" />
+    </bean>
 
-    <!--<bean id="suiteTokenTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="suiteTokenJobDetail" />-->
-        <!--<property name="cronExpression" value="0 */30 * * * ?" />-->
-    <!--</bean>-->
-
-
-    <!--<bean id="corpSuiteAuthFaileJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.CorpSuiteAuthFaileJob"/>-->
-        <!--<property name="durability" value="true" />-->
-    <!--</bean>-->
-
-    <!--<bean id="corpSuiteAuthFaileTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="corpSuiteAuthFaileJobDetail" />-->
-        <!--<property name="cronExpression" value="0 */1 * * * ?" />-->
-    <!--</bean>-->
-
-    <!--<bean id="corpOrgSyncFailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.CorpOrgSyncFailJob"/>-->
-        <!--<property name="durability" value="true" />-->
-    <!--</bean>-->
-
-    <!--<bean id="corpOrgSyncFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="corpOrgSyncFailJobDetail" />-->
-        <!--<property name="cronExpression" value="0 */5 * * * ?" />-->
-    <!--</bean>-->
+    <bean id="suiteTokenTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="suiteTokenJobDetail" />
+        <property name="cronExpression" value="0 */30 * * * ?" />
+    </bean>
 
 
+    <bean id="corpSuiteAuthFaileJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.CorpSuiteAuthFaileJob"/>
+        <property name="durability" value="true" />
+    </bean>
 
-    <!--<bean id="reAuthFaileJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass" value="com.dingtalk.isv.access.biz.scheduler.ReAuthFaileJob"/>-->
-        <!--<property name="jobDataMap">-->
-            <!--<map>-->
-                <!--&lt;!&ndash;<entry key="suiteKey" value="suitexdhgv7mn5ufoi9ui"/>&ndash;&gt;-->
-                <!--<entry key="appId" value="${isv.app.id}"/>-->
-            <!--</map>-->
-        <!--</property>-->
-        <!--<property name="durability" value="true" />-->
-    <!--</bean>-->
-    <!--<bean id="reAuthFaileTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="reAuthFaileJobDetail" />-->
-        <!--<property name="cronExpression" value="0 */10 * * * ?" />-->
-    <!--</bean>-->
+    <bean id="corpSuiteAuthFaileTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="corpSuiteAuthFaileJobDetail" />
+        <property name="cronExpression" value="0 */1 * * * ?" />
+    </bean>
 
-    <!--&lt;!&ndash; a tmp monitor job&ndash;&gt;-->
-    <!--<bean id="monitorJob" class="com.dingtalk.isv.access.biz.scheduler.MonitorJob"/>-->
+    <bean id="corpOrgSyncFailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass"  value="com.dingtalk.isv.access.biz.scheduler.CorpOrgSyncFailJob"/>
+        <property name="durability" value="true" />
+    </bean>
+
+    <bean id="corpOrgSyncFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="corpOrgSyncFailJobDetail" />
+        <property name="cronExpression" value="0 */5 * * * ?" />
+    </bean>
+
+
+
+    <bean id="reAuthFaileJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.dingtalk.isv.access.biz.scheduler.ReAuthFaileJob"/>
+        <property name="jobDataMap">
+            <map>
+                <!--<entry key="suiteKey" value="suitexdhgv7mn5ufoi9ui"/>-->
+                <entry key="appId" value="${isv.app.id}"/>
+            </map>
+        </property>
+        <property name="durability" value="true" />
+    </bean>
+    <bean id="reAuthFaileTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="reAuthFaileJobDetail" />
+        <property name="cronExpression" value="0 */10 * * * ?" />
+    </bean>
+
+    <!-- a tmp monitor job-->
+    <bean id="monitorJob" class="com.dingtalk.isv.access.biz.scheduler.MonitorJob"/>
 
     <!--
     delete from QRTZ_TRIGGERS where TRIGGER_NAME='reAuthFaileTrigger';
@@ -95,13 +95,13 @@
     居然要重启吗?每研究透彻
     -->
 
-    <bean name="quartzRemindScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="dataSource">
-            <ref bean="dataSourceRemind" />
-        </property>
-        <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
-        <property name="configLocation" value="classpath:quartz-remind.properties" />
-        <property name="overwriteExistingJobs" value="true" />
-    </bean>
+    <!--<bean name="quartzRemindScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+        <!--<property name="dataSource">-->
+            <!--<ref bean="dataSourceRemind" />-->
+        <!--</property>-->
+        <!--<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />-->
+        <!--<property name="configLocation" value="classpath:quartz-remind.properties" />-->
+        <!--<property name="overwriteExistingJobs" value="true" />-->
+    <!--</bean>-->
 </beans>
 
