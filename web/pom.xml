@@ -47,7 +47,7 @@
     </dependencies>
 
     <build>
-        <finalName>ding-isv-access</finalName>
+        <finalName>ding-isv-access-2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
