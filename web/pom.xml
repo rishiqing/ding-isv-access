@@ -47,7 +47,7 @@
     </dependencies>
 
     <build>
-        <finalName>ding-isv-access</finalName>
+        <finalName>ding-isv-remind</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
