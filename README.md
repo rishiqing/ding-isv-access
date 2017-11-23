@@ -112,4 +112,10 @@
 - 取消注释spring-task.xml的quartzScheduler bean，启动quartz计时器
 - 取消注释spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，配置队列监听器
 
+## 钉钉提醒程序
+
+- 注释掉spring-task.xml的quartzScheduler bean，不启动quartz计时器
+- 开启spring-task.xml的quartzRemindScheduler
+- 注释掉spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，不配置队列监听器
+
 ## 跳过maven的test，直接运行package打包
