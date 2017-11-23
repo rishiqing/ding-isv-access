@@ -14,6 +14,7 @@ import com.dingtalk.isv.access.biz.corp.model.CorpCallbackQueueDO;
 import com.dingtalk.isv.common.event.EventListener;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class CorpCallbackEventListener implements EventListener {
      * @param corpCallbackEvent
      */
     @Subscribe
+    @AllowConcurrentEvents
     public void listenCorpCallbackEvent(CorpCallbackEvent corpCallbackEvent) {
         try{
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,

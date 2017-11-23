@@ -41,28 +41,28 @@
 
 
     <!--只在job程序中配置监听-->
-    <!-- 消息监听器 -->
-    <bean id="suitCallbackMessageListener" class="com.dingtalk.isv.access.biz.event.mq.SuiteCallbackListener"/>
-    <!-- 消息监听容器 -->
-    <bean id="jmsContainer"
-          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory" />
-        <property name="destination" ref="suiteCallBackQueue" />
-        <property name="messageListener" ref="suitCallbackMessageListener" />
-    </bean>
+    <!--&lt;!&ndash; 消息监听器 &ndash;&gt;-->
+    <!--<bean id="suitCallbackMessageListener" class="com.dingtalk.isv.access.biz.event.mq.SuiteCallbackListener"/>-->
+    <!--&lt;!&ndash; 消息监听容器 &ndash;&gt;-->
+    <!--<bean id="jmsContainer"-->
+          <!--class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="connectionFactory" />-->
+        <!--<property name="destination" ref="suiteCallBackQueue" />-->
+        <!--<property name="messageListener" ref="suitCallbackMessageListener" />-->
+    <!--</bean>-->
 
-    <!-- 与日事清同步成功消息监听器 -->
-    <bean id="rsqSyncCallbackMessageListener" class="com.dingtalk.isv.rsq.biz.event.mq.RsqSyncCallbackListener">
-        <property name="appId" value="${isv.app.id}" />
-        <property name="sendMessageBody" value="${rsqapi.message.body}" />
-    </bean>
-    <!-- 与日事清同步成功消息监听容器 -->
-    <bean id="rsqJmsContainer"
-          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory" />
-        <property name="destination" ref="rsqSyncCallBackQueue" />
-        <property name="messageListener" ref="rsqSyncCallbackMessageListener" />
-    </bean>
+    <!--&lt;!&ndash; 与日事清同步成功消息监听器 &ndash;&gt;-->
+    <!--<bean id="rsqSyncCallbackMessageListener" class="com.dingtalk.isv.rsq.biz.event.mq.RsqSyncCallbackListener">-->
+        <!--<property name="appId" value="${isv.app.id}" />-->
+        <!--<property name="sendMessageBody" value="${rsqapi.message.body}" />-->
+    <!--</bean>-->
+    <!--&lt;!&ndash; 与日事清同步成功消息监听容器 &ndash;&gt;-->
+    <!--<bean id="rsqJmsContainer"-->
+          <!--class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="connectionFactory" />-->
+        <!--<property name="destination" ref="rsqSyncCallBackQueue" />-->
+        <!--<property name="messageListener" ref="rsqSyncCallbackMessageListener" />-->
+    <!--</bean>-->
 
 </beans>
 
