@@ -35,6 +35,7 @@ import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,6 +48,8 @@ import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.impl.matchers.GroupMatcher.*;
@@ -72,16 +75,28 @@ public class SystemController {
     @Qualifier("rsqSyncCallBackQueue")
     private Queue rsqSyncCallBackQueue;
 
-
-
-
     @RequestMapping("/test")
     @ResponseBody
-    public String checkPreload() {
-        asyncCorpAuthSuiteEventBus.post(new Integer(100));
-        asyncCorpAuthSuiteEventBus.post(new Integer(200));
-        asyncCorpAuthSuiteEventBus.post(new Integer(300));
-        return "success......0000";
+    public String checkEventBus() {
+        Integer num = 100;
+        asyncCorpAuthSuiteEventBus.post(num);
+        return "success:--/test: " + num;
+    }
+
+    @RequestMapping("/test1")
+    @ResponseBody
+    public String checkEventBus1(){
+        Integer num = 200;
+        asyncCorpAuthSuiteEventBus.post(num);
+        return "success:--/test1: " + num;
+    }
+
+    @RequestMapping("/test2")
+    @ResponseBody
+    public String checkEventBus2(){
+        Integer num = 300;
+        asyncCorpAuthSuiteEventBus.post(num);
+        return "success:--/test2: " + num;
     }
 
     @RequestMapping("/mqtest")
