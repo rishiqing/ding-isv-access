@@ -265,6 +265,19 @@
 
     <build>
         <finalName>ding-isv-access</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>aaasrc/assembly/main.xml</descriptor>
+                        </descriptors>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -277,9 +290,10 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
                     <descriptors>
-                        <descriptor>web/src/main/assembly/assembly.xml</descriptor>
+                        <descriptor>web/src/main/assembly/main.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
