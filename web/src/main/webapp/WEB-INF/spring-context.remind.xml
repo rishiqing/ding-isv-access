@@ -6,7 +6,6 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd"
        default-autowire="byName">
 
-    <!--默认-->
     <bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
@@ -25,9 +24,9 @@
     <import resource="classpath:spring-sdk.xml"/>
 
     <!--跟类型相关的spring配置文件-->
-    <import resource="classpath:type/main/spring-jdbc.xml"/>
-    <import resource="classpath:type/main/spring-task.xml"/>
-    <import resource="classpath:type/main/spring-queue.xml"/>
+    <import resource="classpath:type/remind/spring-jdbc.xml"/>
+    <import resource="classpath:type/remind/spring-task.xml"/>
+    <import resource="classpath:type/remind/spring-queue.xml"/>
 
 </beans>
 

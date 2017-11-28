@@ -11,6 +11,7 @@ import com.dingtalk.isv.access.biz.suite.model.CorpSuiteAuthFaileDO;
 import com.dingtalk.isv.common.event.EventListener;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class CorpAuthSuiteEventListener implements EventListener {
      * @param corpAuthSuiteEvent
      */
     @Subscribe
+    @AllowConcurrentEvents  //  event并行执行
     public void listenCorpAuthSuiteEvent(CorpAuthSuiteEvent corpAuthSuiteEvent) {
         try{
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -61,6 +63,7 @@ public class CorpAuthSuiteEventListener implements EventListener {
     }
 
     @Subscribe
+    @AllowConcurrentEvents  //  event并行执行
     public void listenAuthChangeEvent(AuthChangeEvent authChangeEvent) {
         try{
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
@@ -86,13 +89,20 @@ public class CorpAuthSuiteEventListener implements EventListener {
 
     }
 
-
     @Subscribe
+    @AllowConcurrentEvents  //  event并行执行
     public void listenIntegerTestEvent(Integer num) {
-        System.out.println("num is " + num);
-        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
-                LogFormatter.KeyValue.getNew("num", num)
-        ));
+        System.out.println("--start--: " + new Date() + ", num is " + num);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("--end--: " + new Date() + ", num is " + num);
+
+        //bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+        //        LogFormatter.KeyValue.getNew("num", num)
+        //));
     }
 
 }

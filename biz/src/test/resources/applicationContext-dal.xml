@@ -22,7 +22,7 @@
 
     <import resource="classpath:spring-sdk.xml"/>
 
-    <import resource="classpath:spring-queue.xml"/>
+    <import resource="classpath:type/main/spring-queue.xml"/>
 
     <!--
 

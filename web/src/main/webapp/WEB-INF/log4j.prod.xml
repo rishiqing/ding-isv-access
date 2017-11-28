@@ -277,141 +277,141 @@
 
 
     <logger name="org.springframework.remoting.support" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="PROJECT" />
     </logger>
 
     <logger name="OAPI_HTTP_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="OAPI_HTTP_LOGGER_APPENDER" />
     </logger>
 
 
     <logger name="MONITOR_LOG" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="MONITOR_LOGGER_APPENDER" />
     </logger>
 
     <logger name="CORP_SUITE_AUTH_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="CORP_SUITE_AUTH_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="TASK_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="TASK_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="CORP_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="CORP_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="ORG_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="ORG_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
 
     <logger name="SUITE_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="SUITE_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
 
     <logger name="STAFF_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="STAFF_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="CRM_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="CRM_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="FORM_MANAGE_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="FORM_MANAGE_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor" additivity="false">
-        <level value="INFO"/>
+        <level value="WARN"/>
         <appender-ref ref="SERVICE_PROFILE_LOG_APPENDER"/>
     </logger>
 
     <logger name="CONTROLLER_PROFILE_LOG" additivity="false">
-        <level value="INFO"/>
+        <level value="WARN"/>
         <appender-ref ref="CONTROLLER_PROFILE_LOG_APPENDER"/>
     </logger>
 
     <logger name="SUITE_CALLBACK_LOGGER" additivity="false">
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="SUITE_CALLBACK_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="HTTP_INVOKE_LOGGER" additivity="false">
-        <level value="INFO"/>
+        <level value="WARN"/>
         <appender-ref ref="HTTP_INVOKE_LOGGER_APPENDER"/>
     </logger>
 
     <logger name="EVENT_LOGGER" additivity="false">
-        <level value="INFO"/>
+        <level value="WARN"/>
         <appender-ref ref="EVENT_LOGGER_APPENDER"/>
     </logger>
 
 
 
     <logger name="DING_OPEN_CLIENT_SDK_LOGGER" additivity="false">
-		<level value="INFO" />
+		<level value="WARN" />
 		<appender-ref ref="DING_OPEN_CLIENT_SDK_LOGGER_APPENDER" />
 	</logger>
 
     <logger name="org.springframework.scheduling.quartz" additivity="false">
-        <level value="DEBUG" />
+        <level value="WARN" />
         <appender-ref ref="TASK_LOGGER_APPENDER" />
     </logger>
     <logger name="JSAPI_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="JSAPI_LOGGER_APPENDER" />
     </logger>
 
     <!--rsq request logger-->
     <logger name="RSQ_REQUEST_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="RSQ_REQUEST_LOGGER_APPENDER" />
     </logger>
 
     <!--corp lock logger-->
     <logger name="CORP_LOCK_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="CORP_LOCK_LOGGER_APPENDER" />
     </logger>
 
     <!--corp callback event logger-->
     <logger name="CORP_CALLBACK_QUEUE_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="CORP_CALLBACK_QUEUE_LOGGER_APPENDER" />
     </logger>
 
     <!--mq listener logger-->
     <logger name="MQ_LISTENER_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="MQ_LISTENER_LOGGER_APPENDER" />
     </logger>
 
     <!--isv id map logger-->
     <logger name="CONTROLLER_ISV_ID_MAP_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="CONTROLLER_ISV_ID_MAP_LOGGER_APPENDER" />
     </logger>
     <!--isv message logger-->
     <logger name="CONTROLLER_ISV_MESSAGE_LOGGER" additivity="false">
-        <level value="INFO" />
+        <level value="WARN" />
         <appender-ref ref="CONTROLLER_ISV_MESSAGE_LOGGER_APPENDER" />
     </logger>
 
     <root>
-        <level value="info"/>
+        <level value="WARN"/>
         <appender-ref ref="PROJECT"/>
         <appender-ref ref="ERROR"/>
     </root>

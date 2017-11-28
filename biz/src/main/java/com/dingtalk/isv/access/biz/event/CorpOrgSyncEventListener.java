@@ -11,6 +11,7 @@ import com.dingtalk.isv.common.event.EventListener;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.rsq.biz.service.RsqAccountService;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class CorpOrgSyncEventListener implements EventListener {
      * @param corpOrgSyncEvent
      */
     @Subscribe
+    @AllowConcurrentEvents  //  event并行执行
     public void listenCorpOrgSyncEvent(CorpOrgSyncEvent corpOrgSyncEvent) {
         try{
             bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
