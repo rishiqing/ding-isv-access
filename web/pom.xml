@@ -12,6 +12,9 @@
     <artifactId>dingtalk.isv.access.web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -98,6 +101,8 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/main.xml</descriptor>
+                                <descriptor>src/main/assembly/job.xml</descriptor>
+                                <descriptor>src/main/assembly/remind.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>

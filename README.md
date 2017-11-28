@@ -94,22 +94,49 @@
 由于需要使用用户集成后的返回数据，因此只能使用同步集成
 
 
-# 钉钉发布注意事项
+# 钉钉发布注意事项（deprecated）
 
 ## log4j日志文件配置
 
 修改log4j.xml文件名为log4j.dev.xml
 修改log4j.prod.xml文件名称为log4j.xml
 
-# 钉钉主程序和job程序发布说明：
-## 钉钉主程序
+## 钉钉主程序和job程序发布说明：
+### 钉钉主程序
 
 - 注释掉spring-task.xml的quartzScheduler bean，不启动quartz计时器
 - 注释掉spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，不配置队列监听器
 
-## 钉钉job程序
+### 钉钉job程序
 
 - 取消注释spring-task.xml的quartzScheduler bean，启动quartz计时器
 - 取消注释spring-queue.xml的suitCallbackMessageListener监听器和jmsContainer bean，配置队列监听器
 
-## 跳过maven的test，直接运行package打包
+### 跳过maven的test，直接运行package打包
+
+### maven打包：
+
+`mvn package -Dmaven.test.skip=true -Denv=prod`
+
+#### env参数说明maven打包的环境，根据环境而有区别的配置如下：
+- web/conf/下的基本配置，根据环境分目录存储
+
+
+# 系统部署
+
+## 打包说明
+钉钉端后台使用maven-assembly-plugin一次性打三个包：
+- ding-isv-access-main：钉钉后台主程序
+- ding-isv-access-job：钉钉后台计时任务（使用quartz）
+- ding-isv-access-remind：钉钉提醒服务器
+
+## 环境说明
+钉钉端在打包时指定`-Denv`变量，可以指定打包的环境，目前支持的环境有`prod`，
+prod环境下会将log4j.prod.xml重命名为log4j.xml
+
+## 打包方式
+
+### 本地打包
+`mvn package -Dmaven.test.skip=true -Denv=prod`
+
+### jenkins集成
