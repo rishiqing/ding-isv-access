@@ -6,7 +6,7 @@
 
     <groupId>com.dingtalk</groupId>
     <artifactId>dingtalk.isv.access</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>biz</module>
@@ -34,17 +34,17 @@
             <dependency>
                 <groupId>com.dingtalk</groupId>
                 <artifactId>dingtalk.isv.access.api</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.dingtalk</groupId>
                 <artifactId>dingtalk.isv.access.biz</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.dingtalk</groupId>
                 <artifactId>com.dingtalk.common</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -271,11 +271,6 @@
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>3.1.0</version>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>aaasrc/assembly/main.xml</descriptor>
-                        </descriptors>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

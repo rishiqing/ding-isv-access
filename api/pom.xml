@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.dingtalk</groupId>
         <artifactId>dingtalk.isv.access</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <groupId>com.dingtalk</groupId>
     <artifactId>dingtalk.isv.access.api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
