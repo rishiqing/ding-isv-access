@@ -95,6 +95,70 @@ public class StaffManageController {
 
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/corp/dept/all", method = RequestMethod.GET)
+    public String getAndSaveAllDept(
+            @RequestParam("suiteKey") String suiteKey,
+            @RequestParam("corpId") String corpId
+    ){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            ServiceResult<Void> deptSr = deptManageService.getAndSaveAllCorpOrg(suiteKey, corpId);
+            if(!deptSr.isSuccess()){
+                return "save staff failed:" + deptSr.getCode();
+            }
+            return "success suiteKey: " + suiteKey + ", corpId: " + corpId;
+        }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ));
+            return "failed";
+        }
+    }
+
+    /**
+     * 从钉钉获取所有用户到日事清
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/corp/staff/all", method = RequestMethod.GET)
+    public String getAndSaveAllCorpOrgStaff(
+            @RequestParam("suiteKey") String suiteKey,
+            @RequestParam("corpId") String corpId
+    ){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            ServiceResult<Void> staffSr = staffManageService.getAndSaveAllCorpOrgStaff(suiteKey, corpId);
+            if(!staffSr.isSuccess()){
+                return "save staff failed:" + staffSr.getCode();
+            }
+            return "success suiteKey: " + suiteKey + ", corpId: " + corpId;
+        }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ));
+            return "failed";
+        }
+    }
+
     /**
      * 根据dept获取用户信息
      * @param suiteKey
@@ -104,7 +168,7 @@ public class StaffManageController {
      */
     @ResponseBody
     @RequestMapping(value = "/corp/dept/staff", method = RequestMethod.GET)
-    public String getAndSaveAllCorpOrgStaff(
+    public String getAndSaveCorpOrgDeptStaff(
             @RequestParam("suiteKey") String suiteKey,
             @RequestParam("corpId") String corpId,
             @RequestParam("deptId") Long deptId
