@@ -10,6 +10,6 @@ import java.util.concurrent.Executors;
 public class AsyncCorpAuthSuiteExecutorFactory {
     public Executor getCorpAuthSuiteExecutor(){
         //  建立默认10个线程的线程池
-        return Executors.newFixedThreadPool(10);
+        return Executors.newFixedThreadPool(15);
     }
 }
