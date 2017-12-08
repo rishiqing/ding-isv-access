@@ -18,8 +18,11 @@ import com.dingtalk.isv.access.biz.dingutil.CrmOapiRequestHelper;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.open.client.api.model.corp.CorpAdmin;
+import com.dingtalk.open.client.api.model.corp.CorpAdminList;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
+import com.dingtalk.open.client.api.service.corp.CorpAdminService;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.common.ServiceException;
 import org.slf4j.Logger;
@@ -41,6 +44,8 @@ public class StaffManageServiceImpl implements StaffManageService {
     private CorpStaffDao corpStaffDao;
     @Autowired
     private CorpUserService corpUserService;
+    @Autowired
+    private CorpAdminService corpAdminService;
     @Autowired
     private CorpManageService corpManageService;
     @Autowired
@@ -425,6 +430,77 @@ public class StaffManageServiceImpl implements StaffManageService {
             ), e);
             mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    @Override
+    public ServiceResult<List<CorpAdmin>> getCorpAdminList(String corpId, String suiteKey){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            ServiceResult<CorpTokenVO> corpTokenSr = corpManageService.getCorpToken(suiteKey, corpId);
+            String corpToken = corpTokenSr.getResult().getCorpToken();
+            CorpAdminList corpAdminList = corpAdminService.getCorpAdminList(corpToken);
+            return ServiceResult.success(corpAdminList.getAdminList());
+        } catch (ServiceException e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "获取corpAdmin异常",
+                    String.valueOf(e.getCode()),
+                    e.getMessage(),
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
+            ));
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("corpId", corpId),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+    @Override
+    public ServiceResult<Void> getAndSaveCorpAdminList(String corpId, String suiteKey){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", corpId),
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
+        ));
+        try {
+
+            ServiceResult<List<CorpAdmin>> adminSr = getCorpAdminList(corpId, suiteKey);
+            if(!adminSr.isSuccess()){
+                return ServiceResult.failure(adminSr.getCode(), adminSr.getMessage());
+            }
+
+            List<CorpAdmin> list = adminSr.getResult();
+            Iterator it = list.iterator();
+            while (it.hasNext()){
+                CorpAdmin corpAdmin = (CorpAdmin)it.next();
+                StaffDO staffDO = StaffConverter.corpAdmin2DtaffDO(corpId, corpAdmin);
+                corpStaffDao.updateIsAdmin(staffDO);
+            }
+            return ServiceResult.success(null);
+
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" + e.toString(),
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());

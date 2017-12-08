@@ -2,6 +2,8 @@ package com.dingtalk.isv.access.biz.corp.dao;
 
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffIdsDO;
+import com.dingtalk.open.client.api.model.corp.CorpAdmin;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -40,6 +42,13 @@ public interface CorpStaffDao {
 	 * @return
 	 */
 	public List<StaffDO> getStaffListByCorpId(@Param("corpId") String corpId);
+
+	/**
+	 * 根据isAmdin属性获取用户
+	 * @param isAdmin
+	 * @return
+	 */
+	public List<StaffDO> getStaffListByCorpIdAndIsAdmin(@Param("corpId") String corpId, @Param("isAdmin") Boolean isAdmin);
 
 	/**
 	 * 根据corpId查询用户id列表
@@ -84,6 +93,16 @@ public interface CorpStaffDao {
 	 * @return
 	 */
 	public void updateUnionId(StaffDO staffDO);
+
+	/**
+	 * 更新用户是否为管理员
+	 * staffDO.corpId: 必要的
+	 * staffDO.userId: 必要的
+	 * staffDO.isAdmin: 必要的
+	 * staffDO.sysLevel: 必要的
+	 * @param staffDO
+	 */
+	public void updateIsAdmin(StaffDO staffDO);
 
 }
 

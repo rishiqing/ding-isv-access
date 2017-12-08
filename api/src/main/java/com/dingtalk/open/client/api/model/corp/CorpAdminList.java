@@ -1,8 +1,5 @@
 package com.dingtalk.open.client.api.model.corp;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,7 +12,15 @@ import java.util.List;
  */
 public class CorpAdminList implements Serializable {
     private static final long serialVersionUID = 1L;
-    private List<CorpUser> adminList;
+    private List<CorpAdmin> adminList;
+
+    public List<CorpAdmin> getAdminList() {
+        return adminList;
+    }
+
+    public void setAdminList(List<CorpAdmin> adminList) {
+        this.adminList = adminList;
+    }
 
     @Override
     public int hashCode() {
