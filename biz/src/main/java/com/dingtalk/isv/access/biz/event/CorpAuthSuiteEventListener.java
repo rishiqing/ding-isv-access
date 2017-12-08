@@ -92,13 +92,13 @@ public class CorpAuthSuiteEventListener implements EventListener {
     @Subscribe
     @AllowConcurrentEvents  //  event并行执行
     public void listenIntegerTestEvent(Integer num) {
-        System.out.println("--start--: " + new Date() + ", num is " + num);
+        System.out.println(">>--" + num +  " --start--: " + new Date());
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+
         }
-        System.out.println("--end--: " + new Date() + ", num is " + num);
+        System.out.println(">>--" + num +  " --end--: " + new Date());
 
         //bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
         //        LogFormatter.KeyValue.getNew("num", num)
