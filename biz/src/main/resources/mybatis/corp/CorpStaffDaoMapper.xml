@@ -193,14 +193,15 @@
     </select>
 
     <update id="updateRsqInfo">
-        update isv_corp_staff set rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set gmt_modified=now(), rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
     <update id="updateUnionId">
-        update isv_corp_staff set union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set gmt_modified=now(), union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
     </update>
+
     <update id="updateIsAdmin">
-        update isv_corp_staff set is_admin=#{isAdmin}, sys_level=#{sysLevel} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set gmt_modified=now(), is_admin=#{isAdmin}, sys_level=#{sysLevel} where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
 

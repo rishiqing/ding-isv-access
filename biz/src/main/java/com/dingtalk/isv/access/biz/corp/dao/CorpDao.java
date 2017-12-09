@@ -4,6 +4,8 @@ import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository("corpDao")
 public interface CorpDao {
 
@@ -28,6 +30,6 @@ public interface CorpDao {
 	 */
 	public void updateRsqInfo(CorpDO corpDO);
 
-
+	public List<CorpDO> getCorpByIdRange(@Param("fromId") Long fromId, @Param("toId") Long toId);
 }
 
