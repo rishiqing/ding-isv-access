@@ -11,7 +11,7 @@
     <groupId>com.dingtalk</groupId>
     <artifactId>dingtalk.isv.access.web</artifactId>
     <!--每次更新web module的版本-->
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>war</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
