@@ -19,7 +19,7 @@ public class TestDemo {
         //ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10,
         //        0L, TimeUnit.MILLISECONDS,
         //        new LinkedBlockingQueue<Runnable>());
-        Executor executor = Executors.newFixedThreadPool(2);
+        Executor executor = Executors.newFixedThreadPool(10);
         AsyncEventBus asyncEventBus = new AsyncEventBus("asyncEventBus", executor);
         /**
          * 注册事件处理器
@@ -28,14 +28,14 @@ public class TestDemo {
             @Subscribe
             @AllowConcurrentEvents
             public void handleUserInfoChangeEvent(String msg){
-                System.out.println("--start--: " + new Date() + ", msg is " + msg);
+                System.out.println(">>--" + msg +" --start--" + new Date());
                 try {
-                    System.out.println("----thread id----" + Thread.currentThread().getId());
+                    System.out.println(">>--" + msg + " ----thread id----" + Thread.currentThread().getId());
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("--end--: " + new Date() + ", msg is " + msg);
+                System.out.println(">>--" + msg + " --end--: " + new Date());
             }
         });
         asyncEventBus.post("apple");

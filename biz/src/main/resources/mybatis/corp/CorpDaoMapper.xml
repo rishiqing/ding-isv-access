@@ -54,11 +54,17 @@
         update isv_corp set rsq_id=#{rsqId} where corp_id=#{corpId}
     </update>
 
-
     <select id="getCorpByCorpId" resultMap="corpMap">
         SELECT <include refid="select-all-fields"/>  FROM isv_corp
         <![CDATA[
 			WHERE corp_id=#{corpId}
+		 ]]>
+    </select>
+
+    <select id="getCorpByIdRange" resultMap="corpMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp
+        <![CDATA[
+			WHERE id >= #{fromId} AND id < #{toId}
 		 ]]>
     </select>
 </mapper>

@@ -180,6 +180,11 @@
 		 ]]>
     </select>
 
+    <select id="getStaffListByCorpIdAndIsAdmin" resultMap="corpStaffMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp_staff
+        WHERE corp_id=#{corpId} AND is_admin=#{isAdmin}
+    </select>
+
     <select id="getStaffUserIdListByCorpId" resultType="java.lang.String">
         SELECT user_id  FROM isv_corp_staff
         <![CDATA[
@@ -188,12 +193,17 @@
     </select>
 
     <update id="updateRsqInfo">
-        update isv_corp_staff set rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set gmt_modified=now(), rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
     <update id="updateUnionId">
-        update isv_corp_staff set union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set gmt_modified=now(), union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
     </update>
+
+    <update id="updateIsAdmin">
+        update isv_corp_staff set gmt_modified=now(), is_admin=#{isAdmin}, sys_level=#{sysLevel} where corp_id=#{corpId} and user_id=#{userId}
+    </update>
+
 
     <insert id="saveStaffDeleted" useGeneratedKeys="true" keyProperty="id">
         insert into isv_corp_staff_deleted (
