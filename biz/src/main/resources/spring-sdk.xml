@@ -41,6 +41,11 @@
         <property name="interfaceName" value="com.dingtalk.open.client.api.service.corp.CorpUserService"/>
     </bean>
 
+    <bean id="corpAdminService" class="com.dingtalk.open.client.spring.DingOpenClientApiBean">
+        <property name="serviceFactory" ref="serviceFactory"/>
+        <property name="interfaceName" value="com.dingtalk.open.client.api.service.corp.CorpAdminService"/>
+    </bean>
+
     <bean id="corpDepartmentService" class="com.dingtalk.open.client.spring.DingOpenClientApiBean">
         <property name="serviceFactory" ref="serviceFactory"/>
         <property name="interfaceName" value="com.dingtalk.open.client.api.service.corp.CorpDepartmentService"/>

@@ -2,6 +2,7 @@ package com.dingtalk.isv.access.api.service.corp;
 import com.dingtalk.isv.access.api.model.corp.LoginUserVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.open.client.api.model.corp.CorpAdmin;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
 
@@ -104,4 +105,18 @@ public interface StaffManageService {
      */
     public ServiceResult<List<String>> getStaffUserIdListByCorpId(String corpId);
 
-    }
+    /**
+     * 获取企业管理员列表
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<List<CorpAdmin>> getCorpAdminList(String corpId, String suiteKey);
+
+    /**
+     * 获取并将企业管理信息保存到本地
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<Void> getAndSaveCorpAdminList(String corpId, String suiteKey);
+
+}

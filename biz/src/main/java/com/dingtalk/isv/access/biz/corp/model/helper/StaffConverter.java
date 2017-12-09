@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffResult;
+import com.dingtalk.open.client.api.model.corp.CorpAdmin;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetailList;
 
@@ -194,5 +195,14 @@ public class StaffConverter {
         }
 
         return voList;
+    }
+
+    public static StaffDO corpAdmin2DtaffDO(String corpId, CorpAdmin corpAdmin){
+        StaffDO staffDO = new StaffDO();
+        staffDO.setCorpId(corpId);
+        staffDO.setUserId(corpAdmin.getUserid());
+        staffDO.setAdmin(true);
+        staffDO.setSysLevel(corpAdmin.getSys_level());
+        return staffDO;
     }
 }

@@ -246,11 +246,51 @@ public class RsqAccountService {
             }
             RsqUser user = rsqUserSr.getResult();
             staffDO.setRsqUserId(String.valueOf(user.getId()));
-            //TODO 为控制并发，保证username和password与日事清系统一致，使用返回值作为rsqUsername和rsqPassword
+            // 为控制并发，保证username和password与日事清系统一致，使用返回值作为rsqUsername和rsqPassword
             staffDO.setRsqUsername(user.getUsername());
             staffDO.setRsqPassword(generateRsqPassword(user.getUsername()));
 
             corpStaffDao.updateRsqInfo(staffDO);
+            return ServiceResult.success(null);
+
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", staffDO.getCorpId()),
+                    LogFormatter.KeyValue.getNew("userID", staffDO.getUserId())
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", staffDO.getCorpId()),
+                    LogFormatter.KeyValue.getNew("userID", staffDO.getUserId())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
+     * 设置staffDO是否是管理员
+     * @param suiteKey
+     * @param staffDO
+     * @return
+     */
+    public ServiceResult<Void> updateRsqTeamAdmin(String suiteKey, StaffDO staffDO) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpId", staffDO.getCorpId()),
+                LogFormatter.KeyValue.getNew("userID", staffDO.getUserId())
+        ));
+        try {
+
+            SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+
+
+            ServiceResult<RsqUser> rsqUserSr = rsqAccountRequestHelper.setUserAdmin(suiteDO, staffDO);
+
+            if(!rsqUserSr.isSuccess()){
+                return ServiceResult.failure(rsqUserSr.getCode(), rsqUserSr.getMessage());
+            }
             return ServiceResult.success(null);
 
         } catch (Exception e) {
@@ -478,6 +518,45 @@ public class RsqAccountService {
     }
 
     /**
+     * 设置corpId中的所有管理员
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<Void> updateAllCorpAdmin(String suiteKey, String corpId){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            List<StaffDO> list = corpStaffDao.getStaffListByCorpIdAndIsAdmin(corpId, true);
+
+            Iterator it = list.iterator();
+            while(it.hasNext()){
+                StaffDO staffDO = (StaffDO) it.next();
+                ServiceResult deptSr = this.updateRsqTeamAdmin(suiteKey, staffDO);
+                if(!deptSr.isSuccess()){
+                    return ServiceResult.failure(deptSr.getCode(),deptSr.getMessage());
+                }
+            }
+
+            return ServiceResult.success(null);
+        } catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
      * 同步所有的企业信息到日事清，包括：
      * 1  公司信息
      * 2  部门信息
@@ -498,17 +577,23 @@ public class RsqAccountService {
             //2  创建企业部门
             ServiceResult<DepartmentVO> rootSr = deptManageService.getDepartmentByCorpIdAndDeptId(corpId, 1L);
             if(!rootSr.isSuccess()){
-                return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
+                return ServiceResult.failure(rootSr.getCode(),rootSr.getMessage());
             }
             ServiceResult<Void> rsqDeptSr = this.createRecursiveSubDepartment(suiteKey, DepartmentConverter.DepartmentVO2DepartmentDO(rootSr.getResult()));
             if(!rsqDeptSr.isSuccess()){
-                return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
+                return ServiceResult.failure(rsqDeptSr.getCode(),rsqDeptSr.getMessage());
             }
 
             //3  新建企业部门成员
             ServiceResult<Void> rsqDeptStaffSr = this.createAllCorpStaff(suiteKey, corpId);
             if(!rsqDeptStaffSr.isSuccess()){
-                return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
+                return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
+            }
+
+            //3  更新企业部门的管理员状态
+            ServiceResult<Void> rsqAdminSr = this.updateAllCorpAdmin(suiteKey, corpId);
+            if(!rsqAdminSr.isSuccess()){
+                return ServiceResult.failure(rsqAdminSr.getCode(),rsqAdminSr.getMessage());
             }
 
             //4  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
