@@ -2,8 +2,6 @@ package com.dingtalk.isv.access.biz.corp.dao;
 
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffIdsDO;
-import com.dingtalk.open.client.api.model.corp.CorpAdmin;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
