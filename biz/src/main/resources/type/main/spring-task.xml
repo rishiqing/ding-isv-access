@@ -95,13 +95,13 @@
     居然要重启吗?每研究透彻
     -->
 
-    <bean name="quartzRemindScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="dataSource">
-            <ref bean="dataSourceRemind" />
-        </property>
-        <property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
-        <property name="configLocation" value="classpath:type/remind/quartz-remind.properties" />
-        <property name="overwriteExistingJobs" value="true" />
-    </bean>
+    <!--<bean name="quartzRemindScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+        <!--<property name="dataSource">-->
+            <!--<ref bean="dataSourceRemind" />-->
+        <!--</property>-->
+        <!--<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />-->
+        <!--<property name="configLocation" value="classpath:type/remind/quartz-remind.properties" />-->
+        <!--<property name="overwriteExistingJobs" value="true" />-->
+    <!--</bean>-->
 </beans>
 
