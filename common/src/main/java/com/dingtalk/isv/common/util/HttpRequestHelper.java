@@ -102,7 +102,7 @@ public class HttpRequestHelper {
                 return null;
             }
         } catch (Exception e) {
-            mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "http post json failed"+e.toString(),
                     LogFormatter.KeyValue.getNew("url", url),
                     LogFormatter.KeyValue.getNew("jsonContent", jsonContent)
@@ -112,7 +112,7 @@ public class HttpRequestHelper {
             if (response != null) try {
                 response.close();
             } catch (IOException e) {
-                mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         "close http connection failed"+e.toString(),
                         LogFormatter.KeyValue.getNew("url", url),
                         LogFormatter.KeyValue.getNew("jsonContent", jsonContent)

@@ -47,7 +47,7 @@ public class IdMapController {
 
             return httpResult.getSuccess(map);
         }catch(Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("json", json),
                     LogFormatter.KeyValue.getNew("corpId", corpId)
@@ -78,7 +78,7 @@ public class IdMapController {
 
             return httpResult.getSuccess(map);
         }catch(Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("json", json),
                     LogFormatter.KeyValue.getNew("corpId", corpId)

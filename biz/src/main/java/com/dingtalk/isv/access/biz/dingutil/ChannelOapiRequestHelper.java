@@ -71,7 +71,7 @@ public class ChannelOapiRequestHelper {
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         } catch (Throwable e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("chAccessToken", chAccessToken)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
@@ -105,7 +105,7 @@ public class ChannelOapiRequestHelper {
              **/
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         } catch (Throwable e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("chAccessToken", chAccessToken)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());

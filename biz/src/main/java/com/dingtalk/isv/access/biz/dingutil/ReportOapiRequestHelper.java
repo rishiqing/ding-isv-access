@@ -61,7 +61,7 @@ public class ReportOapiRequestHelper {
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         } catch (Exception e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常"+e.toString(),
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
@@ -102,7 +102,7 @@ public class ReportOapiRequestHelper {
             }
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         } catch (Exception e) {
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常"+e.toString(),
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),

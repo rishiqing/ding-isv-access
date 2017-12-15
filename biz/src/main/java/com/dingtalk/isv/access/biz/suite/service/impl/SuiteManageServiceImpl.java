@@ -68,10 +68,10 @@ public class SuiteManageServiceImpl implements SuiteManageService {
             suiteDao.addSuite(suiteDO);
             return  ServiceResult.success(null);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("suiteVO", JSON.toJSONString(suiteVO))
             ),e);
-            mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("suiteVO", JSON.toJSONString(suiteVO))
             ),e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
@@ -92,10 +92,10 @@ public class SuiteManageServiceImpl implements SuiteManageService {
             SuiteVO suiteVO = SuiteConverter.SuiteDO2SuiteVO(suiteDO);
             return  ServiceResult.success(suiteVO);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
             ),e);
-            mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
             ),e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
@@ -210,10 +210,10 @@ public class SuiteManageServiceImpl implements SuiteManageService {
             }
             return ServiceResult.success(resultList);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常"
             ));
-            mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常"
             ));
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
@@ -230,11 +230,11 @@ public class SuiteManageServiceImpl implements SuiteManageService {
             SuiteTicketVO suiteTicketVO = SuiteTicketConvert.suiteTicketDO2SuiteTicketVO(suiteTicketDO);
             return ServiceResult.success(suiteTicketVO);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常",
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
             ));
-            mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常",
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey)
             ));
