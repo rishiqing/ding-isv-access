@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao">
+
+    <resultMap type="com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO" id="orderSpecItemMap">
+        <id property="id" column="id" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="goodsCode" column="goods_code" />
+        <result property="itemCode" column="item_code" />
+        <result property="itemName" column="item_name" />
+        <result property="innerKey" column="inner_key" />
+    </resultMap>
+
+    <insert id="saveOrUpdateOrderSpecItem" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_order_event (
+                gmt_create,
+                gmt_modified,
+                goods_code,
+                item_code,
+                item_name,
+                inner_key
+        )values(
+                now(),
+                now(),
+                #{goodsCode},
+                #{itemCode},
+                #{itemName},
+                #{innerKey}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now()
+    </insert>
+</mapper>

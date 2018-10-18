@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dingtalk.isv.access.biz.order.dao.OrderStatusDao">
+
+    <resultMap type="com.dingtalk.isv.access.biz.order.model.OrderStatusDO" id="orderStatusMap">
+        <id property="id" column="id" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="orderId" column="order_id" />
+        <result property="suiteKey" column="suite_key" />
+        <result property="buyCorpId" column="buy_corp_id" />
+        <result property="goodsCode" column="goods_code" />
+        <result property="itemCode" column="item_code" />
+        <result property="itemName" column="item_name" />
+        <result property="subQuantity" column="sub_quantity" />
+        <result property="maxOfPeople" column="max_of_people" />
+        <result property="minOfPeople" column="min_of_people" />
+        <result property="paidtime" column="paidtime" />
+        <result property="serviceStopTime" column="service_stop_time" />
+        <result property="payFee" column="pay_fee" />
+        <result property="orderCreateSource" column="order_create_source" />
+        <result property="nominalPayFee" column="nominal_pay_fee" />
+        <result property="discountFee" column="discount_fee" />
+        <result property="discount" column="discount" />
+        <result property="distributorCorpId" column="distributor_corp_id" />
+        <result property="distributorCorpName" column="distributor_corp_name" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <insert id="saveOrUpdateOrderStatus" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_order_event (
+                gmt_create,
+                gmt_modified,
+                order_id,
+                suite_key,
+                buy_corp_id,
+                goods_code,
+                item_code,
+                item_name,
+                sub_quantity,
+                max_of_people,
+                min_of_people,
+                paidtime,
+                service_stop_time,
+                pay_fee,
+                order_create_source,
+                nominal_pay_fee,
+                discount_fee,
+                discount,
+                distributor_corp_id,
+                distributor_corp_name,
+                `status`
+        )values(
+                now(),
+                now(),
+                #{orderId},
+                #{suiteKey},
+                #{buyCorpId},
+                #{goodsCode},
+                #{itemCode},
+                #{itemName},
+                #{subQuantity},
+                #{maxOfPeople},
+                #{minOfPeople},
+                #{paidtime},
+                #{serviceStopTime},
+                #{payFee},
+                #{orderCreateSource},
+                #{nominalPayFee},
+                #{discountFee},
+                #{discount},
+                #{distributorCorpId},
+                #{distributorCorpName},
+                #{status}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now(), `status`=#{status}
+    </insert>
+</mapper>

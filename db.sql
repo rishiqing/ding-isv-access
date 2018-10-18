@@ -532,3 +532,116 @@ ALTER TABLE `isv_corp_staff_deleted`
 # add 2018-09-29
 ALTER TABLE `isv_corp_staff`
   ADD COLUMN `rsq_login_token`  varchar(255) NULL COMMENT '日事清的登录标识';
+
+# add 2018-10-18
+CREATE TABLE `isv_order_event` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `event_type` varchar(100) NOT NULL COMMENT 'market_buy',
+  `suite_key` varchar(100) NOT NULL COMMENT '用户购买套件的SuiteKey',
+  `buy_corp_id` varchar(128) NOT NULL COMMENT '购买该套件企业的corpid',
+  `goods_code` varchar(256) NOT NULL COMMENT '购买的商品码',
+  `item_code` varchar(256) NOT NULL COMMENT '购买的商品规格码',
+  `item_name` varchar(256) NOT NULL COMMENT '购买的商品规格名称',
+  `sub_quantity` bigint(10) COMMENT '订购的具体人数',
+  `max_of_people` bigint(10) COMMENT '购买的商品规格能服务的最多企业人数',
+  `min_of_people` bigint(10) COMMENT '购买的商品规格能服务的最少企业人数',
+  `order_id` bigint(20) NOT NULL COMMENT '订单id',
+  `paidtime` bigint(20) NOT NULL COMMENT '下单时间',
+  `service_stop_time` bigint(20) NOT NULL COMMENT '该订单的服务到期时间',
+  `pay_fee` bigint(10) NOT NULL COMMENT '订单支付费用,以分为单位',
+  `order_create_source` varchar(256) COMMENT '订单创建来源，如果来自钉钉分销系统，则值为“DRP”',
+  `nominal_pay_fee` bigint(10) COMMENT '钉钉分销系统提单价，以分为单位',
+  `discount_fee` bigint(10) COMMENT '折扣减免费用',
+  `discount` decimal(10,6) COMMENT '订单折扣',
+  `distributor_corp_id` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业corpId',
+  `distributor_corp_name` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业名称',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='isv接收到的订单事件记录';
+
+CREATE TABLE `isv_order_status` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `order_id` bigint(20) NOT NULL COMMENT '订单id',
+  `suite_key` varchar(100) NOT NULL COMMENT '用户购买套件的SuiteKey',
+  `buy_corp_id` varchar(128) NOT NULL COMMENT '购买该套件企业的corpid',
+  `goods_code` varchar(256) DEFAULT NULL COMMENT '购买的商品码',
+  `item_code` varchar(256) NOT NULL COMMENT '购买的商品规格码',
+  `item_name` varchar(256) NOT NULL COMMENT '购买的商品规格名称',
+  `sub_quantity` bigint(10) COMMENT '订购的具体人数',
+  `max_of_people` bigint(10) COMMENT '购买的商品规格能服务的最多企业人数',
+  `min_of_people` bigint(10) COMMENT '购买的商品规格能服务的最少企业人数',
+  `paidtime` bigint(20) NOT NULL COMMENT '下单时间',
+  `service_stop_time` bigint(20) NOT NULL COMMENT '该订单的服务到期时间',
+  `pay_fee` bigint(10) NOT NULL COMMENT '订单支付费用,以分为单位',
+  `order_create_source` varchar(256) COMMENT '订单创建来源，如果来自钉钉分销系统，则值为“DRP”',
+  `nominal_pay_fee` bigint(10) COMMENT '钉钉分销系统提单价，以分为单位',
+  `discount_fee` bigint(10) COMMENT '折扣减免费用',
+  `discount` decimal(10,6) COMMENT '订单折扣',
+  `distributor_corp_id` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业corpId',
+  `distributor_corp_name` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业名称',
+  `status` varchar(32) COMMENT '订单状态',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='订单状态表';
+
+CREATE TABLE `isv_order_spec_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `goods_code` varchar(256) NOT NULL COMMENT '购买的商品码',
+  `item_code` varchar(256) NOT NULL COMMENT '购买的商品规格码',
+  `item_name` varchar(256) NOT NULL COMMENT '购买的商品规格名称',
+  `inner_key` varchar(32) NOT NULL COMMENT '内部key值',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='商品规格表';
+
+CREATE TABLE `isv_order_rsq_push_event` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `order_id` bigint(20) NOT NULL COMMENT '订单id',
+  `corp_id` varchar(128) NOT NULL COMMENT '购买该套件企业的corpid',
+  `quantity` bigint(10) NOT NULL COMMENT '订购的具体人数',
+  `service_stop_time` bigint(20) NOT NULL COMMENT '该订单的服务到期时间',
+  `status` varchar(32) NOT NULL COMMENT '订单状态',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='发送到日事清的事件表';
+
+CREATE TABLE `isv_corp_charge_status` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `corp_id` varchar(128) NOT NULL COMMENT '购买该套件企业的corpid',
+  `total_quantity` bigint(10) COMMENT '公司总人数',
+  `current_order_id` bigint(20) COMMENT '订单id',
+  `current_sub_quantity` bigint(10) COMMENT '订购的具体人数',
+  `current_max_of_people` bigint(10) COMMENT '当前规格的最大人数',
+  `current_min_of_people` bigint(10) COMMENT '当前规格的最小人数',
+  `current_service_stop_time` bigint(20) COMMENT '当前订单的服务到期时间',
+  `status` varchar(32) NOT NULL COMMENT '公司状态',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='公司充值状态表';
+
+CREATE TABLE `isv_staff_popup_config` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `popup_type` varchar(128) NOT NULL COMMENT '弹窗类型',
+  `sale_qr_code_url` varchar(256) COMMENT '弹窗的二维码链接',
+  `sale_phone_number` varchar(64) COMMENT '弹窗的手机号',
+  `is_disabled` varchar(1)DEFAULT 0 COMMENT '是否禁用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='弹窗配置表';
+
+CREATE TABLE `staff_popup_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  `popup_type` varchar(128) NOT NULL COMMENT '弹窗类型',
+  `corp_id` varchar(256) NOT NULL COMMENT '公司id',
+  `user_id` varchar(64) NOT NULL COMMENT '用户id',
+  `popup_mute_expire` bigint(20) COMMENT '沉默期截至时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='弹窗记录表';

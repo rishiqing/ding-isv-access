@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dingtalk.isv.access.biz.corp.dao.CorpChargeStatusDao">
+
+    <resultMap type="com.dingtalk.isv.access.biz.corp.model.CorpChargeStatusDO" id="corpChargeStatusMap">
+        <id property="id" column="id" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="corpId" column="corp_id" />
+        <result property="totalQuantity" column="total_quantity" />
+        <result property="currentOrderId" column="current_order_id" />
+        <result property="currentSubQuantity" column="current_sub_quantity" />
+        <result property="currentMaxOfPeople" column="current_max_of_people" />
+        <result property="currentMinOfPeople" column="current_min_of_people" />
+        <result property="currentServiceStopTime" column="current_service_stop_time" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <insert id="saveOrUpdateCorpChargeStatus" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_corp_charge_status (
+                gmt_create,
+                gmt_modified,
+                corp_id,
+                total_quantity,
+                current_order_id,
+                current_sub_quantity,
+                current_max_of_people,
+                current_min_of_people,
+                current_service_stop_time,
+                `status`
+        )values(
+                now(),
+                now(),
+                #{corpId},
+                #{totalQuantity},
+                #{currentOrderId},
+                #{currentSubQuantity},
+                #{currentMaxOfPeople},
+                #{currentMinOfPeople},
+                #{currentServiceStopTime},
+                #{status}
+        )ON DUPLICATE KEY UPDATE
+            gmt_modified=now(),
+            total_quantity=#{totalQuantity},
+            current_order_id=#{currentOrderId},
+            current_sub_quantity=#{currentSubQuantity},
+            current_max_of_people=#{currentMaxOfPeople},
+            current_min_of_people=#{currentMinOfPeople},
+            current_service_stop_time=#{currentServiceStopTime},
+            `status`=#{status}
+    </insert>
+</mapper>

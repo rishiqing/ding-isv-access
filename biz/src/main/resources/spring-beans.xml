@@ -108,6 +108,7 @@
     <bean id="corpLockService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpLockServiceImpl" />
     <bean id="corpCallbackQueueService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpCallbackQueueServiceImpl" />
 
+    <bean id="chargeService" class="com.dingtalk.isv.access.biz.order.service.impl.ChargeServiceImpl" />
 
     <!-- LOG -->
     <bean id="serviceMethodInterceptor" class="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor"></bean>
