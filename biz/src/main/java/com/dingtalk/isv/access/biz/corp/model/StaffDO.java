@@ -41,6 +41,7 @@ public class StaffDO {
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
+    private String rsqLoginToken;  //存储了日事清中用户的标识
 
     public Long getId() {
         return id;
@@ -274,6 +275,14 @@ public class StaffDO {
         this.rsqPassword = rsqPassword;
     }
 
+    public String getRsqLoginToken() {
+        return rsqLoginToken;
+    }
+
+    public void setRsqLoginToken(String rsqLoginToken) {
+        this.rsqLoginToken = rsqLoginToken;
+    }
+
     @Override
     public String toString() {
         return "StaffDO{" +
@@ -300,6 +309,7 @@ public class StaffDO {
                 ", unionId=" + unionId +
                 ", rsqUserId=" + rsqUserId +
                 ", rsqUsername=" + rsqUsername +
+                ", rsqLoginToken=" + rsqLoginToken +
                 '}';
     }
 }

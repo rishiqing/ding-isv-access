@@ -26,6 +26,9 @@ public class RsqUserConverter {
         if(json.containsKey("unionId")){
             user.setUnionId(json.getString("unionId"));
         }
+        if(json.containsKey("loginToken")){
+            user.setLoginToken(json.getString("loginToken"));
+        }
         return user;
     }
 }

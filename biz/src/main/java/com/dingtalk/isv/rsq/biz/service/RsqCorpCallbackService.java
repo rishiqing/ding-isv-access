@@ -366,6 +366,7 @@ public class RsqCorpCallbackService {
             //TODO 为控制并发，保证username和password与日事清系统一致，使用返回值作为rsqUsername和rsqPassword
             staffVO.setRsqUsername(user.getUsername());
             staffVO.setRsqPassword(rsqAccountService.generateRsqPassword(user.getUsername()));
+            staffVO.setRsqLoginToken(user.getLoginToken());
 
             corpStaffDao.updateRsqInfo(StaffConverter.staffVO2StaffDO(staffVO));
             return ServiceResult.success(staffVO);

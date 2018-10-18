@@ -40,6 +40,7 @@
         <result property="rsqUserId" column="rsq_user_id" />
         <result property="rsqUsername" column="rsq_username" />
         <result property="rsqPassword" column="rsq_password" />
+        <result property="rsqLoginToken" column="rsq_login_token" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -71,7 +72,8 @@
             union_id,
             rsq_user_id,
             rsq_username,
-            rsq_password
+            rsq_password,
+            rsq_login_token
     </sql>
 
     <insert id="saveOrUpdateCorpStaff" useGeneratedKeys="true" keyProperty="id">
@@ -103,7 +105,8 @@
             union_id,
             rsq_user_id,
             rsq_username,
-            rsq_password
+            rsq_password,
+            rsq_login_token
         )values(
             now(),
             now(),
@@ -132,7 +135,8 @@
             #{unionId},
             #{rsqUserId},
             #{rsqUsername},
-            #{rsqPassword}
+            #{rsqPassword},
+            #{rsqLoginToken}
         )ON DUPLICATE KEY UPDATE
         gmt_modified=now(),
         `name`=#{name},
@@ -193,7 +197,13 @@
     </select>
 
     <update id="updateRsqInfo">
-        update isv_corp_staff set gmt_modified=now(), rsq_user_id=#{rsqUserId}, rsq_username=#{rsqUsername}, rsq_password=#{rsqPassword} where corp_id=#{corpId} and user_id=#{userId}
+        update isv_corp_staff set
+            gmt_modified=now(),
+            rsq_user_id=#{rsqUserId},
+            rsq_username=#{rsqUsername},
+            rsq_password=#{rsqPassword},
+            rsq_login_token=#{rsqLoginToken}
+        where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
     <update id="updateUnionId">

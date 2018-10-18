@@ -112,6 +112,7 @@ public class StaffConverter {
 
         staffDO.setRsqUserId(staffVO.getRsqUserId());
         staffDO.setRsqUsername(staffVO.getRsqUsername());
+        staffDO.setRsqLoginToken(staffVO.getRsqLoginToken());
         staffDO.setRsqPassword(staffVO.getRsqPassword());
         staffDO.setUnionId(staffVO.getUnionId());
         return staffDO;
@@ -150,6 +151,7 @@ public class StaffConverter {
         staffVO.setRsqUserId(staffDO.getRsqUserId());
         staffVO.setRsqUsername(staffDO.getRsqUsername());
         staffVO.setRsqPassword(staffDO.getRsqPassword());
+        staffVO.setRsqLoginToken(staffDO.getRsqLoginToken());
         staffVO.setUnionId(staffDO.getUnionId());
         return staffVO;
     }
@@ -176,6 +178,7 @@ public class StaffConverter {
         staffResult.setUnionId(staffVO.getUnionId());
         staffResult.setRsqUserId(staffVO.getRsqUserId());
         staffResult.setRsqUsername(staffVO.getRsqUsername());
+        staffResult.setRsqLoginToken(staffVO.getRsqLoginToken());
         staffResult.setRsqPassword(staffVO.getRsqPassword());
         return staffResult;
     }

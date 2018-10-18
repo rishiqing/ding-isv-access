@@ -44,6 +44,7 @@ public class StaffVO implements Serializable {
     private String rsqUserId;  //日事清中的用户id
     private String rsqUsername;  //日事清中的用户登录名
     private String rsqPassword;  //日事清中的用户登录密码
+    private String rsqLoginToken;  //日事清中的用户表示
 
     public Long getId() {
         return id;
@@ -317,6 +318,14 @@ public class StaffVO implements Serializable {
         this.rsqPassword = rsqPassword;
     }
 
+    public String getRsqLoginToken() {
+        return rsqLoginToken;
+    }
+
+    public void setRsqLoginToken(String rsqLoginToken) {
+        this.rsqLoginToken = rsqLoginToken;
+    }
+
     @Override
     public String toString() {
         return "StaffDO{" +
@@ -343,6 +352,7 @@ public class StaffVO implements Serializable {
                 ", extattr=" + extattr +
                 ", rsqUserId=" + rsqUserId +
                 ", rsqUsername=" + rsqUsername +
+                ", rsqLoginToken=" + rsqLoginToken +
                 '}';
     }
 }
