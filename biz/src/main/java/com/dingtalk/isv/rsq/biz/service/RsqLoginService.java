@@ -1,7 +1,7 @@
 package com.dingtalk.isv.rsq.biz.service;
 
-import com.rishiqing.qywx.service.common.crypto.CryptoUtil;
-import com.rishiqing.qywx.service.model.corp.CorpStaffVO;
+import com.dingtalk.isv.access.api.model.corp.StaffVO;
+import com.dingtalk.isv.access.biz.util.CryptoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -14,17 +14,16 @@ public class RsqLoginService {
     @Autowired
     private CryptoUtil cryptoUtil;
 
-    @Override
-    public String generateLoginToken(CorpStaffVO corpStaffVO) {
+    public String generateLoginToken(StaffVO corpStaffVO) {
         String loginStr = makeLoginString(corpStaffVO);
         return cryptoUtil.encrypt(loginStr);
     }
 
-    private String makeLoginString(CorpStaffVO corpStaffVO){
+    private String makeLoginString(StaffVO corpStaffVO){
         return String.valueOf(new Date().getTime()) +
                 "--" +
                 corpStaffVO.getCorpId() +
                 "--" +
-                corpStaffVO.getUserId();
+                corpStaffVO.getStaffId();
     }
 }
