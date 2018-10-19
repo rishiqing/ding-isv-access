@@ -27,6 +27,38 @@
         <result property="distributorCorpName" column="distributor_corp_name" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        event_type,
+        suite_key,
+        buy_corp_id,
+        goods_code,
+        item_code,
+        item_name,
+        sub_quantity,
+        max_of_people,
+        min_of_people,
+        order_id,
+        paidtime,
+        service_stop_time,
+        pay_fee,
+        order_create_source,
+        nominal_pay_fee,
+        discount_fee,
+        discount,
+        distributor_corp_id,
+        distributor_corp_name
+    </sql>
+
+    <select id="getOrderEventById" resultMap="orderEventMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_order_event
+        <![CDATA[
+			WHERE id=#{id}
+		 ]]>
+    </select>
+
     <insert id="saveOrUpdateOrderEvent" useGeneratedKeys="true" keyProperty="id">
         insert into isv_order_event (
                 gmt_create,

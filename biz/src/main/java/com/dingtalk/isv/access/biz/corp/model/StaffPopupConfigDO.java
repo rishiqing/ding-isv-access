@@ -13,6 +13,7 @@ public class StaffPopupConfigDO {
     private Long id;
     private Date gmtCreate;
     private Date gmtModified;
+    private String suiteKey;
 
     //  弹窗类型
     private String popupType;
@@ -45,6 +46,14 @@ public class StaffPopupConfigDO {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public String getSuiteKey() {
+        return suiteKey;
+    }
+
+    public void setSuiteKey(String suiteKey) {
+        this.suiteKey = suiteKey;
     }
 
     public String getPopupType() {
@@ -85,6 +94,7 @@ public class StaffPopupConfigDO {
                 "id=" + id +
                 ", gmtCreate=" + gmtCreate +
                 ", gmtModified=" + gmtModified +
+                ", suiteKey='" + suiteKey + '\'' +
                 ", popupType='" + popupType + '\'' +
                 ", saleQrCodeUrl='" + saleQrCodeUrl + '\'' +
                 ", salePhoneNumber='" + salePhoneNumber + '\'' +

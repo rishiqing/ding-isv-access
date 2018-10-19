@@ -14,6 +14,7 @@ public class OrderSpecItemDO {
     private Date gmtCreate;
     private Date gmtModified;
 
+    private String suiteKey;
     //  商品码
     private String goodsCode;
     //  由钉钉生成的商品规格码
@@ -45,6 +46,14 @@ public class OrderSpecItemDO {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public String getSuiteKey() {
+        return suiteKey;
+    }
+
+    public void setSuiteKey(String suiteKey) {
+        this.suiteKey = suiteKey;
     }
 
     public String getGoodsCode() {
@@ -85,6 +94,7 @@ public class OrderSpecItemDO {
                 "id=" + id +
                 ", gmtCreate=" + gmtCreate +
                 ", gmtModified=" + gmtModified +
+                ", suiteKey='" + suiteKey + '\'' +
                 ", goodsCode='" + goodsCode + '\'' +
                 ", itemCode='" + itemCode + '\'' +
                 ", itemName='" + itemName + '\'' +

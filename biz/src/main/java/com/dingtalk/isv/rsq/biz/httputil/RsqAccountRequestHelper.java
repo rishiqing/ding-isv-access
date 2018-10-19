@@ -7,6 +7,7 @@ import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
@@ -340,6 +341,38 @@ public class RsqAccountRequestHelper {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
                     LogFormatter.KeyValue.getNew("staffDO", staffDO.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    /**
+     * 充值
+     * @param suiteDO
+     * @param pushEventDO
+     * @return
+     */
+    public ServiceResult<Void> doCharge(SuiteDO suiteDO, OrderRsqPushEventDO pushEventDO){
+        try {
+            String url = getRsqDomain() + "/task/v2/tokenAuth/xxxxxx?token=" + suiteDO.getRsqAppToken();
+            Map params = new HashMap<String, String>();
+//            params.put("appName", suiteDO.getRsqAppName());
+//            params.put("name", corpDO.getCorpName());
+//            params.put("outerId", corpDO.getCorpId());
+//            params.put("note", corpDO.getId());
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            JSONObject jsonObject = JSON.parseObject(sr);
+
+            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            }
+
+
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("pushEventDO", pushEventDO.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }

@@ -13,6 +13,7 @@ import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.message.SendMessageService;
+import com.dingtalk.isv.access.api.service.order.ChargeService;
 import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
@@ -21,11 +22,15 @@ import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
+import com.dingtalk.isv.access.biz.dingutil.ISVRequestHelper;
+import com.dingtalk.isv.access.biz.order.dao.OrderEventDao;
+import com.dingtalk.isv.access.biz.order.model.OrderEventDO;
 import com.dingtalk.isv.access.biz.scheduler.SendCorpMessageJob;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.common.util.HttpRequestHelper;
 import com.dingtalk.isv.common.util.HttpUtils;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
@@ -553,5 +558,30 @@ public class SystemController {
             e.printStackTrace();
         }
         return keys.toString();
+    }
+
+    @Autowired
+    private ChargeService chargeService;
+    @Autowired
+    private OrderEventDao orderEventDao;
+    @Autowired
+    private ISVRequestHelper isvRequestHelper;
+
+    @RequestMapping(value = "/test/charge", method = {RequestMethod.POST})
+    @ResponseBody
+    public String testCharge(HttpServletRequest request,
+                             @RequestParam("suiteKey") String suiteKey,
+                             @RequestBody JSONObject json){
+        String resp = "success";
+//        ServiceResult<Void>  sr = chargeService.handleChargeEvent(suiteKey, json);
+//        System.out.println("====" + JSON.toJSONString(json));
+//        if(!sr.isSuccess()){
+//            resp = "faile";
+//        }
+
+        resp = isvRequestHelper.getOapiDomain();
+        System.out.println("=====respDomain: " + resp);
+
+        return resp;
     }
 }

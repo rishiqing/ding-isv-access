@@ -13,6 +13,7 @@ public class StaffPopupLogDO {
     private Long id;
     private Date gmtCreate;
     private Date gmtModified;
+    private String suiteKey;
 
     private String corpId;
     private String userId;
@@ -41,6 +42,14 @@ public class StaffPopupLogDO {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public String getSuiteKey() {
+        return suiteKey;
+    }
+
+    public void setSuiteKey(String suiteKey) {
+        this.suiteKey = suiteKey;
     }
 
     public String getCorpId() {
@@ -81,6 +90,7 @@ public class StaffPopupLogDO {
                 "id=" + id +
                 ", gmtCreate=" + gmtCreate +
                 ", gmtModified=" + gmtModified +
+                ", suiteKey='" + suiteKey + '\'' +
                 ", corpId='" + corpId + '\'' +
                 ", userId='" + userId + '\'' +
                 ", popupType='" + popupType + '\'' +

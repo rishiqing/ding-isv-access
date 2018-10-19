@@ -6,16 +6,29 @@
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
         <result property="popupType" column="popup_type" />
         <result property="corpId" column="corp_id" />
         <result property="userId" column="user_id" />
         <result property="popupMuteExpire" column="popup_mute_expire" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        suite_key,
+        popup_type,
+        corp_id,
+        user_id,
+        popup_mute_expire
+    </sql>
+
     <insert id="saveOrUpdateStaffPopupLog" useGeneratedKeys="true" keyProperty="id">
         insert into staff_popup_log (
                 gmt_create,
                 gmt_modified,
+                suite_key,
                 popup_type,
                 corp_id,
                 user_id,
@@ -23,6 +36,7 @@
         )values(
                 now(),
                 now(),
+                #{suiteKey},
                 #{popupType},
                 #{corpId},
                 #{userId},
@@ -31,4 +45,11 @@
             gmt_modified=now(),
             popup_mute_expire=#{popupMuteExpire}
     </insert>
+
+    <select id="getStaffPopupLogListBySuiteKeyAndCorpIdAndUserId" resultMap="staffPopupLogMap">
+        SELECT <include refid="select-all-fields"/>  FROM staff_popup_log
+        <![CDATA[
+			WHERE suite_key=#{suiteKey} AND corp_id=#{corpId} AND user_id=#{userId}
+		 ]]>
+    </select>
 </mapper>

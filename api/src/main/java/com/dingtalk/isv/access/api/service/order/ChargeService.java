@@ -11,4 +11,6 @@ import com.dingtalk.isv.common.model.ServiceResult;
 public interface ChargeService {
 
     ServiceResult<Void> handleChargeEvent(String suiteKey, JSONObject jsonMessage);
+
+    ServiceResult<Void> charge(String suiteKey, Long eventId);
 }

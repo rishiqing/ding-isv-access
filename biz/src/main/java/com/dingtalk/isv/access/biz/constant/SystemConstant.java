@@ -10,4 +10,6 @@ public class SystemConstant {
 
     public static final String ORDER_PUSH_STATUS_PENDING = "pending";
     public static final String ORDER_PUSH_STATUS_SUCCESS = "success";
+
+    public static final String ORDER_CORP_CHARGE_STATUS_OK = "ok";
 }

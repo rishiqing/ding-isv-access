@@ -6,16 +6,29 @@
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
         <result property="popupType" column="popup_type" />
         <result property="saleQrCodeUrl" column="sale_qr_code_url" />
         <result property="salePhoneNumber" column="sale_phone_number" />
         <result property="isDisabled" column="is_disabled" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        suite_key,
+        popup_type,
+        sale_qr_code_url,
+        sale_phone_number,
+        is_disabled
+    </sql>
+
     <insert id="saveOrUpdateStaffPopupConfig" useGeneratedKeys="true" keyProperty="id">
         insert into isv_staff_popup_config (
                 gmt_create,
                 gmt_modified,
+                suite_key,
                 popup_type,
                 sale_qr_code_url,
                 sale_phone_number,
@@ -23,6 +36,7 @@
         )values(
                 now(),
                 now(),
+                #{suiteKey},
                 #{popupType},
                 #{saleQrCodeUrl},
                 #{salePhoneNumber},
@@ -34,4 +48,11 @@
             sale_phone_number=#{salePhoneNumber},
             is_disabled=#{isDisabled}
     </insert>
+
+    <select id="getStaffPopupConfigListBySuiteKeyAndIsDisabled" resultMap="staffPopupConfigMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_staff_popup_config
+        <![CDATA[
+			WHERE suite_key=#{suiteKey} AND is_disabled=#{isDisabled}
+		 ]]>
+    </select>
 </mapper>

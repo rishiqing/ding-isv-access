@@ -6,9 +6,12 @@
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
         <result property="corpId" column="corp_id" />
         <result property="totalQuantity" column="total_quantity" />
         <result property="currentOrderId" column="current_order_id" />
+        <result property="currentGoodsCode" column="current_goods_code" />
+        <result property="currentItemCode" column="current_item_code" />
         <result property="currentSubQuantity" column="current_sub_quantity" />
         <result property="currentMaxOfPeople" column="current_max_of_people" />
         <result property="currentMinOfPeople" column="current_min_of_people" />
@@ -16,13 +19,32 @@
         <result property="status" column="status" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        suite_key,
+        corp_id,
+        total_quantity,
+        current_order_id,
+        current_goods_code,
+        current_item_code,
+        current_sub_quantity,
+        current_max_of_people,
+        current_min_of_people,
+        current_service_stop_time
+    </sql>
+
     <insert id="saveOrUpdateCorpChargeStatus" useGeneratedKeys="true" keyProperty="id">
         insert into isv_corp_charge_status (
                 gmt_create,
                 gmt_modified,
+                suite_key,
                 corp_id,
                 total_quantity,
                 current_order_id,
+                current_goods_code,
+                current_item_code,
                 current_sub_quantity,
                 current_max_of_people,
                 current_min_of_people,
@@ -31,9 +53,12 @@
         )values(
                 now(),
                 now(),
+                #{suiteKey},
                 #{corpId},
                 #{totalQuantity},
                 #{currentOrderId},
+                #{currentGoodsCode},
+                #{currentItemCode},
                 #{currentSubQuantity},
                 #{currentMaxOfPeople},
                 #{currentMinOfPeople},
@@ -43,10 +68,19 @@
             gmt_modified=now(),
             total_quantity=#{totalQuantity},
             current_order_id=#{currentOrderId},
+            current_goods_code=#{currentGoodsCode},
+            current_item_code=#{currentItemCode},
             current_sub_quantity=#{currentSubQuantity},
             current_max_of_people=#{currentMaxOfPeople},
             current_min_of_people=#{currentMinOfPeople},
             current_service_stop_time=#{currentServiceStopTime},
             `status`=#{status}
     </insert>
+
+    <select id="getCorpChargeStatusBySuiteKeyAndCorpId" resultMap="corpChargeStatusMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp_charge_status
+        <![CDATA[
+			WHERE suite_key=#{suiteKey} AND corp_id=#{corpId}
+		 ]]>
+    </select>
 </mapper>

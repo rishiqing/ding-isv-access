@@ -15,6 +15,7 @@ public class OrderRsqPushEventDO {
     private Date gmtCreate;
     private Date gmtModified;
 
+    private String suiteKey;
     //  订单id
     private Long orderId;
     //  购买该套件企业的corpid
@@ -48,6 +49,14 @@ public class OrderRsqPushEventDO {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public String getSuiteKey() {
+        return suiteKey;
+    }
+
+    public void setSuiteKey(String suiteKey) {
+        this.suiteKey = suiteKey;
     }
 
     public Long getOrderId() {
@@ -96,6 +105,7 @@ public class OrderRsqPushEventDO {
                 "id=" + id +
                 ", gmtCreate=" + gmtCreate +
                 ", gmtModified=" + gmtModified +
+                ", suiteKey='" + suiteKey + '\'' +
                 ", orderId=" + orderId +
                 ", corpId='" + corpId + '\'' +
                 ", quantity=" + quantity +

@@ -13,6 +13,7 @@ public class CorpChargeStatusDO {
     private Long id;
     private Date gmtCreate;
     private Date gmtModified;
+    private String suiteKey;
 
     //  购买该套件企业的corpid
     private String corpId;
@@ -20,6 +21,10 @@ public class CorpChargeStatusDO {
     private Long totalQuantity;
     //  当前生效订单id
     private Long currentOrderId;
+    //  当前商品代码
+    private String currentGoodsCode;
+    //  当前规格代码
+    private String currentItemCode;
     //  当前生效订单订购的具体人数
     private Long currentSubQuantity;
     //  当前生效订单购买的商品规格能服务的最多企业人数
@@ -55,6 +60,14 @@ public class CorpChargeStatusDO {
         this.gmtModified = gmtModified;
     }
 
+    public String getSuiteKey() {
+        return suiteKey;
+    }
+
+    public void setSuiteKey(String suiteKey) {
+        this.suiteKey = suiteKey;
+    }
+
     public String getCorpId() {
         return corpId;
     }
@@ -81,6 +94,22 @@ public class CorpChargeStatusDO {
 
     public Long getCurrentSubQuantity() {
         return currentSubQuantity;
+    }
+
+    public String getCurrentGoodsCode() {
+        return currentGoodsCode;
+    }
+
+    public void setCurrentGoodsCode(String currentGoodsCode) {
+        this.currentGoodsCode = currentGoodsCode;
+    }
+
+    public String getCurrentItemCode() {
+        return currentItemCode;
+    }
+
+    public void setCurrentItemCode(String currentItemCode) {
+        this.currentItemCode = currentItemCode;
     }
 
     public void setCurrentSubQuantity(Long currentSubQuantity) {
@@ -125,9 +154,12 @@ public class CorpChargeStatusDO {
                 "id=" + id +
                 ", gmtCreate=" + gmtCreate +
                 ", gmtModified=" + gmtModified +
+                ", suiteKey='" + suiteKey + '\'' +
                 ", corpId='" + corpId + '\'' +
                 ", totalQuantity=" + totalQuantity +
                 ", currentOrderId=" + currentOrderId +
+                ", currentGoodsCode='" + currentGoodsCode + '\'' +
+                ", currentItemCode='" + currentItemCode + '\'' +
                 ", currentSubQuantity=" + currentSubQuantity +
                 ", currentMaxOfPeople=" + currentMaxOfPeople +
                 ", currentMinOfPeople=" + currentMinOfPeople +

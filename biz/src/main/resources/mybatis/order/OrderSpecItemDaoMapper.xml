@@ -6,6 +6,7 @@
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
         <result property="goodsCode" column="goods_code" />
         <result property="itemCode" column="item_code" />
         <result property="itemName" column="item_name" />
@@ -13,9 +14,10 @@
     </resultMap>
 
     <insert id="saveOrUpdateOrderSpecItem" useGeneratedKeys="true" keyProperty="id">
-        insert into isv_order_event (
+        insert into isv_order_spec_item (
                 gmt_create,
                 gmt_modified,
+                suite_key,
                 goods_code,
                 item_code,
                 item_name,
@@ -23,10 +25,18 @@
         )values(
                 now(),
                 now(),
+                #{suiteKey},
                 #{goodsCode},
                 #{itemCode},
                 #{itemName},
                 #{innerKey}
         )ON DUPLICATE KEY UPDATE gmt_modified=now()
     </insert>
+
+    <select id="getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode" resultMap="orderSpecItemMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_order_spec_item
+        <![CDATA[
+			WHERE suite_key=#{suiteKey} AND goods_code=#{goodsCode} AND item_code=#{itemCode}
+		 ]]>
+    </select>
 </mapper>

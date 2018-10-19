@@ -77,6 +77,13 @@
     </bean>
     <bean id="corpCallbackEventListener" class="com.dingtalk.isv.access.biz.event.CorpCallbackEventListener"/>
 
+    <bean id="asyncOrderChargeExecutorFactory" class="com.dingtalk.isv.access.biz.event.AsyncOrderChargeExecutorFactory" />
+    <bean id="asyncOrderChargeExecutor" factory-bean="asyncOrderChargeExecutorFactory" factory-method="getOrderChargeExecutor" />
+    <bean id="asyncOrderChargeEventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg ref="asyncOrderChargeExecutor"/>
+    </bean>
+    <bean id="orderChargeEventListener" class="com.dingtalk.isv.access.biz.event.OrderChargeEventListener"/>
+
     <bean id="listenerInitService" class="com.dingtalk.isv.common.event.ListenerInitService" init-method="register">
         <property name="eventListenerMap">
             <map>
@@ -85,6 +92,7 @@
                 <entry key-ref="asyncCorpAuthSuiteEventBus" value-ref="corpAuthSuiteEventListener"></entry>
                 <entry key-ref="asyncCorpOrgSyncEventBus" value-ref="corpOrgSyncEventListener"></entry>
                 <entry key-ref="asyncCorpCallbackEventBus" value-ref="corpCallbackEventListener"></entry>
+                <entry key-ref="asyncOrderChargeEventBus" value-ref="orderChargeEventListener"></entry>
             </map>
         </property>
     </bean>
@@ -104,6 +112,7 @@
 
     <bean id="rsqAccountService" class="com.dingtalk.isv.rsq.biz.service.RsqAccountService"/>
     <bean id="rsqCorpCallbackService" class="com.dingtalk.isv.rsq.biz.service.RsqCorpCallbackService"/>
+    <bean id="popupService" class="com.dingtalk.isv.rsq.biz.client.PopupService" />
 
     <bean id="corpLockService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpLockServiceImpl" />
     <bean id="corpCallbackQueueService" class="com.dingtalk.isv.access.biz.corp.service.impl.CorpCallbackQueueServiceImpl" />

@@ -6,6 +6,7 @@
         <id property="id" column="id" />
         <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
         <result property="orderId" column="order_id" />
         <result property="corpId" column="corp_id" />
         <result property="quantity" column="quantity" />
@@ -17,6 +18,7 @@
         insert into isv_order_rsq_push_event (
                 gmt_create,
                 gmt_modified,
+                suite_key,
                 order_id,
                 corp_id,
                 quantity,
@@ -25,6 +27,7 @@
         )values(
                 now(),
                 now(),
+                #{suiteKey},
                 #{orderId},
                 #{corpId},
                 #{quantity},
