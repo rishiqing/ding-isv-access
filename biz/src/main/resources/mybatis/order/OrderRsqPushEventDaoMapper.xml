@@ -11,6 +11,7 @@
         <result property="corpId" column="corp_id" />
         <result property="quantity" column="quantity" />
         <result property="serviceStopTime" column="service_stop_time" />
+        <result property="rsqTeamId" column="rsq_team_id" />
         <result property="status" column="status" />
     </resultMap>
 
@@ -23,6 +24,7 @@
                 corp_id,
                 quantity,
                 service_stop_time,
+                rsq_team_id,
                 `status`
         )values(
                 now(),
@@ -32,6 +34,7 @@
                 #{corpId},
                 #{quantity},
                 #{serviceStopTime},
+                #{rsqTeamId},
                 #{status}
         )ON DUPLICATE KEY UPDATE gmt_modified=now(), `status`=#{status}
     </insert>

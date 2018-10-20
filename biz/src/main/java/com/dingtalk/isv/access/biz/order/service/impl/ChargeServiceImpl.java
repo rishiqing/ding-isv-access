@@ -6,12 +6,16 @@ import com.dingtalk.isv.access.api.model.event.OrderChargeEvent;
 import com.dingtalk.isv.access.api.service.order.ChargeService;
 import com.dingtalk.isv.access.biz.constant.SystemConstant;
 import com.dingtalk.isv.access.biz.corp.dao.CorpChargeStatusDao;
+import com.dingtalk.isv.access.biz.corp.dao.CorpDao;
 import com.dingtalk.isv.access.biz.corp.model.CorpChargeStatusDO;
+import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.order.dao.OrderEventDao;
 import com.dingtalk.isv.access.biz.order.dao.OrderRsqPushEventDao;
+import com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao;
 import com.dingtalk.isv.access.biz.order.dao.OrderStatusDao;
 import com.dingtalk.isv.access.biz.order.model.OrderEventDO;
 import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
+import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.order.model.OrderStatusDO;
 import com.dingtalk.isv.access.biz.order.model.helper.OrderModelConverter;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
@@ -40,9 +44,13 @@ public class ChargeServiceImpl implements ChargeService {
     @Autowired
     private OrderStatusDao orderStatusDao;
     @Autowired
+    private OrderSpecItemDao orderSpecItemDao;
+    @Autowired
     private OrderRsqPushEventDao orderRsqPushEventDao;
     @Autowired
     private CorpChargeStatusDao corpChargeStatusDao;
+    @Autowired
+    private CorpDao corpDao;
     @Autowired
     private RsqAccountRequestHelper rsqAccountRequestHelper;
     @Autowired
@@ -100,14 +108,38 @@ public class ChargeServiceImpl implements ChargeService {
             orderStatus.setStatus(SystemConstant.ORDER_STATUS_PAID);
             orderStatusDao.saveOrUpdateOrderStatus(orderStatus);
 
+            // 读取corp
+            CorpDO corp = corpDao.getCorpByCorpId(orderEvent.getBuyCorpId());
+            if(corp == null){
+                bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "charge: corpId not found!" ,
+                        LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                        LogFormatter.KeyValue.getNew("eventId", eventId)
+                ));
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+            if(corp.getRsqId() == null){
+                bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "charge：rsqTeamId not exists in corp" ,
+                        LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                        LogFormatter.KeyValue.getNew("eventId", eventId)
+                ));
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+
             // 保存OrderRsqPushEventDO
             OrderRsqPushEventDO rsqPushEvent = OrderModelConverter.orderStatusDO2OrderRsqPushEventDO(orderStatus);
             rsqPushEvent.setStatus(SystemConstant.ORDER_PUSH_STATUS_PENDING);
+            rsqPushEvent.setRsqTeamId(Long.valueOf(corp.getRsqId()));
             orderRsqPushEventDao.saveOrUpdateOrderRsqPushEvent(rsqPushEvent);
 
             //发送后台接口进行充值
             SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
-            ServiceResult<Void> requestSr = rsqAccountRequestHelper.doCharge(suiteDO, rsqPushEvent);
+            OrderSpecItemDO specItemDO = orderSpecItemDao.getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode(
+                    suiteKey,
+                    orderStatus.getGoodsCode(),
+                    orderStatus.getItemCode());
+            ServiceResult<Void> requestSr = rsqAccountRequestHelper.doCharge(suiteDO, specItemDO, rsqPushEvent);
             if(!requestSr.isSuccess()){
                 bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         "系统异常" ,

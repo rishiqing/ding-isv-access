@@ -167,6 +167,61 @@ public class HttpRequestHelper {
         return null;
     }
 
+    public String doHttpPost(String url, String content) {
+        CloseableHttpResponse response = null;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost(url);
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(socketTimeOut).setConnectTimeout(connectTimeout).build();
+        httpPost.setConfig(requestConfig);
+        StringEntity requestEntity = new StringEntity(content, "utf-8");
+        httpPost.setEntity(requestEntity);
+        try {
+            response = httpClient.execute(httpPost, new BasicHttpContext());
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "response code is :"+response.getStatusLine().getStatusCode(),
+                        LogFormatter.KeyValue.getNew("url", url),
+                        LogFormatter.KeyValue.getNew("content", content)
+                ));
+                return null;
+            }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                String resultStr = EntityUtils.toString(entity, "utf-8");
+                mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        LogFormatter.KeyValue.getNew("url", url),
+                        LogFormatter.KeyValue.getNew("content", content),
+                        LogFormatter.KeyValue.getNew("return", resultStr)
+                ));
+                return resultStr;
+            } else {
+                mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "response.getEntity is null",
+                        LogFormatter.KeyValue.getNew("url", url),
+                        LogFormatter.KeyValue.getNew("content", content)
+                ));
+                return null;
+            }
+        } catch (Exception e) {
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "http post json failed"+e.toString(),
+                    LogFormatter.KeyValue.getNew("url", url),
+                    LogFormatter.KeyValue.getNew("jsonContent", content)
+            ),e);
+            return null;
+        } finally {
+            if (response != null) try {
+                response.close();
+            } catch (IOException e) {
+                mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                        "close http connection failed"+e.toString(),
+                        LogFormatter.KeyValue.getNew("url", url),
+                        LogFormatter.KeyValue.getNew("jsonContent", content)
+                ),e);
+            }
+        }
+    }
+
 
     public static void main(String []args){
         Map<String,Object> map = new HashMap<String, Object>();

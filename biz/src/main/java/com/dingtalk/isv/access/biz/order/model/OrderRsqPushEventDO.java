@@ -24,6 +24,8 @@ public class OrderRsqPushEventDO {
     private Long quantity;
     //  该订单的服务到期时间
     private Long serviceStopTime;
+    //  日事清teamId
+    private Long rsqTeamId;
     //  当前状态
     private String status;
 
@@ -91,6 +93,14 @@ public class OrderRsqPushEventDO {
         this.serviceStopTime = serviceStopTime;
     }
 
+    public Long getRsqTeamId() {
+        return rsqTeamId;
+    }
+
+    public void setRsqTeamId(Long rsqTeamId) {
+        this.rsqTeamId = rsqTeamId;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -110,6 +120,7 @@ public class OrderRsqPushEventDO {
                 ", corpId='" + corpId + '\'' +
                 ", quantity=" + quantity +
                 ", serviceStopTime=" + serviceStopTime +
+                ", rsqTeamId=" + rsqTeamId +
                 ", status='" + status + '\'' +
                 '}';
     }

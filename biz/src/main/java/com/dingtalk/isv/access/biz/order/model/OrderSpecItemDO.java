@@ -23,6 +23,8 @@ public class OrderSpecItemDO {
     private String itemName;
     //  日事清内部使用的规格标识
     private String innerKey;
+    //  日事清对应的充值版本
+    private String rsqProductName;
 
     public Long getId() {
         return id;
@@ -88,6 +90,14 @@ public class OrderSpecItemDO {
         this.innerKey = innerKey;
     }
 
+    public String getRsqProductName() {
+        return rsqProductName;
+    }
+
+    public void setRsqProductName(String rsqProductName) {
+        this.rsqProductName = rsqProductName;
+    }
+
     @Override
     public String toString() {
         return "OrderSpecItemDO{" +
@@ -99,6 +109,7 @@ public class OrderSpecItemDO {
                 ", itemCode='" + itemCode + '\'' +
                 ", itemName='" + itemName + '\'' +
                 ", innerKey='" + innerKey + '\'' +
+                ", rsqProductName='" + rsqProductName + '\'' +
                 '}';
     }
 }

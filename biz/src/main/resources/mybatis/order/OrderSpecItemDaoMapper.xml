@@ -11,6 +11,7 @@
         <result property="itemCode" column="item_code" />
         <result property="itemName" column="item_name" />
         <result property="innerKey" column="inner_key" />
+        <result property="rsqProductName" column="rsq_product_name" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -21,7 +22,8 @@
         goods_code,
         item_code,
         item_name,
-        inner_key
+        inner_key,
+        rsq_product_name
     </sql>
 
     <insert id="saveOrUpdateOrderSpecItem" useGeneratedKeys="true" keyProperty="id">
@@ -32,7 +34,8 @@
                 goods_code,
                 item_code,
                 item_name,
-                inner_key
+                inner_key,
+                rsq_product_name
         )values(
                 now(),
                 now(),
@@ -40,7 +43,8 @@
                 #{goodsCode},
                 #{itemCode},
                 #{itemName},
-                #{innerKey}
+                #{innerKey},
+                #{rsqProductName}
         )ON DUPLICATE KEY UPDATE gmt_modified=now()
     </insert>
 

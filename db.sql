@@ -597,6 +597,7 @@ CREATE TABLE `isv_order_spec_item` (
   `item_code` varchar(256) NOT NULL COMMENT '购买的商品规格码',
   `item_name` varchar(256) NOT NULL COMMENT '购买的商品规格名称',
   `inner_key` varchar(32) NOT NULL COMMENT '内部key值',
+  `rsq_product_name` varchar(64) NOT NULL COMMENT '日事清对应的付费版本',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='商品规格表';
 
@@ -609,6 +610,7 @@ CREATE TABLE `isv_order_rsq_push_event` (
   `corp_id` varchar(128) NOT NULL COMMENT '购买该套件企业的corpid',
   `quantity` bigint(10) NOT NULL COMMENT '订购的具体人数',
   `service_stop_time` bigint(20) NOT NULL COMMENT '该订单的服务到期时间',
+  `rsq_team_id` bigint(20) NOT NULL COMMENT '该订单关联的充值的日事清公司的id',
   `status` varchar(32) NOT NULL COMMENT '订单状态',
   PRIMARY KEY (`id`),
   UNIQUE KEY `isv_order_rsq_push_event_unique_order_id` (`order_id`)
