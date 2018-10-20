@@ -19,6 +19,10 @@
 
     <!--<util:properties id="config" location="WEB-INF/config.properties"/>-->
 
+    <util:map id="isvGlobal">
+        <entry key="appId" value="${isv.app.id}" />
+    </util:map>
+
     <!--公共spring配置文件-->
     <import resource="classpath:spring-beans.xml"/>
     <import resource="classpath:spring-dao.xml"/>

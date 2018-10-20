@@ -354,19 +354,18 @@ public class RsqAccountRequestHelper {
      */
     public ServiceResult<Void> doCharge(SuiteDO suiteDO, OrderRsqPushEventDO pushEventDO){
         try {
-            String url = getRsqDomain() + "/task/v2/tokenAuth/xxxxxx?token=" + suiteDO.getRsqAppToken();
-            Map params = new HashMap<String, String>();
+//            String url = getRsqDomain() + "/task/v2/tokenAuth/xxxxxx?token=" + suiteDO.getRsqAppToken();
+//            Map params = new HashMap<String, String>();
 //            params.put("appName", suiteDO.getRsqAppName());
 //            params.put("name", corpDO.getCorpName());
 //            params.put("outerId", corpDO.getCorpId());
 //            params.put("note", corpDO.getId());
-            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
-            JSONObject jsonObject = JSON.parseObject(sr);
-
-            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
-                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
-            }
-
+//            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+//            JSONObject jsonObject = JSON.parseObject(sr);
+//
+//            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+//                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+//            }
 
             return ServiceResult.success(null);
         } catch (Exception e) {

@@ -25,7 +25,7 @@
     </sql>
 
     <insert id="saveOrUpdateStaffPopupLog" useGeneratedKeys="true" keyProperty="id">
-        insert into staff_popup_log (
+        insert into isv_staff_popup_log (
                 gmt_create,
                 gmt_modified,
                 suite_key,
@@ -46,10 +46,10 @@
             popup_mute_expire=#{popupMuteExpire}
     </insert>
 
-    <select id="getStaffPopupLogListBySuiteKeyAndCorpIdAndUserId" resultMap="staffPopupLogMap">
-        SELECT <include refid="select-all-fields"/>  FROM staff_popup_log
+    <select id="getStaffPopupLogBySuiteKeyAndCorpIdAndUserIdAndType" resultMap="staffPopupLogMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_staff_popup_log
         <![CDATA[
-			WHERE suite_key=#{suiteKey} AND corp_id=#{corpId} AND user_id=#{userId}
+			WHERE suite_key=#{suiteKey} AND corp_id=#{corpId} AND user_id=#{userId} AND popup_type=#{popupType}
 		 ]]>
     </select>
 </mapper>

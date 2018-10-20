@@ -573,14 +573,14 @@ public class SystemController {
                              @RequestParam("suiteKey") String suiteKey,
                              @RequestBody JSONObject json){
         String resp = "success";
-//        ServiceResult<Void>  sr = chargeService.handleChargeEvent(suiteKey, json);
-//        System.out.println("====" + JSON.toJSONString(json));
-//        if(!sr.isSuccess()){
-//            resp = "faile";
-//        }
+        ServiceResult<Void>  sr = chargeService.handleChargeEvent(suiteKey, json);
+        System.out.println("====" + JSON.toJSONString(json));
+        if(!sr.isSuccess()){
+            resp = "faile";
+        }
 
-        resp = isvRequestHelper.getOapiDomain();
-        System.out.println("=====respDomain: " + resp);
+//        resp = isvRequestHelper.getOapiDomain();
+//        System.out.println("=====respDomain: " + resp);
 
         return resp;
     }

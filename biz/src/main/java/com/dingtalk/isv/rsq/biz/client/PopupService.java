@@ -9,6 +9,7 @@ import com.dingtalk.isv.access.biz.corp.model.CorpChargeStatusDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffPopupConfigDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffPopupLogDO;
+import com.dingtalk.isv.access.biz.exception.ApplicationException;
 import com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao;
 import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.common.model.ServiceResult;
@@ -30,11 +31,12 @@ import static com.dingtalk.isv.rsq.biz.model.PopupType.OLD_UPGRADE;
  * Date: 2018-10-19 19:57
  */
 public class PopupService {
-    private static final Logger bizLogger = LoggerFactory.getLogger("CHARGE_LOGGER");
+    private static final Logger bizLogger = LoggerFactory.getLogger("STAFF_MANAGE_LOGGER");
     private static final Logger mainLogger = LoggerFactory.getLogger(PopupService.class);
 
-    private static final long ONE_HUNDRED_YEAR_MILLS = 1000 * 60 * 60 * 24 * 365 * 100;
-    private static final long FOR_DAY_YEAR_MILLS = 1000 * 60 * 60 * 24 * 4;
+    //  这里的long类型，需要在数字后面都加上L，否则java将会默认为int类型，会很容易overflow
+    private static final long ONE_HUNDRED_YEAR_MILLS = 1000L * 60L * 60L * 24L * 365L * 100L;
+    private static final long FOR_DAY_YEAR_MILLS = 1000L * 60L * 60L * 24L * 4L;
 
     @Autowired
     private StaffPopupConfigDao staffPopupConfigDao;
@@ -56,6 +58,31 @@ public class PopupService {
      */
     public PopupInfoVO getPopupInfo(String suiteKey, String corpId, String userId){
         PopupInfoVO popupInfo = new PopupInfoVO();
+        //  设置默认的数据
+        popupInfo.setCorpId(corpId);
+        popupInfo.setServiceExpire(0L);
+        popupInfo.setBuyNumber(0L);
+        popupInfo.setTotalNumber(0L);
+        popupInfo.setSpecKey(null);
+        //  读取当前用户信息
+        StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
+        popupInfo.setAdmin(staffDO.getAdmin());
+
+        //  读取企业信息
+        CorpChargeStatusDO corpStatus = corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corpId);
+        if(corpStatus != null){
+            popupInfo.setServiceExpire(corpStatus.getCurrentServiceStopTime());
+            popupInfo.setBuyNumber(corpStatus.getCurrentSubQuantity());
+            popupInfo.setTotalNumber(corpStatus.getTotalQuantity());
+
+            //  读取规格信息
+            OrderSpecItemDO spec = orderSpecItemDao.getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode(
+                    suiteKey,
+                    corpStatus.getCurrentGoodsCode(),
+                    corpStatus.getCurrentItemCode());
+
+            popupInfo.setSpecKey(spec.getInnerKey());
+        }
 
         //  读取mute信息
         List<StaffPopupConfigDO> configList =
@@ -66,30 +93,11 @@ public class PopupService {
             String type = configDO.getPopupType();
             popupConfigMap.put(type, configDO);
             StaffPopupLogDO logDO =
-                    staffPopupLogDao.getStaffPopupLogListBySuiteKeyAndCorpIdAndUserId(suiteKey, corpId, userId);
+                    staffPopupLogDao.getStaffPopupLogBySuiteKeyAndCorpIdAndUserIdAndType(suiteKey, corpId, userId, type);
             muteInfoMap.put(type, logDO);
         }
         popupInfo.setPopupConfigMap(popupConfigMap);
         popupInfo.setMuteInfoMap(muteInfoMap);
-
-        //  读取企业信息
-        CorpChargeStatusDO corpStatus = corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corpId);
-        popupInfo.setCorpId(corpId);
-        popupInfo.setServiceExpire(corpStatus.getCurrentServiceStopTime());
-        popupInfo.setBuyNumber(corpStatus.getCurrentSubQuantity());
-        popupInfo.setTotalNumber(corpStatus.getTotalQuantity());
-
-        //  读取当前用户信息
-        StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
-        popupInfo.setAdmin(staffDO.getAdmin());
-
-        //  读取规格信息
-        OrderSpecItemDO spec = orderSpecItemDao.getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode(
-                suiteKey,
-                corpStatus.getCurrentGoodsCode(),
-                corpStatus.getCurrentItemCode());
-
-        popupInfo.setSpecKey(spec.getInnerKey());
 
         return popupInfo;
     }
@@ -108,7 +116,7 @@ public class PopupService {
     public void logStaffPopup(String suiteKey, String corpId, String userId, String type){
         PopupType popupType = PopupType.getPopupType(type);
         if(popupType == null){
-            return;
+            throw new ApplicationException("popupType not found: " + type);
         }
         long expireTime = 0L;
         long now = new Date().getTime();
@@ -124,8 +132,8 @@ public class PopupService {
                 break;
         }
         if(expireTime != 0L){
-            StaffPopupLogDO logDO = staffPopupLogDao.getStaffPopupLogListBySuiteKeyAndCorpIdAndUserId(
-                    suiteKey, corpId, userId
+            StaffPopupLogDO logDO = staffPopupLogDao.getStaffPopupLogBySuiteKeyAndCorpIdAndUserIdAndType(
+                    suiteKey, corpId, userId, type
             );
             if(logDO == null){
                 logDO = new StaffPopupLogDO();

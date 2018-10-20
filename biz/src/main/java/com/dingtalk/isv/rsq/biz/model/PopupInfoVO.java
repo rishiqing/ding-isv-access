@@ -108,11 +108,12 @@ public class PopupInfoVO {
                 Map<String, Object> objMap = new HashMap<String, Object>();
                 objMap.put("saleQrCodeUrl", configDO.getSaleQrCodeUrl());
                 objMap.put("salePhoneNumber", configDO.getSalePhoneNumber());
-                objMap.put("muteExpire", logDO != null ? logDO.getPopupMuteExpire() : null);
+                objMap.put("muteExpire", logDO != null ? logDO.getPopupMuteExpire() : 0L);
                 muteInfo.put(type, objMap);
             }
         }
         Map<String, Object> map = new HashMap<String, Object>();
+        map.put("corpId", this.corpId);
         map.put("serviceExpire", this.serviceExpire);
         map.put("buyNumber", this.buyNumber);
         map.put("totalNumber", this.totalNumber);

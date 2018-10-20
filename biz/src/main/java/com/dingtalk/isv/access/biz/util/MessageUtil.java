@@ -17,6 +17,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class MessageUtil {
+    private static final String RISHIQING = "日事清";
+    private static final String DEFAULT_HEAD_BG = "FF458CDA";
     public static MessageBody parseOAMessage(JSONObject json){
         MessageBody.OABody oaBody = new MessageBody.OABody();
 
@@ -83,6 +85,40 @@ public class MessageUtil {
             oaBody.setBody(body);
         }
 
+        return oaBody;
+    }
+
+    /**
+     * 解析日事清后台直接发送OA的消息
+     * 格式如下：
+     {
+       "title" : "领奖通知",
+       "description" : "<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+       "url" : "URL",
+       "btntxt":"更多"
+     }
+     * @param json
+     * @return
+     */
+    public static MessageBody parseRsqOAMessage(JSONObject json){
+        MessageBody.OABody oaBody = new MessageBody.OABody();
+        String url = json.getString("url");
+        String title = json.getString("title");
+        String desc = json.getString("description");
+        String btntxt = json.getString("btntxt");
+
+        oaBody.setMessage_url(url);
+
+        MessageBody.OABody.Head head = new MessageBody.OABody.Head();
+        head.setText(RISHIQING);
+        head.setBgcolor(DEFAULT_HEAD_BG);
+        oaBody.setHead(head);
+
+        MessageBody.OABody.Body body = new MessageBody.OABody.Body();
+        body.setTitle(title);
+        body.setContent(desc);
+
+        oaBody.setBody(body);
         return oaBody;
     }
 

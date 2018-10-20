@@ -13,6 +13,17 @@
         <result property="innerKey" column="inner_key" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        suite_key,
+        goods_code,
+        item_code,
+        item_name,
+        inner_key
+    </sql>
+
     <insert id="saveOrUpdateOrderSpecItem" useGeneratedKeys="true" keyProperty="id">
         insert into isv_order_spec_item (
                 gmt_create,

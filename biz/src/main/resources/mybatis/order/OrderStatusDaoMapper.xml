@@ -28,7 +28,7 @@
     </resultMap>
 
     <insert id="saveOrUpdateOrderStatus" useGeneratedKeys="true" keyProperty="id">
-        insert into isv_order_event (
+        insert into isv_order_status (
                 gmt_create,
                 gmt_modified,
                 order_id,

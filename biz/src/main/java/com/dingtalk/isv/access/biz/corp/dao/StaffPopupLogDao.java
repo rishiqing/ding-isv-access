@@ -13,10 +13,11 @@ public interface StaffPopupLogDao {
 	 */
 	public void saveOrUpdateStaffPopupLog(StaffPopupLogDO staffPopupLogDO);
 
-	public StaffPopupLogDO getStaffPopupLogListBySuiteKeyAndCorpIdAndUserId(
+	public StaffPopupLogDO getStaffPopupLogBySuiteKeyAndCorpIdAndUserIdAndType(
 			@Param("suiteKey") String suiteKey,
 			@Param("corpId") String corpId,
-			@Param("userId") String userId
+			@Param("userId") String userId,
+			@Param("popupType") String popupType
 	);
 }
 

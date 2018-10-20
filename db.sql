@@ -557,7 +557,8 @@ CREATE TABLE `isv_order_event` (
   `discount` decimal(10,6) COMMENT '订单折扣',
   `distributor_corp_id` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业corpId',
   `distributor_corp_name` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业名称',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isv_order_event_unique_order_id` (`order_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='isv接收到的订单事件记录';
 
 CREATE TABLE `isv_order_status` (
@@ -583,7 +584,8 @@ CREATE TABLE `isv_order_status` (
   `distributor_corp_id` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业corpId',
   `distributor_corp_name` varchar(256) COMMENT '钉钉分销系统提单的代理商的企业名称',
   `status` varchar(32) COMMENT '订单状态',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isv_order_status_unique_order_id` (`order_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='订单状态表';
 
 CREATE TABLE `isv_order_spec_item` (
@@ -608,7 +610,8 @@ CREATE TABLE `isv_order_rsq_push_event` (
   `quantity` bigint(10) NOT NULL COMMENT '订购的具体人数',
   `service_stop_time` bigint(20) NOT NULL COMMENT '该订单的服务到期时间',
   `status` varchar(32) NOT NULL COMMENT '订单状态',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isv_order_rsq_push_event_unique_order_id` (`order_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='发送到日事清的事件表';
 
 CREATE TABLE `isv_corp_charge_status` (
@@ -626,7 +629,8 @@ CREATE TABLE `isv_corp_charge_status` (
   `current_min_of_people` bigint(10) COMMENT '当前规格的最小人数',
   `current_service_stop_time` bigint(20) COMMENT '当前订单的服务到期时间',
   `status` varchar(32) NOT NULL COMMENT '公司状态',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isv_corp_charge_status_unique_corp_id` (`suite_key`, `corp_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='公司充值状态表';
 
 CREATE TABLE `isv_staff_popup_config` (
@@ -641,14 +645,15 @@ CREATE TABLE `isv_staff_popup_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='弹窗配置表';
 
-CREATE TABLE `staff_popup_log` (
+CREATE TABLE `isv_staff_popup_log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `gmt_create` datetime NOT NULL COMMENT '创建时间',
   `gmt_modified` datetime NOT NULL COMMENT '修改时间',
   `suite_key` varchar(100) NOT NULL COMMENT 'suiteKey',
-  `popup_type` varchar(128) NOT NULL COMMENT '弹窗类型',
-  `corp_id` varchar(256) NOT NULL COMMENT '公司id',
+  `popup_type` varchar(32) NOT NULL COMMENT '弹窗类型',
+  `corp_id` varchar(128) NOT NULL COMMENT '公司id',
   `user_id` varchar(64) NOT NULL COMMENT '用户id',
   `popup_mute_expire` bigint(20) COMMENT '沉默期截至时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `isv_staff_popup_log_unique_popup` (`suite_key`, `corp_id`, `user_id`, `popup_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='弹窗记录表';

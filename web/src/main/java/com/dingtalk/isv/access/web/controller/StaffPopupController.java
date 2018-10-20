@@ -25,7 +25,7 @@ import java.util.Map;
 @Controller
 public class StaffPopupController {
     private static final Logger mainLogger = LoggerFactory.getLogger(IdMapController.class);
-    private static final Logger bizLogger = LoggerFactory.getLogger("CHARGE_LOGGER");
+    private static final Logger bizLogger = LoggerFactory.getLogger("STAFF_MANAGE_LOGGER");
 
     @Resource
     private HttpResult httpResult;
@@ -40,7 +40,7 @@ public class StaffPopupController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/corp/charge/popup", method = {RequestMethod.GET})
+    @RequestMapping(value = "/corp/user/popup", method = {RequestMethod.GET})
     public Map<String, Object> fetchCorpChargeInfo(
             @RequestParam("suiteKey") String suiteKey,
             @RequestParam("corpId") String corpId,
