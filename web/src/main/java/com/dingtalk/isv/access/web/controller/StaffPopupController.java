@@ -2,6 +2,8 @@ package com.dingtalk.isv.access.web.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
+import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.HttpResult;
@@ -31,10 +33,13 @@ public class StaffPopupController {
     private HttpResult httpResult;
     @Autowired
     private PopupService popupService;
+    @Autowired
+    private AppManageService appManageService;
+    @Resource(name="isvGlobal")
+    private Map<String, String> isvGlobal;
 
     /**
      * 获取企业充值信息
-     * @param suiteKey
      * @param corpId
      * @param userId
      * @return
@@ -42,26 +47,23 @@ public class StaffPopupController {
     @ResponseBody
     @RequestMapping(value = "/corp/user/popup", method = {RequestMethod.GET})
     public Map<String, Object> fetchCorpChargeInfo(
-            @RequestParam("suiteKey") String suiteKey,
             @RequestParam("corpId") String corpId,
             @RequestParam("userId") String userId
     ) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
-                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", corpId),
                 LogFormatter.KeyValue.getNew("userId", userId)
         ));
         try{
-//            List<StaffIdsDO> list = corpStaffDao.getRsqIdFromUserId(corpId, json.toArray(new String[]{}));
-//            Map<String, Object> map = new HashMap<String, Object>();
-//            map.put("result", list);
-//
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(appId);
+            String suiteKey = appVOSr.getResult().getSuiteKey();
+
             PopupInfoVO popupInfo = popupService.getPopupInfo(suiteKey, corpId, userId);
             return httpResult.getSuccess(popupInfo.toMap());
         }catch(Exception e){
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
-                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("userId", userId)
             ),e);
@@ -78,19 +80,20 @@ public class StaffPopupController {
     @ResponseBody
     @RequestMapping(value = "/corp/user/popup", method = {RequestMethod.POST})
     public Map<String, Object> submitPopup(
-            @RequestParam("suiteKey") String suiteKey,
             @RequestParam("corpId") String corpId,
             @RequestParam("userId") String userId,
             @RequestBody JSONObject json
     ) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
-                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", corpId),
                 LogFormatter.KeyValue.getNew("userId", userId),
                 LogFormatter.KeyValue.getNew("json", json)
         ));
         try{
-//            List<StaffIdsDO> list = corpStaffDao.getRsqIdFromUserId(corpId, json.toArray(new String[]{}));
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(appId);
+            String suiteKey = appVOSr.getResult().getSuiteKey();
+
             String type = json.getString("popupType");
             popupService.logStaffPopup(suiteKey, corpId, userId, type);
             Map<String, Object> map = new HashMap<String, Object>();
@@ -98,7 +101,6 @@ public class StaffPopupController {
         }catch(Exception e){
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
-                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("userId", userId),
                     LogFormatter.KeyValue.getNew("json", json)
