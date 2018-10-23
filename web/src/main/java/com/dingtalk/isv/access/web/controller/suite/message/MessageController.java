@@ -192,7 +192,7 @@ public class MessageController {
 
             List<String> userIdList = null;
             if(json.containsKey("touser")){
-                String[] userArray  = json.getString("touser").split("|");
+                String[] userArray  = json.getString("touser").split("\\|");
                 userIdList = Arrays.asList(userArray);
             }
             //  安全起见，toAllUser接口不开放

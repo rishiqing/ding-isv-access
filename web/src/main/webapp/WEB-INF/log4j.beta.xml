@@ -3,7 +3,7 @@
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
     <appender name="PROJECT" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/isv-crm-access.log"/>
+        <param name="file" value="/acs/log/biz/isv-crm-access.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -12,7 +12,7 @@
     </appender>
 
     <appender name="ERROR" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/isv-crm-access-err.log"/>
+        <param name="file" value="/acs/log/biz/isv-crm-access-err.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="ERROR"/>
@@ -23,7 +23,7 @@
 
     <!-- callback -->
     <appender name="SUITE_CALLBACK_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/suite_callback.log"/>
+        <param name="file" value="/acs/log/biz/biz/suite_callback.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -34,7 +34,7 @@
 
     <!-- suite -->
     <appender name="SUITE_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/suite_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/suite_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -44,7 +44,7 @@
     </appender>
     <!-- 企业套件授权管理 -->
     <appender name="CORP_SUITE_AUTH_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/corp_suite_auth.log"/>
+        <param name="file" value="/acs/log/biz/biz/corp_suite_auth.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -55,7 +55,7 @@
 
     <!-- task -->
     <appender name="TASK_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/task.log"/>
+        <param name="file" value="/acs/log/biz/biz/task.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -66,7 +66,7 @@
 
     <!-- corp-->
     <appender name="CORP_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/corp_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/corp_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -77,7 +77,7 @@
 
    <!-- org-->
     <appender name="ORG_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/org_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/org_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -88,7 +88,7 @@
 
     <!-- staff-->
     <appender name="STAFF_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/staff_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/staff_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -99,7 +99,7 @@
 
     <!-- CRM-->
     <appender name="CRM_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/crm_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/crm_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -110,7 +110,7 @@
 
     <!-- form -->
     <appender name="FORM_MANAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/from_manage.log"/>
+        <param name="file" value="/acs/log/biz/biz/from_manage.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
@@ -121,7 +121,7 @@
 
     <!-- remote serivce -->
     <appender name="SERVICE_PROFILE_LOG_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/service_profile_access.log"/>
+        <param name="file" value="/acs/log/biz/biz/service_profile_access.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="INFO"/>
@@ -132,7 +132,7 @@
 
     <!-- http controller -->
     <appender name="CONTROLLER_PROFILE_LOG_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/controller_profile_access.log"/>
+        <param name="file" value="/acs/log/biz/biz/controller_profile_access.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="INFO"/>
@@ -143,7 +143,7 @@
 
     <!-- http invoke log -->
     <appender name="HTTP_INVOKE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/http_invoke.log"/>
+        <param name="file" value="/acs/log/biz/biz/http_invoke.log"/>
         <param name="append" value="true"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="INFO"/>
@@ -154,7 +154,7 @@
 
     <!-- ding open sdk log -->
     <appender name="DING_OPEN_CLIENT_SDK_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/client_sdk.log" />
+        <param name="file" value="/acs/log/biz/biz/client_sdk.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -165,7 +165,7 @@
 
     <!-- monitor log -->
     <appender name="MONITOR_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/monitor.log" />
+        <param name="file" value="/acs/log/biz/biz/monitor.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -176,7 +176,7 @@
 
     <!-- monitor log -->
     <appender name="OAPI_HTTP_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/http_request_helper.log" />
+        <param name="file" value="/acs/log/biz/biz/http_request_helper.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -188,7 +188,7 @@
 
     <!-- monitor log -->
     <appender name="EVENT_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/event.log" />
+        <param name="file" value="/acs/log/biz/biz/event.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -199,7 +199,7 @@
 
     <!-- jsapi log -->
     <appender name="JSAPI_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/jsapi.log" />
+        <param name="file" value="/acs/log/biz/biz/jsapi.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -210,7 +210,7 @@
 
     <!-- rsq request log appender -->
     <appender name="RSQ_REQUEST_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/rsq_request.log" />
+        <param name="file" value="/acs/log/biz/biz/rsq_request.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -221,7 +221,7 @@
 
     <!-- corp lock log appender -->
     <appender name="CORP_LOCK_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/corp_lock.log" />
+        <param name="file" value="/acs/log/biz/biz/corp_lock.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -232,7 +232,7 @@
 
     <!-- corp callback queue log appender -->
     <appender name="CORP_CALLBACK_QUEUE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/corp_callback_queue.log" />
+        <param name="file" value="/acs/log/biz/biz/corp_callback_queue.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -243,7 +243,7 @@
 
     <!-- mq listener log appender -->
     <appender name="MQ_LISTENER_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/mq_listener.log" />
+        <param name="file" value="/acs/log/biz/biz/mq_listener.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -254,7 +254,7 @@
 
     <!--id map logger-->
     <appender name="CONTROLLER_ISV_ID_MAP_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/controller_isv_id_map.log" />
+        <param name="file" value="/acs/log/biz/biz/controller_isv_id_map.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -264,7 +264,7 @@
     </appender>
     <!--isv message logger-->
     <appender name="CONTROLLER_ISV_MESSAGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/controller_isv_message.log" />
+        <param name="file" value="/acs/log/biz/biz/controller_isv_message.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
@@ -274,7 +274,7 @@
     </appender>
     <!--charge logger-->
     <appender name="CHARGE_LOGGER_APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="../ding-logs/biz/charge.log" />
+        <param name="file" value="/acs/log/biz/biz/charge.log" />
         <param name="append" value="true" />
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
