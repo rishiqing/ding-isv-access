@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
+import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -116,7 +117,9 @@ public class MessageUtil {
 
         MessageBody.OABody.Body body = new MessageBody.OABody.Body();
         body.setTitle(title);
-        body.setContent(desc);
+
+        //  desc可能为富文本，从中提取出文字
+        body.setContent(Jsoup.parse(desc).body().text());
 
         oaBody.setBody(body);
         return oaBody;

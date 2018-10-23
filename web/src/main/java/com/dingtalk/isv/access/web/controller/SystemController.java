@@ -41,6 +41,8 @@ import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -583,5 +585,14 @@ public class SystemController {
 //        System.out.println("=====respDomain: " + resp);
 
         return resp;
+    }
+
+    @RequestMapping("/test/jsoup")
+    @ResponseBody
+    public String testJsoup(){
+        String html = "<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>";
+        Document doc = Jsoup.parse(html);
+        String text = doc.body().text();
+        return "success:--/test1: " + text;
     }
 }
