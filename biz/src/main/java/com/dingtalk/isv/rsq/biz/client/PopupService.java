@@ -63,7 +63,7 @@ public class PopupService {
         popupInfo.setServiceExpire(0L);
         popupInfo.setBuyNumber(0L);
         popupInfo.setTotalNumber(0L);
-        popupInfo.setSpecKey(null);
+        popupInfo.setSpecKey("");
         //  读取当前用户信息
         StaffDO staffDO = corpStaffDao.getStaffByCorpIdAndUserId(corpId, userId);
         popupInfo.setAdmin(staffDO.getAdmin());

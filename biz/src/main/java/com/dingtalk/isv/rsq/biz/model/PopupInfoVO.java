@@ -98,6 +98,14 @@ public class PopupInfoVO {
     }
 
     public Map<String, Object> toMap(){
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("corpId", this.corpId);
+        map.put("serviceExpire", this.serviceExpire);
+        map.put("buyNumber", this.buyNumber);
+        map.put("totalNumber", this.totalNumber);
+        map.put("isAdmin", this.isAdmin);
+        map.put("specKey", this.specKey);
+
         Map<String, Object> muteInfo = new HashMap<String, Object>();
         if(this.popupConfigMap != null){
             for(Map.Entry<String, StaffPopupConfigDO> entry : this.popupConfigMap.entrySet()){
@@ -106,19 +114,16 @@ public class PopupInfoVO {
                 StaffPopupLogDO logDO = this.muteInfoMap.get(type);
 
                 Map<String, Object> objMap = new HashMap<String, Object>();
-                objMap.put("saleQrCodeUrl", configDO.getSaleQrCodeUrl());
-                objMap.put("salePhoneNumber", configDO.getSalePhoneNumber());
+                if(!map.containsKey("saleQrCodeUrl")){
+                    map.put("saleQrCodeUrl", configDO.getSaleQrCodeUrl());
+                }
+                if(!map.containsKey("salePhoneNumber")){
+                    map.put("salePhoneNumber", configDO.getSalePhoneNumber());
+                }
                 objMap.put("muteExpire", logDO != null ? logDO.getPopupMuteExpire() : 0L);
                 muteInfo.put(type, objMap);
             }
         }
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("corpId", this.corpId);
-        map.put("serviceExpire", this.serviceExpire);
-        map.put("buyNumber", this.buyNumber);
-        map.put("totalNumber", this.totalNumber);
-        map.put("isAdmin", this.isAdmin);
-        map.put("specKey", this.specKey);
         map.put("muteInfo", muteInfo);
         return map;
     }
