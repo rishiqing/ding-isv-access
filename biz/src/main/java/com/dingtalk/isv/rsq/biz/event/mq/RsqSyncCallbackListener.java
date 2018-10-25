@@ -96,7 +96,10 @@ public class RsqSyncCallbackListener implements MessageListener {
             }
 
             Boolean toAllUser = false;
-            JSONObject json = JSONObject.parseObject(appVO.getActiveMessage());
+            //TODO 这里要做文字替换，将$CORPID$和$APPID$替换成真实的corpId和appId
+            String msgString = appVO.getActiveMessage().replace("$CORPID$", corpId).replace("$APPID$", this.appId);
+
+            JSONObject json = JSONObject.parseObject(msgString);
             String msgType = json.getString("msgtype");
 
             MessageBody msg = MessageUtil.parseMessage(json);
