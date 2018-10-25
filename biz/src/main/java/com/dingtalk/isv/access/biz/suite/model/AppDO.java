@@ -29,6 +29,10 @@ public class AppDO {
      * 为应用id.和钉钉保持一致
      */
     private Long appId;
+    /**
+     * 开通应用时推送的消息
+     */
+    private String activeMessage;
 
     public Long getId() {
         return id;
@@ -68,5 +72,13 @@ public class AppDO {
 
     public void setAppId(Long appId) {
         this.appId = appId;
+    }
+
+    public String getActiveMessage() {
+        return activeMessage;
+    }
+
+    public void setActiveMessage(String activeMessage) {
+        this.activeMessage = activeMessage;
     }
 }

@@ -3,10 +3,13 @@ package com.dingtalk.isv.rsq.biz.event.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.message.SendMessageService;
+import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.service.CorpCallbackQueueService;
+import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
@@ -36,6 +39,8 @@ public class RsqSyncCallbackListener implements MessageListener {
     private SendMessageService sendMessageService;
     @Autowired
     private StaffManageService staffManageService;
+    @Autowired
+    private AppManageService appManageService;
 
     private String appId;
     private String sendMessageBody;
@@ -81,11 +86,22 @@ public class RsqSyncCallbackListener implements MessageListener {
                 return;
             }
             List<String> staffList = staffListSr.getResult();
-            MessageBody.TextBody messageBody = new MessageBody.TextBody();
-            messageBody.setContent(this.sendMessageBody);
-            Long appId = Long.valueOf(this.appId);
 
-            ServiceResult sendSr = sendMessageService.sendMessageToUser(suiteKey, corpId, appId, "text", staffList, null, messageBody);
+            Long appId = Long.valueOf(this.appId);
+            ServiceResult<AppVO> appSr = appManageService.getAppByAppId(appId);
+            AppVO appVO = appSr.getResult();
+            //activeMessage为空不开通
+            if(appVO.getActiveMessage() == null || "".equals(appVO.getActiveMessage())){
+                return;
+            }
+
+            Boolean toAllUser = false;
+            JSONObject json = JSONObject.parseObject(appVO.getActiveMessage());
+            String msgType = json.getString("msgtype");
+
+            MessageBody msg = MessageUtil.parseMessage(json);
+            ServiceResult sendSr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, staffList, null, msg);
+
             if(!sendSr.isSuccess()){
                 bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         LogFormatter.KeyValue.getNew("send rsq sync mq message failed", "suiteKey:" + suiteKey + ",corpId:" + corpId)

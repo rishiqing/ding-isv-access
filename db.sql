@@ -659,3 +659,7 @@ CREATE TABLE `isv_staff_popup_log` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `isv_staff_popup_log_unique_popup` (`suite_key`, `corp_id`, `user_id`, `popup_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='弹窗记录表';
+
+# add 2018-10-25
+ALTER TABLE `isv_app`
+  ADD COLUMN `active_message`  varchar(1024) NULL COMMENT '开通应用推送的消息';

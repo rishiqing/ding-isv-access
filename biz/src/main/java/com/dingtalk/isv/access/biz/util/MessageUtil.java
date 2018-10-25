@@ -139,6 +139,69 @@ public class MessageUtil {
         return JSON.toJSONString(orgContent);
     }
 
+    private static MessageBody parseActionCardMessage(JSONObject json){
+        MessageBody.ActionCardBody body = new MessageBody.ActionCardBody();
+        body.setTitle(json.getString("title"));
+        body.setMarkdown(json.getString("markdown"));
+        if(json.containsKey("single_title")){
+            body.setSingleTitle(json.getString("single_title"));
+        }
+        if(json.containsKey("single_url")){
+            body.setSingleUrl(json.getString("single_url"));
+        }
+        if(json.containsKey("btn_orientation")){
+            body.setBtnOrientation(json.getString("btn_orientation"));
+        }
+        if(json.containsKey("btn_json_list")){
+            List<MessageBody.ActionCardBody.Button> btnList = new ArrayList<MessageBody.ActionCardBody.Button>();
+            JSONArray btnArray = json.getJSONArray("btn_json_list");
+            Iterator it = btnArray.iterator();
+            while(it.hasNext()){
+                MessageBody.ActionCardBody.Button btn = new MessageBody.ActionCardBody.Button();
+                JSONObject object = (JSONObject) it.next();
+                btn.setTitle(object.getString("title"));
+                btn.setActionUrl(object.getString("action_url"));
+                btnList.add(btn);
+            }
+            body.setBtnJsonList(btnList);
+        }
+        return body;
+    }
+
+    private static MessageBody parseTextMessage(JSONObject orgContent){
+        MessageBody.TextBody body = new MessageBody.TextBody();
+        body.setContent(orgContent.getString("content"));
+        return body;
+    }
+
+    private static MessageBody parseLinkMessage(JSONObject json){
+        MessageBody.LinkBody body = new MessageBody.LinkBody();
+        body.setMessageUrl(json.getString("messageUrl"));
+        body.setPicUrl(json.getString("picUrl"));
+        body.setTitle(json.getString("title"));
+        body.setText(json.getString("title"));
+        return body;
+    }
+
+    /**
+     * 通用方法，根据orgContent做转换
+     * @param orgContent
+     * @return
+     */
+    public static MessageBody parseMessage(JSONObject orgContent){
+        String msgType = orgContent.getString("msgtype");
+        JSONObject msgJson = orgContent.getJSONObject(msgType);
+        if("action_card".equals(msgType)){
+            return parseActionCardMessage(msgJson);
+        }else if("oa".equals(msgType)){
+            return parseOAMessage(msgJson);
+        }else if("link".equals(msgType)){
+            return parseLinkMessage(msgJson);
+        }else{
+            return parseTextMessage(msgJson);
+        }
+    }
+
     public static void main(String[] args) {
         JSONObject json = JSON.parseObject("{message_url: \"aaaaaaa\", head: {text: 'ttttext',bgcolor:'FFAAAAAA'}}");
         MessageBody body = parseOAMessage(json);
