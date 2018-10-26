@@ -157,12 +157,6 @@ public class SystemController {
             @RequestParam(value = "corpId", required = true) String corpId
     ){
         try {
-            List<String> staffList = new ArrayList<String>();
-            staffList.add("manager5864");
-            MessageBody.TextBody messageBody = new MessageBody.TextBody();
-            messageBody.setContent("hello wallace!");
-            Long appId = 2585L;
-
             jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
 
 //            ServiceResult sendSr = sendMessageService.sendMessageToUser(suiteKey, corpId, appId, "text", staffList, null, messageBody);
