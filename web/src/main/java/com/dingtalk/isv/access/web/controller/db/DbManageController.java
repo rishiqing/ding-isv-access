@@ -1,18 +1,21 @@
 package com.dingtalk.isv.access.web.controller.db;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.biz.corp.dao.CorpDao;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.service.RsqAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.jms.Queue;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +37,11 @@ public class DbManageController {
     RsqAccountService rsqAccountService;
     @Autowired
     CorpDao corpDao;
+    @Autowired
+    private JmsTemplate jmsTemplate;
+    @Autowired
+    @Qualifier("rsqSyncCallBackQueue")
+    private Queue rsqSyncCallBackQueue;
 
     /**
      * 从钉钉根据corpId获取corp的admin信息,并更新到本地
@@ -98,5 +106,20 @@ public class DbManageController {
             }
         }
         return "<<success>>" + new Date();
+    }
+
+    @RequestMapping(value = "/admin/message/push", method = {RequestMethod.POST})
+    @ResponseBody
+    public String syncAllCorpAdmin(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "corpId", required = false) String corpId,
+            @RequestParam(value = "staffNumberMin") Long staffNumberMin,
+            @RequestParam(value = "staffNumberMax") Long staffNumberMax,
+            @RequestBody JSONObject json
+    ) {
+        if(corpId != null){
+            jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
+        }
+        return "success";
     }
 }
