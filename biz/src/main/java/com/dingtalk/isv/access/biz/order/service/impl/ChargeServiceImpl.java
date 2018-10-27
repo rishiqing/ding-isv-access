@@ -160,8 +160,8 @@ public class ChargeServiceImpl implements ChargeService {
             // 保存CorpChargeStatusDO
             CorpChargeStatusDO corpChargeStatusDO = OrderModelConverter.orderStatusDO2CorpChargeStatusDO(orderStatus);
             corpChargeStatusDO.setStatus(SystemConstant.ORDER_CORP_CHARGE_STATUS_OK);
-            //TODO 计算当前人数
-            // corpChargeStatusDO.setTotalQuantity();
+            // 计算当前人数，先暂时指定公司总人数为1，保证不超员，以后改为每天查人数来更新这个字段
+             corpChargeStatusDO.setTotalQuantity(1L);
             corpChargeStatusDao.saveOrUpdateCorpChargeStatus(corpChargeStatusDO);
 
             return ServiceResult.success(null);

@@ -27,7 +27,7 @@ public class OrderChargeEventListener implements EventListener {
 
     @Subscribe
     @AllowConcurrentEvents  //  event并行执行
-    public void listenCorpOrgSyncEvent(OrderChargeEvent event) {
+    public void listenCheckAndCharge(OrderChargeEvent event) {
         try{
             String suiteKey = event.getSuiteKey();
             Long eventId = event.getOrderEventId();
