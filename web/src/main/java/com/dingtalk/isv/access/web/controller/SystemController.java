@@ -13,6 +13,7 @@ import com.dingtalk.isv.access.api.model.suite.CorpSuiteCallBackVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.message.SendMessageService;
+import com.dingtalk.isv.access.api.service.order.ChargeService;
 import com.dingtalk.isv.access.api.service.suite.AppManageService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
@@ -21,11 +22,15 @@ import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpJSAPITicketConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
+import com.dingtalk.isv.access.biz.dingutil.ISVRequestHelper;
+import com.dingtalk.isv.access.biz.order.dao.OrderEventDao;
+import com.dingtalk.isv.access.biz.order.model.OrderEventDO;
 import com.dingtalk.isv.access.biz.scheduler.SendCorpMessageJob;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.model.ServiceResult;
+import com.dingtalk.isv.common.util.HttpRequestHelper;
 import com.dingtalk.isv.common.util.HttpUtils;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
@@ -36,6 +41,8 @@ import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -150,12 +157,6 @@ public class SystemController {
             @RequestParam(value = "corpId", required = true) String corpId
     ){
         try {
-            List<String> staffList = new ArrayList<String>();
-            staffList.add("manager5864");
-            MessageBody.TextBody messageBody = new MessageBody.TextBody();
-            messageBody.setContent("hello wallace!");
-            Long appId = 2585L;
-
             jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
 
 //            ServiceResult sendSr = sendMessageService.sendMessageToUser(suiteKey, corpId, appId, "text", staffList, null, messageBody);
@@ -553,5 +554,39 @@ public class SystemController {
             e.printStackTrace();
         }
         return keys.toString();
+    }
+
+    @Autowired
+    private ChargeService chargeService;
+    @Autowired
+    private OrderEventDao orderEventDao;
+    @Autowired
+    private ISVRequestHelper isvRequestHelper;
+
+    @RequestMapping(value = "/test/charge", method = {RequestMethod.POST})
+    @ResponseBody
+    public String testCharge(HttpServletRequest request,
+                             @RequestParam("suiteKey") String suiteKey,
+                             @RequestBody JSONObject json){
+        String resp = "success";
+        ServiceResult<Void>  sr = chargeService.handleChargeEvent(suiteKey, json);
+        System.out.println("====" + JSON.toJSONString(json));
+        if(!sr.isSuccess()){
+            resp = "faile";
+        }
+
+//        resp = isvRequestHelper.getOapiDomain();
+//        System.out.println("=====respDomain: " + resp);
+
+        return resp;
+    }
+
+    @RequestMapping("/test/jsoup")
+    @ResponseBody
+    public String testJsoup(){
+        String html = "<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>";
+        Document doc = Jsoup.parse(html);
+        String text = doc.body().text();
+        return "success:--/test1: " + text;
     }
 }

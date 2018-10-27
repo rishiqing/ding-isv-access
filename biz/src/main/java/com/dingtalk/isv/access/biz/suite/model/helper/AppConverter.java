@@ -19,6 +19,7 @@ public class AppConverter {
        appVO.setGmtModified(appDO.getGmtModified());
        appVO.setAppId(appDO.getAppId());
        appVO.setSuiteKey(appDO.getSuiteKey());
+       appVO.setActiveMessage(appDO.getActiveMessage());
        return appVO;
    }
 
@@ -32,6 +33,7 @@ public class AppConverter {
         appDO.setGmtModified(appVO.getGmtModified());
         appDO.setAppId(appVO.getAppId());
         appDO.setSuiteKey(appVO.getSuiteKey());
+        appDO.setActiveMessage(appVO.getActiveMessage());
         return appDO;
     }
 }

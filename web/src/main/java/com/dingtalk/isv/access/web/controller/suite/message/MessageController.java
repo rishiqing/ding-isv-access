@@ -40,8 +40,13 @@ public class MessageController {
     private static final Logger mainLogger = LoggerFactory.getLogger(MessageController.class);
     private static final Logger bizLogger = LoggerFactory.getLogger("CONTROLLER_ISV_MESSAGE_LOGGER");
 
+    private static final String RSQ_DEFAULT_MESSAGE_TYPE = "oa";
+
+
     @Resource
     private HttpResult httpResult;
+    @Resource(name="isvGlobal")
+    private Map<String, String> isvGlobal;
 
     @Resource
     private AppManageService appManageService;
@@ -90,6 +95,15 @@ public class MessageController {
             return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
         }
     }
+
+    /**
+     * 该接口供前端直接调用。日事清后台调用的接口是sendNotification
+     * @param request
+     * @param corpId
+     * @param appId
+     * @param json
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/msg/sendasynccorpmessage", method = {RequestMethod.POST})
     public Map<String, Object> sendAsyncCorpMessage(HttpServletRequest request,
@@ -145,6 +159,70 @@ public class MessageController {
             return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
         }
     }
+
+    /**
+     * 该接口供日事清后台调用。前端调用的接口是sendAsyncCorpMessage。日事清后台发送的格式如下：
+     {
+       "touser" : "UserID1|UserID2|UserID3",
+       "textcard" : {
+         "title" : "领奖通知",
+         "description" : "<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+         "url" : "URL",
+         "btntxt":"更多"
+       }
+     }
+     * @param request
+     * @param corpId
+     * @param json
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/msg/sendNotification", method = {RequestMethod.POST})
+    public Map<String, Object> sendNotification(HttpServletRequest request,
+                                                    @RequestParam("corpid") String corpId,
+                                                    @RequestBody JSONObject json
+    ) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpid", corpId),
+                LogFormatter.KeyValue.getNew("json", json)
+        ));
+        try{
+            String msgType = RSQ_DEFAULT_MESSAGE_TYPE;
+            //Long appId = json.getLong("agent_id");
+
+            List<String> userIdList = null;
+            if(json.containsKey("touser")){
+                String[] userArray  = json.getString("touser").split("\\|");
+                userIdList = Arrays.asList(userArray);
+            }
+            //  安全起见，toAllUser接口不开放
+            Boolean toAllUser = false;
+            JSONObject msgcontent = json.getJSONObject("textcard");
+
+            //  根据appId查询到suiteKey
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(appId);
+            String suiteKey = appVOSr.getResult().getSuiteKey();
+
+            MessageBody message = MessageUtil.parseRsqOAMessage(msgcontent);
+            ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
+            if(!sr.isSuccess()){
+                return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("errcode", 0);
+
+            return httpResult.getSuccess(map);
+        }catch(Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统错误",
+                    LogFormatter.KeyValue.getNew("json", json),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ),e);
+            return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
     @ResponseBody
     @RequestMapping(value = "/msg/remind", method = {RequestMethod.POST})
     public Map<String, Object> setRemind(HttpServletRequest request,

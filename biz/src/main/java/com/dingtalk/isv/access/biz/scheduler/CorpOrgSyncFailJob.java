@@ -54,10 +54,10 @@ public class CorpOrgSyncFailJob extends QuartzJobBean {
                     }
                 }
             }catch (Exception e){
-                bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         LogFormatter.KeyValue.getNew("nextFireTime", jobExecutionContext.getNextFireTime())
                 ),e);
-                mainLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                         LogFormatter.KeyValue.getNew("nextFireTime", jobExecutionContext.getNextFireTime())
                 ),e);
             }

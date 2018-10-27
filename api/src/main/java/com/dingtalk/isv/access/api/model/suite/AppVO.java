@@ -30,6 +30,10 @@ public class AppVO implements Serializable {
      * 为应用id.和钉钉保持一致
      */
     private Long appId;
+    /**
+     * 开通应用时推送的消息
+     */
+    private String activeMessage;
 
     public Long getId() {
         return id;
@@ -71,6 +75,14 @@ public class AppVO implements Serializable {
         this.appId = appId;
     }
 
+    public String getActiveMessage() {
+        return activeMessage;
+    }
+
+    public void setActiveMessage(String activeMessage) {
+        this.activeMessage = activeMessage;
+    }
+
     @Override
     public String toString() {
         return "AppVO{" +
@@ -79,6 +91,7 @@ public class AppVO implements Serializable {
                 ", gmtModified=" + gmtModified +
                 ", suiteKey='" + suiteKey + '\'' +
                 ", appId=" + appId +
+                ", activeMessage='" + activeMessage + '\'' +
                 '}';
     }
 }

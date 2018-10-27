@@ -8,6 +8,7 @@
         <result property="gmtModified" column="gmt_modified" />
         <result property="suiteKey" column="suite_key" />
         <result property="appId" column="app_id" />
+        <result property="activeMessage" column="active_message" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -15,7 +16,8 @@
         gmt_create,
         gmt_modified,
         suite_key,
-        app_id
+        app_id,
+        active_message
     </sql>
 
     <insert id="addApp" useGeneratedKeys="true" keyProperty="id">
@@ -23,12 +25,14 @@
                 gmt_create,
                 gmt_modified,
                 suite_key,
-                app_id
+                app_id,
+                active_message
         )values(
                 now(),
                 now(),
                 #{suiteKey},
-                #{appId}
+                #{appId},
+                #{activeMessage}
         )
     </insert>
 

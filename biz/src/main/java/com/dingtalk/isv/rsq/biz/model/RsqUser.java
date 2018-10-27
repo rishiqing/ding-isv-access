@@ -22,6 +22,7 @@ public class RsqUser {
     private String outerId;
     private String fromClient;
     private String unionId;
+    private String loginToken;
 
     public Long getId() {
         return id;
@@ -77,5 +78,27 @@ public class RsqUser {
 
     public void setUnionId(String unionId) {
         this.unionId = unionId;
+    }
+
+    public String getLoginToken() {
+        return loginToken;
+    }
+
+    public void setLoginToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
+
+    @Override
+    public String toString() {
+        return "RsqUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", realName='" + realName + '\'' +
+                ", outerId='" + outerId + '\'' +
+                ", fromClient='" + fromClient + '\'' +
+                ", unionId='" + unionId + '\'' +
+                ", loginToken='" + loginToken + '\'' +
+                '}';
     }
 }

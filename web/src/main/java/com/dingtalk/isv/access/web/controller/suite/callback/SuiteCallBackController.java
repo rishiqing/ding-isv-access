@@ -2,13 +2,12 @@ package com.dingtalk.isv.access.web.controller.suite.callback;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dingtalk.isv.access.api.constant.AccessSystemConfig;
 import com.dingtalk.isv.access.api.enums.suite.SuitePushType;
 import com.dingtalk.isv.access.api.model.event.mq.SuiteCallBackMessage;
 import com.dingtalk.isv.access.api.model.suite.CorpSuiteAuthVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteTicketVO;
 import com.dingtalk.isv.access.api.model.suite.SuiteVO;
-import com.dingtalk.isv.access.api.service.corp.CorpManageService;
+import com.dingtalk.isv.access.api.service.order.ChargeService;
 import com.dingtalk.isv.access.api.service.suite.CorpSuiteAuthService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
 import com.dingtalk.isv.access.biz.corp.service.CorpCallbackQueueService;
@@ -42,11 +41,9 @@ public class SuiteCallBackController{
     @Autowired
     private CorpSuiteAuthService corpSuiteAuthService;
     @Autowired
+    private ChargeService chargeService;
+    @Autowired
     private CorpCallbackQueueService corpCallbackQueueService;
-    @Autowired
-    private CorpManageService corpManageService;
-    @Autowired
-    private AccessSystemConfig accessSystemConfig;
     @Autowired
     private JmsTemplate jmsTemplate;
     @Autowired
@@ -259,6 +256,11 @@ public class SuiteCallBackController{
         }else if(SuitePushType.CHECK_SUITE_LICENSE_CODE.getKey().equals(eventType)){
              //TODO
              //留给业务自行判断
+        }else if(SuitePushType.MARKET_BUY.getKey().equals(eventType)){
+            ServiceResult<Void>  sr = chargeService.handleChargeEvent(suiteKey,callbackMsgJson);
+            if(!sr.isSuccess()){
+                responseEncryMsg = "faile";
+            }
         }else{
             //当开放平台更新了新的推送类型,为了避免不认识,需要报警出来
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,

@@ -104,7 +104,7 @@
 /* 104 */       this.text = text;
 /*     */     }
 /*     */   }
-/*     */   
+/*     */
 /*     */   @ParamAttr(location=ParamAttr.Location.JSON_CONTENT, paramKey="oa")
 /*     */   public static class OABody extends MessageBody
 /*     */   {
@@ -272,6 +272,87 @@
 /*     */       }
 /*     */     }
 /*     */   }
+    @ParamAttr(location=ParamAttr.Location.JSON_CONTENT, paramKey="action_card")
+    public static class ActionCardBody extends MessageBody
+    {
+        private String title;
+        private String markdown;
+
+        private String singleTitle;
+        private String singleUrl;
+
+        private String btnOrientation;
+        private List<Button> btnJsonList;
+
+        public static class Button implements Serializable {
+            private String title;
+            private String actionUrl;
+
+            public String getTitle() {
+                return title;
+            }
+
+            public void setTitle(String title) {
+                this.title = title;
+            }
+
+            public String getActionUrl() {
+                return actionUrl;
+            }
+
+            public void setActionUrl(String actionUrl) {
+                this.actionUrl = actionUrl;
+            }
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getMarkdown() {
+            return markdown;
+        }
+
+        public void setMarkdown(String markdown) {
+            this.markdown = markdown;
+        }
+
+        public String getSingleTitle() {
+            return singleTitle;
+        }
+
+        public void setSingleTitle(String singleTitle) {
+            this.singleTitle = singleTitle;
+        }
+
+        public String getSingleUrl() {
+            return singleUrl;
+        }
+
+        public void setSingleUrl(String singleUrl) {
+            this.singleUrl = singleUrl;
+        }
+
+        public String getBtnOrientation() {
+            return btnOrientation;
+        }
+
+        public void setBtnOrientation(String btnOrientation) {
+            this.btnOrientation = btnOrientation;
+        }
+
+        public List<Button> getBtnJsonList() {
+            return btnJsonList;
+        }
+
+        public void setBtnJsonList(List<Button> btnJsonList) {
+            this.btnJsonList = btnJsonList;
+        }
+    }
 /*     */ }
 
 

@@ -7,6 +7,8 @@ import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
+import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
@@ -21,10 +23,9 @@ import com.dingtalk.isv.rsq.biz.model.helper.RsqUserConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 与日事清服务器发送公司和账号创建请求的helper
@@ -343,5 +344,45 @@ public class RsqAccountRequestHelper {
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
+    }
+
+    /**
+     * 充值
+     * @param suiteDO
+     * @param pushEventDO
+     * @return
+     */
+    public ServiceResult<Void> doCharge(SuiteDO suiteDO, OrderSpecItemDO specItem, OrderRsqPushEventDO pushEventDO){
+        try {
+            StringBuilder sb = new StringBuilder(getRsqDomain());
+            sb.append("/task/v2/tokenAuth/pay/recharge?token=");
+            sb.append(suiteDO.getRsqAppToken());
+            sb.append("&productName=");
+            sb.append(specItem.getRsqProductName());
+            sb.append("&userLimit=");
+            sb.append(pushEventDO.getQuantity());
+            sb.append("&deadLine=");
+            // 转成yyyy-MM-dd HH:mm:ss的格式
+            sb.append(URLEncoder.encode(parseFormat(pushEventDO.getServiceStopTime()), "UTF-8"));
+            sb.append("&teamId=");
+            sb.append(pushEventDO.getRsqTeamId());
+
+            String url = sb.toString();
+            httpRequestHelper.doHttpPost(url, "");
+
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("pushEventDO", pushEventDO.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    private String parseFormat(Long mills){
+        Date date = new Date(mills);
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        return dt.format(date);
     }
 }

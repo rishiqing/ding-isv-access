@@ -28,6 +28,7 @@ public class StaffResult {
     private String rsqUserId;
     private String rsqUsername;
     private String rsqPassword;
+    private String rsqLoginToken;
 
     public String getCorpId() {
         return corpId;
@@ -173,6 +174,14 @@ public class StaffResult {
         this.unionId = unionId;
     }
 
+    public String getRsqLoginToken() {
+        return rsqLoginToken;
+    }
+
+    public void setRsqLoginToken(String rsqLoginToken) {
+        this.rsqLoginToken = rsqLoginToken;
+    }
+
     @Override
     public String toString() {
         return "StaffDO{" +
@@ -191,6 +200,7 @@ public class StaffResult {
                 ", jobnumber='" + jobnumber + '\'' +
                 ", extattr=" + extattr +
                 ", rsqUserId=" + rsqUserId +
+                ", rsqLoginToken=" + rsqLoginToken +
                 '}';
     }
 }

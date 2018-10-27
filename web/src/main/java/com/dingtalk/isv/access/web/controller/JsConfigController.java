@@ -84,7 +84,7 @@ public class JsConfigController {
             jsapiConfig.put("appId", appId);
             return httpResult.getSuccess(jsapiConfig);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统错误",
                     LogFormatter.KeyValue.getNew("url", url),
                     LogFormatter.KeyValue.getNew("corpId", corpId),

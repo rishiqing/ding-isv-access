@@ -354,7 +354,7 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
 //            jmsTemplate.send(corpAuthSuiteQueue,new CorpAuthSuiteMessage(corpId,suiteKey, CorpAuthSuiteMessage.Tag.Auth));
             return ServiceResult.success(null);
         }catch (Exception e){
-            bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId),
                     LogFormatter.KeyValue.getNew("permanentCode", permanentCode)

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
+import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +18,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class MessageUtil {
+    private static final String RISHIQING = "日事清";
+    private static final String DEFAULT_HEAD_BG = "FF458CDA";
     public static MessageBody parseOAMessage(JSONObject json){
         MessageBody.OABody oaBody = new MessageBody.OABody();
 
@@ -87,6 +90,42 @@ public class MessageUtil {
     }
 
     /**
+     * 解析日事清后台直接发送OA的消息
+     * 格式如下：
+     {
+       "title" : "领奖通知",
+       "description" : "<div class=\"gray\">2016年9月26日</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\"highlight\">请于2016年10月10日前联系行政同事领取</div>",
+       "url" : "URL",
+       "btntxt":"更多"
+     }
+     * @param json
+     * @return
+     */
+    public static MessageBody parseRsqOAMessage(JSONObject json){
+        MessageBody.OABody oaBody = new MessageBody.OABody();
+        String url = json.getString("url");
+        String title = json.getString("title");
+        String desc = json.getString("description");
+        String btntxt = json.getString("btntxt");
+
+        oaBody.setMessage_url(url);
+
+        MessageBody.OABody.Head head = new MessageBody.OABody.Head();
+        head.setText(RISHIQING);
+        head.setBgcolor(DEFAULT_HEAD_BG);
+        oaBody.setHead(head);
+
+        MessageBody.OABody.Body body = new MessageBody.OABody.Body();
+        body.setTitle(title);
+
+        //  desc可能为富文本，从中提取出文字
+        body.setContent(Jsoup.parse(desc).body().text());
+
+        oaBody.setBody(body);
+        return oaBody;
+    }
+
+    /**
      * 将orgContent加上时间提醒的参数，并转换成String返回
      * @param orgContent
      * @return
@@ -98,6 +137,69 @@ public class MessageUtil {
         }
         body.put("content", remind);
         return JSON.toJSONString(orgContent);
+    }
+
+    private static MessageBody parseActionCardMessage(JSONObject json){
+        MessageBody.ActionCardBody body = new MessageBody.ActionCardBody();
+        body.setTitle(json.getString("title"));
+        body.setMarkdown(json.getString("markdown"));
+        if(json.containsKey("single_title")){
+            body.setSingleTitle(json.getString("single_title"));
+        }
+        if(json.containsKey("single_url")){
+            body.setSingleUrl(json.getString("single_url"));
+        }
+        if(json.containsKey("btn_orientation")){
+            body.setBtnOrientation(json.getString("btn_orientation"));
+        }
+        if(json.containsKey("btn_json_list")){
+            List<MessageBody.ActionCardBody.Button> btnList = new ArrayList<MessageBody.ActionCardBody.Button>();
+            JSONArray btnArray = json.getJSONArray("btn_json_list");
+            Iterator it = btnArray.iterator();
+            while(it.hasNext()){
+                MessageBody.ActionCardBody.Button btn = new MessageBody.ActionCardBody.Button();
+                JSONObject object = (JSONObject) it.next();
+                btn.setTitle(object.getString("title"));
+                btn.setActionUrl(object.getString("action_url"));
+                btnList.add(btn);
+            }
+            body.setBtnJsonList(btnList);
+        }
+        return body;
+    }
+
+    private static MessageBody parseTextMessage(JSONObject orgContent){
+        MessageBody.TextBody body = new MessageBody.TextBody();
+        body.setContent(orgContent.getString("content"));
+        return body;
+    }
+
+    private static MessageBody parseLinkMessage(JSONObject json){
+        MessageBody.LinkBody body = new MessageBody.LinkBody();
+        body.setMessageUrl(json.getString("messageUrl"));
+        body.setPicUrl(json.getString("picUrl"));
+        body.setTitle(json.getString("title"));
+        body.setText(json.getString("title"));
+        return body;
+    }
+
+    /**
+     * 通用方法，根据orgContent做转换
+     * @param orgContent
+     * @return
+     */
+    public static MessageBody parseMessage(JSONObject orgContent){
+        String msgType = orgContent.getString("msgtype");
+        JSONObject msgJson = orgContent.getJSONObject(msgType);
+        if("action_card".equals(msgType)){
+            return parseActionCardMessage(msgJson);
+        }else if("oa".equals(msgType)){
+            return parseOAMessage(msgJson);
+        }else if("link".equals(msgType)){
+            return parseLinkMessage(msgJson);
+        }else{
+            return parseTextMessage(msgJson);
+        }
     }
 
     public static void main(String[] args) {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dingtalk.isv.access.biz.order.dao.OrderRsqPushEventDao">
+
+    <resultMap type="com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO" id="orderRsqPushEventMap">
+        <id property="id" column="id" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="suiteKey" column="suite_key" />
+        <result property="orderId" column="order_id" />
+        <result property="corpId" column="corp_id" />
+        <result property="quantity" column="quantity" />
+        <result property="serviceStopTime" column="service_stop_time" />
+        <result property="rsqTeamId" column="rsq_team_id" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <insert id="saveOrUpdateOrderRsqPushEvent" useGeneratedKeys="true" keyProperty="id">
+        insert into isv_order_rsq_push_event (
+                gmt_create,
+                gmt_modified,
+                suite_key,
+                order_id,
+                corp_id,
+                quantity,
+                service_stop_time,
+                rsq_team_id,
+                `status`
+        )values(
+                now(),
+                now(),
+                #{suiteKey},
+                #{orderId},
+                #{corpId},
+                #{quantity},
+                #{serviceStopTime},
+                #{rsqTeamId},
+                #{status}
+        )ON DUPLICATE KEY UPDATE gmt_modified=now(), `status`=#{status}
+    </insert>
+</mapper>
