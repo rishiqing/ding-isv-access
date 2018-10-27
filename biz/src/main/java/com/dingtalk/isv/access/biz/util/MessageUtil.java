@@ -144,13 +144,13 @@ public class MessageUtil {
         body.setTitle(json.getString("title"));
         body.setMarkdown(json.getString("markdown"));
         if(json.containsKey("single_title")){
-            body.setSingleTitle(json.getString("single_title"));
+            body.setSingle_title(json.getString("single_title"));
         }
         if(json.containsKey("single_url")){
-            body.setSingleUrl(json.getString("single_url"));
+            body.setSingle_url(json.getString("single_url"));
         }
         if(json.containsKey("btn_orientation")){
-            body.setBtnOrientation(json.getString("btn_orientation"));
+            body.setBtn_orientation(json.getString("btn_orientation"));
         }
         if(json.containsKey("btn_json_list")){
             List<MessageBody.ActionCardBody.Button> btnList = new ArrayList<MessageBody.ActionCardBody.Button>();
@@ -160,10 +160,10 @@ public class MessageUtil {
                 MessageBody.ActionCardBody.Button btn = new MessageBody.ActionCardBody.Button();
                 JSONObject object = (JSONObject) it.next();
                 btn.setTitle(object.getString("title"));
-                btn.setActionUrl(object.getString("action_url"));
+                btn.setAction_url(object.getString("action_url"));
                 btnList.add(btn);
             }
-            body.setBtnJsonList(btnList);
+            body.setBtn_json_list(btnList);
         }
         return body;
     }

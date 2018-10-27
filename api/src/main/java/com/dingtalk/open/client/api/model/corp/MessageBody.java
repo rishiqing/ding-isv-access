@@ -278,15 +278,15 @@
         private String title;
         private String markdown;
 
-        private String singleTitle;
-        private String singleUrl;
+        private String single_title;
+        private String single_url;
 
-        private String btnOrientation;
-        private List<Button> btnJsonList;
+        private String btn_orientation;
+        private List<Button> btn_json_list;
 
         public static class Button implements Serializable {
             private String title;
-            private String actionUrl;
+            private String action_url;
 
             public String getTitle() {
                 return title;
@@ -296,12 +296,12 @@
                 this.title = title;
             }
 
-            public String getActionUrl() {
-                return actionUrl;
+            public String getAction_url() {
+                return action_url;
             }
 
-            public void setActionUrl(String actionUrl) {
-                this.actionUrl = actionUrl;
+            public void setAction_url(String action_url) {
+                this.action_url = action_url;
             }
         }
 
@@ -321,36 +321,36 @@
             this.markdown = markdown;
         }
 
-        public String getSingleTitle() {
-            return singleTitle;
+        public String getSingle_title() {
+            return single_title;
         }
 
-        public void setSingleTitle(String singleTitle) {
-            this.singleTitle = singleTitle;
+        public void setSingle_title(String single_title) {
+            this.single_title = single_title;
         }
 
-        public String getSingleUrl() {
-            return singleUrl;
+        public String getSingle_url() {
+            return single_url;
         }
 
-        public void setSingleUrl(String singleUrl) {
-            this.singleUrl = singleUrl;
+        public void setSingle_url(String single_url) {
+            this.single_url = single_url;
         }
 
-        public String getBtnOrientation() {
-            return btnOrientation;
+        public String getBtn_orientation() {
+            return btn_orientation;
         }
 
-        public void setBtnOrientation(String btnOrientation) {
-            this.btnOrientation = btnOrientation;
+        public void setBtn_orientation(String btn_orientation) {
+            this.btn_orientation = btn_orientation;
         }
 
-        public List<Button> getBtnJsonList() {
-            return btnJsonList;
+        public List<Button> getBtn_json_list() {
+            return btn_json_list;
         }
 
-        public void setBtnJsonList(List<Button> btnJsonList) {
-            this.btnJsonList = btnJsonList;
+        public void setBtn_json_list(List<Button> btn_json_list) {
+            this.btn_json_list = btn_json_list;
         }
     }
 /*     */ }
