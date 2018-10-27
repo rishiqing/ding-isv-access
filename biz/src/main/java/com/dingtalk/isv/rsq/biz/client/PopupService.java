@@ -72,7 +72,8 @@ public class PopupService {
         CorpChargeStatusDO corpStatus = corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corpId);
         if(corpStatus != null){
             popupInfo.setServiceExpire(corpStatus.getCurrentServiceStopTime());
-            popupInfo.setBuyNumber(corpStatus.getCurrentSubQuantity());
+            Long buyNumber = corpStatus.getCurrentSubQuantity() != null ? corpStatus.getCurrentSubQuantity() : corpStatus.getCurrentMaxOfPeople();
+            popupInfo.setBuyNumber(buyNumber);
             popupInfo.setTotalNumber(corpStatus.getTotalQuantity());
 
             //  读取规格信息
