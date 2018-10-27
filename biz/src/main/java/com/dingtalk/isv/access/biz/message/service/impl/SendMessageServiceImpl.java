@@ -210,6 +210,7 @@ public class SendMessageServiceImpl implements SendMessageService {
             req.setToAllUser(isToAll);
 
             req.setMsgcontentString(JSON.toJSONString(message));
+            bizLogger.warn("=========message: " + JSON.toJSONString(message));
             CorpMessageCorpconversationAsyncsendResponse rsp = client.execute(req, corpToken);
             JSONObject resultJOSN = JSON.parseObject(rsp.getBody());
             if(resultJOSN.containsKey("error_response")){
