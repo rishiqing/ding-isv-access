@@ -6,11 +6,13 @@ import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.api.model.corp.DepartmentVO;
 import com.dingtalk.isv.access.api.model.corp.LoginUserVO;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
+import com.dingtalk.isv.access.api.model.event.OrderChargeEvent;
 import com.dingtalk.isv.access.api.model.suite.SuiteVO;
 import com.dingtalk.isv.access.api.service.corp.CorpManageService;
 import com.dingtalk.isv.access.api.service.corp.DeptManageService;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
 import com.dingtalk.isv.access.api.service.suite.SuiteManageService;
+import com.dingtalk.isv.access.biz.constant.SystemConstant;
 import com.dingtalk.isv.access.biz.corp.dao.CorpDao;
 import com.dingtalk.isv.access.biz.corp.dao.CorpDepartmentDao;
 import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
@@ -20,6 +22,10 @@ import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.helper.CorpConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.DepartmentConverter;
 import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
+import com.dingtalk.isv.access.biz.order.dao.OrderEventDao;
+import com.dingtalk.isv.access.biz.order.dao.OrderStatusDao;
+import com.dingtalk.isv.access.biz.order.model.OrderEventDO;
+import com.dingtalk.isv.access.biz.order.model.OrderStatusDO;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.common.code.ServiceResultCode;
@@ -31,6 +37,8 @@ import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.model.RsqCorp;
 import com.dingtalk.isv.rsq.biz.model.RsqDepartment;
 import com.dingtalk.isv.rsq.biz.model.RsqUser;
+import com.google.common.eventbus.AsyncEventBus;
+import com.sun.xml.internal.bind.annotation.OverrideAnnotationOf;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -69,12 +77,18 @@ public class RsqAccountService {
     private StaffManageService staffManageService;
     @Autowired
     private DeptManageService deptManageService;
+    @Autowired
+    private OrderEventDao orderEventDao;
+    @Autowired
+    private OrderStatusDao orderStatusDao;
 
     @Autowired
     private JmsTemplate jmsTemplate;
     @Autowired
     @Qualifier("rsqSyncCallBackQueue")
     private javax.jms.Queue rsqSyncCallBackQueue;
+    @Autowired
+    private AsyncEventBus asyncOrderChargeEventBus;
 
     /**
      * 创建公司，分为以下几步：
@@ -557,6 +571,27 @@ public class RsqAccountService {
     }
 
     /**
+     * 查看是否有需要充值的订单，如果有那么调用接口进行充值
+     * @param suiteKey
+     * @param corpId
+     */
+    private void checkOrderCharge(String suiteKey, String corpId){
+        OrderEventDO dbEvent = orderEventDao.getOrderEventBySuiteKeyAndCorpIdAndLatest(suiteKey, corpId);
+        if(dbEvent == null){
+            return;
+        }
+        OrderStatusDO dbOrderStatus = orderStatusDao.getOrderStatusByOrderId(dbEvent.getOrderId());
+        //  要么orderStatus不存在，要么orderStatus的状态为初始的状态，这两种情况都进行充值
+        if(dbOrderStatus == null || SystemConstant.ORDER_STATUS_PAID.equals(dbOrderStatus.getStatus())){
+            //  使用eventBus异步调用
+            OrderChargeEvent event = new OrderChargeEvent();
+            event.setSuiteKey(dbEvent.getSuiteKey());
+            event.setOrderEventId(dbEvent.getId());
+            asyncOrderChargeEventBus.post(event);
+        }
+    }
+
+    /**
      * 同步所有的企业信息到日事清，包括：
      * 1  公司信息
      * 2  部门信息
@@ -574,6 +609,7 @@ public class RsqAccountService {
             if(!corpSr.isSuccess()){
                 return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
             }
+            checkOrderCharge(suiteKey, corpId);
             //2  创建企业部门
             ServiceResult<DepartmentVO> rootSr = deptManageService.getDepartmentByCorpIdAndDeptId(corpId, 1L);
             if(!rootSr.isSuccess()){

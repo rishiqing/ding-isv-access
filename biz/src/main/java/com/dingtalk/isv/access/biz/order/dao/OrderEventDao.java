@@ -20,5 +20,15 @@ public interface OrderEventDao {
 	 * @return
 	 */
 	public OrderEventDO getOrderEventById(@Param("id") Long id);
+
+	/**
+	 * 获取一个公司最近一条orderEvent记录
+	 * @param corpId
+	 * @return
+	 */
+	public OrderEventDO getOrderEventBySuiteKeyAndCorpIdAndLatest(
+			@Param("suiteKey") String suiteKey,
+			@Param("corpId") String corpId
+	);
 }
 

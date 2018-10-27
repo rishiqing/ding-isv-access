@@ -92,9 +92,12 @@ public class OrderModelConverter {
         event.setSuiteKey(orderStatusDO.getSuiteKey());
         event.setOrderId(orderStatusDO.getOrderId());
         event.setCorpId(orderStatusDO.getBuyCorpId());
-        event.setQuantity(orderStatusDO.getSubQuantity());
         event.setServiceStopTime(orderStatusDO.getServiceStopTime());
-
+        if(orderStatusDO.getSubQuantity() != null){
+            event.setQuantity(orderStatusDO.getSubQuantity());
+        }else{
+            event.setQuantity(orderStatusDO.getMaxOfPeople());
+        }
         return event;
     }
 

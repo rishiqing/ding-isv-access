@@ -74,4 +74,11 @@
                 #{status}
         )ON DUPLICATE KEY UPDATE gmt_modified=now(), `status`=#{status}
     </insert>
+
+    <select id="getOrderStatusByOrderId" resultMap="orderStatusMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_order_status
+        <![CDATA[
+			WHERE order_id=#{orderId}
+		 ]]>
+    </select>
 </mapper>

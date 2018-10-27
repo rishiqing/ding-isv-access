@@ -663,3 +663,7 @@ CREATE TABLE `isv_staff_popup_log` (
 # add 2018-10-25
 ALTER TABLE `isv_app`
   ADD COLUMN `active_message`  varchar(1024) NULL COMMENT '开通应用推送的消息';
+
+# add 2018-10-27
+ALTER TABLE `isv_order_event`
+  ADD KEY `isv_order_event_corp_id`(`buy_corp_id`) USING BTREE;
