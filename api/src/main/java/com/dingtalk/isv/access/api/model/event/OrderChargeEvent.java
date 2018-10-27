@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class OrderChargeEvent implements Serializable {
     private String suiteKey;
     private Long OrderEventId;
+    private String corpId;
 
     public String getSuiteKey() {
         return suiteKey;
@@ -26,11 +27,20 @@ public class OrderChargeEvent implements Serializable {
         OrderEventId = orderEventId;
     }
 
+    public String getCorpId() {
+        return corpId;
+    }
+
+    public void setCorpId(String corpId) {
+        this.corpId = corpId;
+    }
+
     @Override
     public String toString() {
         return "OrderChargeEvent{" +
                 "suiteKey='" + suiteKey + '\'' +
                 ", OrderEventId=" + OrderEventId +
+                ", corpId='" + corpId + '\'' +
                 '}';
     }
 }

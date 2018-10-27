@@ -58,6 +58,12 @@
 			WHERE id=#{id}
 		 ]]>
     </select>
+    <select id="getOrderEventBySuiteKeyAndCorpIdAndLatest" resultMap="orderEventMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_order_event
+        <![CDATA[
+			WHERE suite_key=#{suiteKey} and buy_corp_id=#{corpId} ORDER BY id DESC limit 1
+		 ]]>
+    </select>
 
     <insert id="saveOrUpdateOrderEvent" useGeneratedKeys="true" keyProperty="id">
         insert into isv_order_event (
