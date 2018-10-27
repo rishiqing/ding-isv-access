@@ -27,6 +27,31 @@
         <result property="status" column="status" />
     </resultMap>
 
+    <sql id="select-all-fields">
+        id,
+        gmt_create,
+        gmt_modified,
+        order_id,
+        suite_key,
+        buy_corp_id,
+        goods_code,
+        item_code,
+        item_name,
+        sub_quantity,
+        max_of_people,
+        min_of_people,
+        paidtime,
+        service_stop_time,
+        pay_fee,
+        order_create_source,
+        nominal_pay_fee,
+        discount_fee,
+        discount,
+        distributor_corp_id,
+        distributor_corp_name,
+        `status`
+    </sql>
+
     <insert id="saveOrUpdateOrderStatus" useGeneratedKeys="true" keyProperty="id">
         insert into isv_order_status (
                 gmt_create,
