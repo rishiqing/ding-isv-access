@@ -24,6 +24,7 @@ public class SuiteConverter {
        suiteVO.setGmtModified(suiteDO.getGmtModified());
        suiteVO.setRsqAppName(suiteDO.getRsqAppName());
        suiteVO.setRsqAppToken(suiteDO.getRsqAppToken());
+       suiteVO.setSuiteId(suiteDO.getSuiteId());
        return suiteVO;
    }
 
@@ -43,6 +44,7 @@ public class SuiteConverter {
         suiteDO.setGmtModified(suiteVO.getGmtModified());
         suiteDO.setRsqAppName(suiteVO.getRsqAppName());
         suiteDO.setRsqAppToken(suiteVO.getRsqAppToken());
+        suiteDO.setSuiteId(suiteVO.getSuiteId());
         return suiteDO;
     }
 }

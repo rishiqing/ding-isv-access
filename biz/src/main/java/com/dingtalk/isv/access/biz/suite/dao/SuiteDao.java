@@ -29,6 +29,8 @@ public interface SuiteDao{
 	 */
 	public SuiteDO getSuiteByKey(@Param("suiteKey") String suiteKey);
 
+	public SuiteDO getSuiteBySuiteId(@Param("suiteId") String suiteId);
+
 
 }
 

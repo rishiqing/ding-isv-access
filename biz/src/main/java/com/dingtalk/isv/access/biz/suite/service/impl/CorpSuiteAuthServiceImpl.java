@@ -317,10 +317,10 @@ public class CorpSuiteAuthServiceImpl implements CorpSuiteAuthService {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
             }
             //4.注册或者更新回调，在通讯录或者群会话发生变更时会调用此接口
-            ServiceResult<Void> saveCallBackSr = this.saveCorpCallback(suiteKey, corpId, (accessSystemConfig.getCorpSuiteCallBackUrl() + suiteKey), SuiteCallBackMessage.Tag.getAllTag());
-            if(!saveCallBackSr.isSuccess()){
-                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
-            }
+//            ServiceResult<Void> saveCallBackSr = this.saveCorpCallback(suiteKey, corpId, (accessSystemConfig.getCorpSuiteCallBackUrl() + suiteKey), SuiteCallBackMessage.Tag.getAllTag());
+//            if(!saveCallBackSr.isSuccess()){
+//                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+//            }
 
             //5.  更新部门及人员信息
             //5.1 同步部门

@@ -71,4 +71,6 @@ public interface SuiteManageService{
      * @return
      */
     public ServiceResult<SuiteTicketVO> getSuiteTicket(String suiteKey);
+
+    ServiceResult<SuiteVO> getSuiteBySuiteId(String suiteId);
 }

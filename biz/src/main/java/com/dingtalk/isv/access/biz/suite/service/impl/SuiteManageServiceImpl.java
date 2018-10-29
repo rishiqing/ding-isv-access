@@ -241,4 +241,27 @@ public class SuiteManageServiceImpl implements SuiteManageService {
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
         }
     }
+
+    @Override
+    public ServiceResult<SuiteVO> getSuiteBySuiteId(String suiteId) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteId", suiteId)
+        ));
+        try{
+            SuiteDO suiteDO =  suiteDao.getSuiteBySuiteId(suiteId);
+            if(null==suiteDO){
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+            }
+            SuiteVO suiteVO = SuiteConverter.SuiteDO2SuiteVO(suiteDO);
+            return  ServiceResult.success(suiteVO);
+        }catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteId", suiteId)
+            ),e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteId", suiteId)
+            ),e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
 }

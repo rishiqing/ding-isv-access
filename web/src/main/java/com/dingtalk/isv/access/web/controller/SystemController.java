@@ -24,13 +24,16 @@ import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.dingutil.ConfOapiRequestHelper;
 import com.dingtalk.isv.access.biz.dingutil.ISVRequestHelper;
 import com.dingtalk.isv.access.biz.order.dao.OrderEventDao;
-import com.dingtalk.isv.access.biz.order.model.OrderEventDO;
 import com.dingtalk.isv.access.biz.scheduler.SendCorpMessageJob;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
+import com.dingtalk.isv.access.bizex.dingpush.dao.OpenSyncBizDataDao;
+import com.dingtalk.isv.access.bizex.dingpush.model.OpenGlobalLock;
+import com.dingtalk.isv.access.bizex.dingpush.model.OpenSyncBizData;
+import com.dingtalk.isv.access.bizex.dingpush.service.DbAuthCheckService;
+import com.dingtalk.isv.access.bizex.dingpush.service.OpenGlobalLockService;
 import com.dingtalk.isv.common.model.ServiceResult;
-import com.dingtalk.isv.common.util.HttpRequestHelper;
 import com.dingtalk.isv.common.util.HttpUtils;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
@@ -40,10 +43,11 @@ import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.api.service.corp.MessageService;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -55,8 +59,7 @@ import javax.annotation.Resource;
 import javax.jms.Queue;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.impl.matchers.GroupMatcher.*;
@@ -588,5 +591,65 @@ public class SystemController {
         Document doc = Jsoup.parse(html);
         String text = doc.body().text();
         return "success:--/test1: " + text;
+    }
+
+    @Autowired
+    private OpenSyncBizDataDao openSyncBizDataDao;
+    @RequestMapping("/test/open_sync_biz_data")
+    @ResponseBody
+    public String testOpenSyncBizData(){
+        OpenSyncBizData data = openSyncBizDataDao.getOpenSyncBizDataById(1L);
+        return "success:--/open_sync_biz_data: " + data;
+    }
+
+    private static final Logger bizLogger = LoggerFactory.getLogger("CORP_LOCK_LOGGER");
+
+    @Autowired
+    private DbAuthCheckService dbAuthCheckService;
+    @Autowired
+    private OpenGlobalLockService openGlobalLockService;
+    @RequestMapping("/test/lock")
+    @ResponseBody
+    public String testOpenGlobalLock(){
+        final String lockKey = "testaaa";
+//        OpenGlobalLock lock = openGlobalLockService.requireOpenGlobalLock(lockKey);
+        int threadCount = 10;
+
+
+        Callable<Void> task = new Callable<Void>() {
+            @Override
+            public Void call() {
+                bizLogger.info("Thread id: " + Thread.currentThread().getId() + " started");
+                OpenGlobalLock lock = openGlobalLockService.requireOpenGlobalLock(lockKey);
+                bizLogger.info("Thread id: " + Thread.currentThread().getId() + ", lock is " + lock);
+                if(lock != null){
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    openGlobalLockService.releaseOpenGlobalLock(lockKey);
+                    bizLogger.info("Thread id: " + Thread.currentThread().getId() + ", lock released ");
+                }
+                return null;
+            }
+        };
+        List<Callable<Void>> tasks = Collections.nCopies(threadCount, task);
+        bizLogger.info("========tasks: " + tasks.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        try {
+            List<Future<Void>> futures = executorService.invokeAll(tasks);
+//            List<Long> resultList = new ArrayList<Long>(futures.size());
+//            System.out.println("========tasks: " + resultList.size());
+//            for (Future<Long> future : futures) {
+//                // Throws an exception if an exception was thrown by the task.
+//                resultList.add(future.get());
+//            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return "success:--/open_sync_biz_data: ";
     }
 }

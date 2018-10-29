@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dingtalk.isv.access.bizex.dingpush.dao.OpenGlobalLockDao">
+
+    <resultMap type="com.dingtalk.isv.access.bizex.dingpush.model.OpenGlobalLock" id="openGlobalLockMap">
+        <id property="id" column="id" />
+        <result property="lockKey" column="lock_key" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <sql id="select-all-fields">
+            id,
+            lock_key,
+            `status`
+    </sql>
+
+    <insert id="saveOrUpdateOpenGlobalLock" useGeneratedKeys="true" keyProperty="id">
+        insert into open_global_lock (
+        lock_key,
+        `status`
+        )values(
+        #{lockKey},
+        #{status}
+        )ON DUPLICATE KEY UPDATE `status`=#{status}
+    </insert>
+
+    <update id="updateStatus">
+        update open_global_lock
+        set `status`=#{status}
+        where lock_key=#{lockKey}
+    </update>
+
+    <select id="getOpenGlobalLockByLockKey" resultMap="openGlobalLockMap">
+        SELECT <include refid="select-all-fields"/>  FROM open_global_lock
+        <![CDATA[
+			WHERE lock_key=#{lockKey}
+		 ]]>
+        FOR UPDATE
+    </select>
+</mapper>

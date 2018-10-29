@@ -119,6 +119,9 @@
 
     <bean id="chargeService" class="com.dingtalk.isv.access.biz.order.service.impl.ChargeServiceImpl" />
 
+    <bean id="dbAuthCheckService" class="com.dingtalk.isv.access.bizex.dingpush.service.impl.DbAuthCheckServiceImpl" />
+    <bean id="openGlobalLockService" class="com.dingtalk.isv.access.bizex.dingpush.service.impl.OpenGlobalLockServiceImpl" />
+
     <!-- LOG -->
     <bean id="serviceMethodInterceptor" class="com.dingtalk.isv.common.log.service.ServiceMethodInterceptor"></bean>
     <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">

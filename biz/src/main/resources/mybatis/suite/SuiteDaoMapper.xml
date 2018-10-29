@@ -69,6 +69,10 @@
 		 ]]>
     </select>
 
-
-
+    <select id="getSuiteBySuiteId" resultMap="suiteMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_suite
+        <![CDATA[
+			WHERE suite_id=#{suiteId}
+		 ]]>
+    </select>
 </mapper>

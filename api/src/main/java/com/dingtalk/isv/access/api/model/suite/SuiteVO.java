@@ -63,6 +63,8 @@ public class SuiteVO implements Serializable{
      */
     private String rsqAppToken;
 
+    private String suiteId;
+
     public Long getId() {
         return id;
     }
@@ -151,6 +153,14 @@ public class SuiteVO implements Serializable{
         this.rsqAppToken = rsqAppToken;
     }
 
+    public String getSuiteId() {
+        return suiteId;
+    }
+
+    public void setSuiteId(String suiteId) {
+        this.suiteId = suiteId;
+    }
+
     @Override
     public String toString() {
         return "SuiteVO{" +
@@ -163,6 +173,9 @@ public class SuiteVO implements Serializable{
                 ", encodingAesKey='" + encodingAesKey + '\'' +
                 ", token='" + token + '\'' +
                 ", eventReceiveUrl='" + eventReceiveUrl + '\'' +
+                ", rsqAppName='" + rsqAppName + '\'' +
+                ", rsqAppToken='" + rsqAppToken + '\'' +
+                ", suiteId='" + suiteId + '\'' +
                 '}';
     }
 }

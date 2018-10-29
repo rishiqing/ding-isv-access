@@ -667,3 +667,7 @@ ALTER TABLE `isv_app`
 # add 2018-10-27
 ALTER TABLE `isv_order_event`
   ADD KEY `isv_order_event_corp_id`(`buy_corp_id`) USING BTREE;
+
+# add 2018-10-30 兼容钉钉新版本，需要加suiteId
+ALTER TABLE `isv_suite`
+  ADD COLUMN `suite_id`  varchar(64) NULL COMMENT '钉钉中的suiteId'
