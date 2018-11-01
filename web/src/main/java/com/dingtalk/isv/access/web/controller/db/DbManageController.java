@@ -148,7 +148,11 @@ public class DbManageController {
             Long fromId = corpNumberMin == null ? 0 : corpNumberMin;
             Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             for(long i = fromId; i < toId + 1; i++){
-                manualPostMessage(suiteKey, i, json);
+                try{
+                    manualPostMessage(suiteKey, i, json);
+                }catch (Exception e){
+                    bizLogger.error("error in message push: " + i, e);
+                }
             }
             return "success";
         }catch (Exception e){
@@ -194,7 +198,11 @@ public class DbManageController {
             Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             expireDate = expireDate == null ? new Date().getTime() + 30L * 24L * 3600L * 1000L : expireDate;
             for(long i = fromId; i < toId + 1; i++){
-                manualCharge(suiteKey, i, expireDate);
+                try{
+                    manualCharge(suiteKey, i, expireDate);
+                }catch (Exception e){
+                    bizLogger.error("error in charge trial: " + i, e);
+                }
             }
             return "success";
         }catch (Exception e){
@@ -254,6 +262,10 @@ public class DbManageController {
         }
         // 已经存在充值记录的不给充值
         if(null != corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corp.getCorpId())){
+            return;
+        }
+        // rsqId为null的不充值
+        if(corp.getRsqId() == null){
             return;
         }
         String corpId = corp.getCorpId();
