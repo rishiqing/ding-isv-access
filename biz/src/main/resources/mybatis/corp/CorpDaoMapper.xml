@@ -61,6 +61,13 @@
 		 ]]>
     </select>
 
+    <select id="getCorpById" resultMap="corpMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp
+        <![CDATA[
+			WHERE id=#{id}
+		 ]]>
+    </select>
+
     <select id="getCorpByIdRange" resultMap="corpMap">
         SELECT <include refid="select-all-fields"/>  FROM isv_corp
         <![CDATA[

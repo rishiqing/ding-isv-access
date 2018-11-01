@@ -1,12 +1,31 @@
 package com.dingtalk.isv.access.web.controller.db;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
+import com.dingtalk.isv.access.api.service.message.SendMessageService;
+import com.dingtalk.isv.access.biz.constant.SystemConstant;
+import com.dingtalk.isv.access.biz.corp.dao.CorpChargeStatusDao;
 import com.dingtalk.isv.access.biz.corp.dao.CorpDao;
+import com.dingtalk.isv.access.biz.corp.dao.CorpStaffDao;
+import com.dingtalk.isv.access.biz.corp.model.CorpChargeStatusDO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
+import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.order.dao.OrderRsqPushEventDao;
+import com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao;
+import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
+import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
+import com.dingtalk.isv.access.biz.order.model.helper.OrderModelConverter;
+import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
+import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
+import com.dingtalk.isv.access.biz.util.MessageUtil;
+import com.dingtalk.isv.common.code.ServiceResultCode;
+import com.dingtalk.isv.common.log.format.LogFormatter;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
+import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
 import com.dingtalk.isv.rsq.biz.service.RsqAccountService;
+import com.dingtalk.open.client.api.model.corp.MessageBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +35,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.jms.Queue;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -108,18 +125,168 @@ public class DbManageController {
         return "<<success>>" + new Date();
     }
 
+    /**
+     * 给指定范围内的用户推送消息：
+     * 如果corpId存在，那么只给corpId的公司的管理员发送发送
+     * 否则给staffNumberMin到staffNumberMax范围内的公司管理员发送
+     * @param suiteKey
+     * @param corpNumberMin
+     * @param corpNumberMax
+     * @param json
+     * @return
+     */
     @RequestMapping(value = "/admin/message/push", method = {RequestMethod.POST})
     @ResponseBody
     public String syncAllCorpAdmin(
             @RequestParam(value = "suiteKey") String suiteKey,
-            @RequestParam(value = "corpId", required = false) String corpId,
-            @RequestParam(value = "staffNumberMin") Long staffNumberMin,
-            @RequestParam(value = "staffNumberMax") Long staffNumberMax,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
+            @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
             @RequestBody JSONObject json
     ) {
-        if(corpId != null){
-            jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
+        try{
+            Long fromId = id == null ? corpNumberMin : id;
+            Long toId = id == null ? corpNumberMax : id;
+            for(long i = fromId; i < toId + 1; i++){
+                manualPostMessage(suiteKey, i, json);
+            }
+            return "success";
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return "fail";
         }
-        return "success";
+    }
+
+    @Autowired
+    private CorpChargeStatusDao corpChargeStatusDao;
+    @Autowired
+    private OrderRsqPushEventDao orderRsqPushEventDao;
+    @Autowired
+    private OrderSpecItemDao orderSpecItemDao;
+    @Autowired
+    private SuiteDao suiteDao;
+    @Autowired
+    private CorpStaffDao corpStaffDao;
+    @Autowired
+    private RsqAccountRequestHelper rsqAccountRequestHelper;
+    @Autowired
+    private SendMessageService sendMessageService;
+    @Autowired
+    private Map<String, String> isvGlobal;
+    /**
+     * 给所有老用户充值试用版，如果corpId存在，那么只给corpId发，否则给
+     * @param suiteKey
+     * @param corpNumberMin
+     * @param corpNumberMax
+     * @param expireDate
+     * @return
+     */
+    @RequestMapping(value = "/admin/charge/trial", method = {RequestMethod.POST})
+    @ResponseBody
+    public String syncAllCorpAdmin(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
+            @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
+            @RequestParam(value = "expireDate", required = false) Long expireDate
+    ) {
+        try{
+            Long fromId = id == null ? corpNumberMin : id;
+            Long toId = id == null ? corpNumberMax : id;
+            expireDate = expireDate == null ? new Date().getTime() + 30L * 24L * 3600L * 1000L : expireDate;
+            for(long i = fromId; i < toId + 1; i++){
+                manualCharge(suiteKey, i, expireDate);
+            }
+            return "success";
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return "fail";
+        }
+    }
+
+    private void manualPostMessage(String suiteKey, Long id, JSONObject json){
+        CorpDO corp = corpDao.getCorpById(id);
+        if(corp == null){
+            return;
+        }
+        String corpId = corp.getCorpId();
+        //  找到企业管理员
+        List<StaffDO> adminList = corpStaffDao.getStaffListByCorpIdAndIsAdmin(corpId, true);
+        //  如果管理员人数超过20，那么只给前20个人发
+        if(adminList.size() > 20){
+            adminList = adminList.subList(0, 20);
+        }
+        String msgType = json.getString("msgtype");
+        //Long appId = json.getLong("agent_id");
+
+        List<String> userIdList = new ArrayList<String>();
+        for (StaffDO staffDO : adminList){
+            if(staffDO.getUserId() != null){
+                userIdList.add(staffDO.getUserId());
+            }
+        }
+
+        //  安全起见，toAllUser接口不开放
+        Boolean toAllUser = false;
+        JSONObject msgcontent = json.getJSONObject("msgcontent");
+        Long appId = Long.valueOf(isvGlobal.get("appId"));
+
+
+        MessageBody message = MessageUtil.parseMessage(msgcontent);
+        ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
+    }
+
+    private void manualCharge(String suiteKey, Long id, Long expireMills){
+        CorpDO corp = corpDao.getCorpById(id);
+        if(null == corp){
+            return;
+        }
+        // 已经存在充值记录的不给充值
+        if(null != corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corp.getCorpId())){
+            return;
+        }
+        String corpId = corp.getCorpId();
+        Long quantity = 99999L;
+        OrderRsqPushEventDO rsqPushEvent = new OrderRsqPushEventDO();
+        rsqPushEvent.setSuiteKey(suiteKey);
+        rsqPushEvent.setOrderId(id);
+        rsqPushEvent.setCorpId(corpId);
+        rsqPushEvent.setQuantity(quantity);
+        rsqPushEvent.setServiceStopTime(expireMills);
+        rsqPushEvent.setStatus(SystemConstant.ORDER_PUSH_STATUS_PENDING);
+        rsqPushEvent.setRsqTeamId(Long.valueOf(corp.getRsqId()));
+        orderRsqPushEventDao.saveOrUpdateOrderRsqPushEvent(rsqPushEvent);
+
+        //发送后台接口进行充值
+        SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+        OrderSpecItemDO specItemDO = orderSpecItemDao.getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode(
+                suiteKey,
+                "FW_GOODS-1000330934",
+                "0423c5392dbb385581b097b00df0da41");
+        ServiceResult<Void> requestSr = rsqAccountRequestHelper.doCharge(suiteDO, specItemDO, rsqPushEvent);
+        if(!requestSr.isSuccess()){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常" ,
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("id", id)
+            ));
+            return;
+        }
+
+        // 更新OrderRsqPushEventDO的状态为success
+        rsqPushEvent.setStatus(SystemConstant.ORDER_PUSH_STATUS_SUCCESS);
+        orderRsqPushEventDao.saveOrUpdateOrderRsqPushEvent(rsqPushEvent);
+
+        // 保存CorpChargeStatusDO
+        CorpChargeStatusDO corpChargeStatusDO = new CorpChargeStatusDO();
+        corpChargeStatusDO.setSuiteKey(suiteKey);
+        corpChargeStatusDO.setCorpId(corpId);
+        corpChargeStatusDO.setCurrentMaxOfPeople(quantity);
+        corpChargeStatusDO.setCurrentMinOfPeople(0L);
+        corpChargeStatusDO.setCurrentServiceStopTime(expireMills);
+        corpChargeStatusDO.setStatus(SystemConstant.ORDER_CORP_CHARGE_STATUS_OK);
+        // 计算当前人数，先暂时指定公司总人数为1，保证不超员，以后改为每天查人数来更新这个字段
+        corpChargeStatusDO.setTotalQuantity(1L);
+        corpChargeStatusDao.saveOrUpdateCorpChargeStatus(corpChargeStatusDO);
     }
 }

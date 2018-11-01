@@ -23,6 +23,8 @@ public interface CorpDao {
 	 */
 	public CorpDO getCorpByCorpId(@Param("corpId") String corpId);
 
+	public CorpDO getCorpById(@Param("id") Long id);
+
 	/**
 	 * 更新日事清相关信息，例如rsq_id
 	 * @param corpDO
