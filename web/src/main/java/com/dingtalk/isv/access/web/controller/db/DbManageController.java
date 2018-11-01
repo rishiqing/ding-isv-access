@@ -209,6 +209,19 @@ public class DbManageController {
         if(corp == null){
             return;
         }
+        CorpChargeStatusDO status = corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corp.getCorpId());
+        //  status不存在，那么不发送消息
+        if(status == null){
+            return;
+        }
+        // goodsCode码为空，不发送消息
+        if(status.getCurrentGoodsCode() == null){
+            return;
+        }
+        // maxOfPeople不为99999，那么不发送消息
+        if(status.getCurrentMaxOfPeople() != 99999L){
+            return;
+        }
         String corpId = corp.getCorpId();
         //  找到企业管理员
         List<StaffDO> adminList = corpStaffDao.getStaffListByCorpIdAndIsAdmin(corpId, true);
@@ -247,6 +260,8 @@ public class DbManageController {
         }
         String corpId = corp.getCorpId();
         Long quantity = 99999L;
+        String goodsCode = "FW_GOODS-1000330934";
+        String itemCode = "0423c5392dbb385581b097b00df0da41";
         OrderRsqPushEventDO rsqPushEvent = new OrderRsqPushEventDO();
         rsqPushEvent.setSuiteKey(suiteKey);
         rsqPushEvent.setOrderId(id);
@@ -260,9 +275,7 @@ public class DbManageController {
         //发送后台接口进行充值
         SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
         OrderSpecItemDO specItemDO = orderSpecItemDao.getOrderSpecItemBySuiteKeyAndGoodsCodeAndItemCode(
-                suiteKey,
-                "FW_GOODS-1000330934",
-                "0423c5392dbb385581b097b00df0da41");
+                suiteKey, goodsCode, itemCode);
         ServiceResult<Void> requestSr = rsqAccountRequestHelper.doCharge(suiteDO, specItemDO, rsqPushEvent);
         if(!requestSr.isSuccess()){
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
@@ -284,6 +297,8 @@ public class DbManageController {
         corpChargeStatusDO.setCurrentMaxOfPeople(quantity);
         corpChargeStatusDO.setCurrentMinOfPeople(0L);
         corpChargeStatusDO.setCurrentServiceStopTime(expireMills);
+        corpChargeStatusDO.setCurrentGoodsCode(goodsCode);
+        corpChargeStatusDO.setCurrentItemCode(itemCode);
         corpChargeStatusDO.setStatus(SystemConstant.ORDER_CORP_CHARGE_STATUS_OK);
         // 计算当前人数，先暂时指定公司总人数为1，保证不超员，以后改为每天查人数来更新这个字段
         corpChargeStatusDO.setTotalQuantity(1L);
