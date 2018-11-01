@@ -138,22 +138,21 @@ public class DbManageController {
      */
     @RequestMapping(value = "/admin/message/push", method = {RequestMethod.POST})
     @ResponseBody
-    public String syncAllCorpAdmin(
+    public String pushMessage(
             @RequestParam(value = "suiteKey") String suiteKey,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
             @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
             @RequestBody JSONObject json
     ) {
         try{
-            Long fromId = id == null ? corpNumberMin : id;
-            Long toId = id == null ? corpNumberMax : id;
+            Long fromId = corpNumberMin == null ? 0 : corpNumberMin;
+            Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             for(long i = fromId; i < toId + 1; i++){
                 manualPostMessage(suiteKey, i, json);
             }
             return "success";
         }catch (Exception e){
-            bizLogger.error("error in charge trial", e);
+            bizLogger.error("error in message push", e);
             return "fail";
         }
     }
@@ -184,16 +183,15 @@ public class DbManageController {
      */
     @RequestMapping(value = "/admin/charge/trial", method = {RequestMethod.POST})
     @ResponseBody
-    public String syncAllCorpAdmin(
+    public String chargeTrial(
             @RequestParam(value = "suiteKey") String suiteKey,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
             @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
             @RequestParam(value = "expireDate", required = false) Long expireDate
     ) {
         try{
-            Long fromId = id == null ? corpNumberMin : id;
-            Long toId = id == null ? corpNumberMax : id;
+            Long fromId = corpNumberMin == null ? 0 : corpNumberMin;
+            Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             expireDate = expireDate == null ? new Date().getTime() + 30L * 24L * 3600L * 1000L : expireDate;
             for(long i = fromId; i < toId + 1; i++){
                 manualCharge(suiteKey, i, expireDate);
@@ -242,12 +240,11 @@ public class DbManageController {
 
         //  安全起见，toAllUser接口不开放
         Boolean toAllUser = false;
-        JSONObject msgcontent = json.getJSONObject("msgcontent");
         Long appId = Long.valueOf(isvGlobal.get("appId"));
 
 
-        MessageBody message = MessageUtil.parseMessage(msgcontent);
-        ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
+        MessageBody message = MessageUtil.parseMessage(json);
+        sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
     }
 
     private void manualCharge(String suiteKey, Long id, Long expireMills){
