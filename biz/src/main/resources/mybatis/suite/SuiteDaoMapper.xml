@@ -14,6 +14,7 @@
         <result property="eventReceiveUrl" column="event_receive_url" />
         <result property="rsqAppName" column="rsq_app_name" />
         <result property="rsqAppToken" column="rsq_app_token" />
+        <result property="suiteId" column="suite_id" />
     </resultMap>
 
     <sql id="select-all-fields">
@@ -27,32 +28,35 @@
         token,
         event_receive_url,
         rsq_app_name,
-        rsq_app_token
+        rsq_app_token,
+        suite_id
     </sql>
 
     <insert id="addSuite" useGeneratedKeys="true" keyProperty="id">
         insert into isv_suite (
-                gmt_create,
-                gmt_modified,
-                suite_name,
-                suite_key,
-                suite_secret,
-                encoding_aes_key,
-                token,
-                event_receive_url,
-                rsq_app_name,
-                rsq_app_token
+            gmt_create,
+            gmt_modified,
+            suite_name,
+            suite_key,
+            suite_secret,
+            encoding_aes_key,
+            token,
+            event_receive_url,
+            rsq_app_name,
+            rsq_app_token,
+            suite_id
         )values(
-                now(),
-                now(),
-                #{suiteName},
-                #{suiteKey},
-                #{suiteSecret},
-                #{encodingAesKey},
-                #{token},
-                #{eventReceiveUrl},
-                #{rsqAppName},
-                #{rsqAppToken}
+            now(),
+            now(),
+            #{suiteName},
+            #{suiteKey},
+            #{suiteSecret},
+            #{encodingAesKey},
+            #{token},
+            #{eventReceiveUrl},
+            #{rsqAppName},
+            #{rsqAppToken},
+            #{suiteId}
         )
     </insert>
 

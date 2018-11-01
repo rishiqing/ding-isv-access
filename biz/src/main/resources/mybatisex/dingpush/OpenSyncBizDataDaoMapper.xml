@@ -49,5 +49,6 @@
         <![CDATA[
 			WHERE `status`=#{status}
 		 ]]>
+        ORDER BY id
     </select>
 </mapper>
