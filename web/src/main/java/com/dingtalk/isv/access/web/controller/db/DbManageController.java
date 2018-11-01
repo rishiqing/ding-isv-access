@@ -34,6 +34,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.jms.Queue;
 import java.util.*;
 
@@ -171,7 +172,7 @@ public class DbManageController {
     private RsqAccountRequestHelper rsqAccountRequestHelper;
     @Autowired
     private SendMessageService sendMessageService;
-    @Autowired
+    @Resource(name="isvGlobal")
     private Map<String, String> isvGlobal;
     /**
      * 给所有老用户充值试用版，如果corpId存在，那么只给corpId发，否则给
