@@ -18,7 +18,11 @@ import com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao;
 import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
 import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.order.model.helper.OrderModelConverter;
+import com.dingtalk.isv.access.biz.suite.dao.AppDao;
+import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
+import com.dingtalk.isv.access.biz.suite.model.AppDO;
+import com.dingtalk.isv.access.biz.suite.model.CorpAppDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.code.ServiceResultCode;
@@ -216,6 +220,8 @@ public class DbManageController {
 
     @Resource
     private HttpResult httpResult;
+    @Autowired
+    private AppDao appDao;
     @RequestMapping(value = "/admin/corp/search", method = {RequestMethod.POST})
     @ResponseBody
     public Map<String, Object> searchCorp(
@@ -224,7 +230,9 @@ public class DbManageController {
             @RequestBody JSONObject json
     ) {
         try{
-            String dbSuiteKey = isvGlobal.get("suiteKey");
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            AppDO appDO = appDao.getAppByAppId(appId);
+            String dbSuiteKey = appDO.getSuiteKey();
             SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
             String dbToken = suite.getToken();
             if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
@@ -259,7 +267,9 @@ public class DbManageController {
             @RequestBody JSONObject json
     ) {
         try{
-            String dbSuiteKey = isvGlobal.get("suiteKey");
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            AppDO appDO = appDao.getAppByAppId(appId);
+            String dbSuiteKey = appDO.getSuiteKey();
             SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
             String dbToken = suite.getToken();
             if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
