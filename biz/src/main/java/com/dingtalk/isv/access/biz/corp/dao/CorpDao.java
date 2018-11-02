@@ -33,5 +33,7 @@ public interface CorpDao {
 	public void updateRsqInfo(CorpDO corpDO);
 
 	public List<CorpDO> getCorpByIdRange(@Param("fromId") Long fromId, @Param("toId") Long toId);
+
+	public List<CorpDO> getCorpListByCorpName(@Param("corpName") String corpName);
 }
 

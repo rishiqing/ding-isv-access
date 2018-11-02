@@ -1,6 +1,7 @@
 package com.dingtalk.isv.access.web.controller.db;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
@@ -22,6 +23,7 @@ import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
+import com.dingtalk.isv.common.model.HttpResult;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
@@ -205,6 +207,66 @@ public class DbManageController {
                     bizLogger.error("error in charge trial: " + i, e);
                 }
             }
+            return "success";
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return "fail";
+        }
+    }
+
+    @Resource
+    private HttpResult httpResult;
+    @RequestMapping(value = "/admin/corp/search", method = {RequestMethod.POST})
+    @ResponseBody
+    public Map<String, Object> searchCorp(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "token") String token,
+            @RequestBody JSONObject json
+    ) {
+        try{
+            String dbSuiteKey = isvGlobal.get("suiteKey");
+            SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
+            String dbToken = suite.getToken();
+            if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
+                return new HashMap<String, Object>();
+            }
+            JSONArray nameList = json.getJSONArray("corpNameList");
+            Map<String, Object> nameMap = new HashMap<String, Object>();
+            for(Object name : nameList){
+                List<CorpDO> dbList = corpDao.getCorpListByCorpName((String)name);
+                List<Map> corpMapList = new ArrayList<Map>();
+                for(CorpDO corp : dbList){
+                    Map<String, String> corpMap = new HashMap<String, String>();
+                    corpMap.put("rsqId", corp.getRsqId());
+                    corpMap.put("corpId", corp.getCorpId());
+                    corpMap.put("corpName", corp.getCorpName());
+                    corpMapList.add(corpMap);
+                }
+                nameMap.put((String)name, corpMapList);
+            }
+            return httpResult.getSuccess(nameMap);
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return new HashMap<String, Object>();
+        }
+    }
+
+    @RequestMapping(value = "/admin/corp/backToFree", method = {RequestMethod.POST})
+    @ResponseBody
+    public String chargeTrial(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "token") String token,
+            @RequestBody JSONObject json
+    ) {
+        try{
+            String dbSuiteKey = isvGlobal.get("suiteKey");
+            SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
+            String dbToken = suite.getToken();
+            if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
+                return "fail";
+            }
+            String corpId = json.getString("corpId");
+            corpChargeStatusDao.deleteCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corpId);
             return "success";
         }catch (Exception e){
             bizLogger.error("error in charge trial", e);

@@ -14,5 +14,7 @@ public interface CorpChargeStatusDao {
 	public void saveOrUpdateCorpChargeStatus(CorpChargeStatusDO corpChargeStatusDO);
 
 	public CorpChargeStatusDO getCorpChargeStatusBySuiteKeyAndCorpId(@Param("suiteKey") String suiteKey, @Param("corpId") String corpId);
+
+	public void deleteCorpChargeStatusBySuiteKeyAndCorpId(@Param("suiteKey") String suiteKey, @Param("corpId") String corpId);
 }
 
