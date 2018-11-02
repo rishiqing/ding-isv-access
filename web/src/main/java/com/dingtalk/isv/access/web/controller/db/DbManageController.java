@@ -1,5 +1,6 @@
 package com.dingtalk.isv.access.web.controller.db;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
@@ -250,8 +251,9 @@ public class DbManageController {
         Boolean toAllUser = false;
         Long appId = Long.valueOf(isvGlobal.get("appId"));
 
+        String msgString = json.toJSONString().replace("$CORPID$", corpId).replace("$APPID$", isvGlobal.get("appId"));
 
-        MessageBody message = MessageUtil.parseMessage(json);
+        MessageBody message = MessageUtil.parseMessage(JSONObject.parseObject(msgString));
         sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
     }
 
