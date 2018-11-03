@@ -4,7 +4,7 @@
 
     <resultMap type="com.dingtalk.isv.access.biz.corp.model.CorpTokenDO" id="corpTokenMap">
         <id property="id" column="id" />
-        <result property="gmtCreate" column="gmt_createa" />
+        <result property="gmtCreate" column="gmt_create" />
         <result property="gmtModified" column="gmt_modified" />
         <result property="suiteKey" column="suite_key" />
         <result property="corpId" column="corp_id" />

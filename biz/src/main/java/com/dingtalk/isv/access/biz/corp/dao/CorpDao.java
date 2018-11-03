@@ -23,6 +23,8 @@ public interface CorpDao {
 	 */
 	public CorpDO getCorpByCorpId(@Param("corpId") String corpId);
 
+	public CorpDO getCorpById(@Param("id") Long id);
+
 	/**
 	 * 更新日事清相关信息，例如rsq_id
 	 * @param corpDO
@@ -31,5 +33,7 @@ public interface CorpDao {
 	public void updateRsqInfo(CorpDO corpDO);
 
 	public List<CorpDO> getCorpByIdRange(@Param("fromId") Long fromId, @Param("toId") Long toId);
+
+	public List<CorpDO> getCorpListByCorpName(@Param("corpName") String corpName);
 }
 

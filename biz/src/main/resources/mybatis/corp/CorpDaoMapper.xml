@@ -61,10 +61,25 @@
 		 ]]>
     </select>
 
+    <select id="getCorpById" resultMap="corpMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp
+        <![CDATA[
+			WHERE id=#{id}
+		 ]]>
+    </select>
+
     <select id="getCorpByIdRange" resultMap="corpMap">
         SELECT <include refid="select-all-fields"/>  FROM isv_corp
         <![CDATA[
 			WHERE id >= #{fromId} AND id < #{toId}
 		 ]]>
     </select>
+
+    <select id="getCorpListByCorpName" resultMap="corpMap">
+        SELECT <include refid="select-all-fields"/>  FROM isv_corp
+        <![CDATA[
+			WHERE corp_name LIKE concat('%', #{corpName}, '%')
+		 ]]>
+    </select>
+
 </mapper>
