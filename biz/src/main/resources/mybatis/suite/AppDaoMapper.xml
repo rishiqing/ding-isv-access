@@ -8,6 +8,8 @@
         <result property="gmtModified" column="gmt_modified" />
         <result property="suiteKey" column="suite_key" />
         <result property="appId" column="app_id" />
+        <result property="appName" column="app_name" />
+        <result property="mainColor" column="main_color" />
         <result property="activeMessage" column="active_message" />
     </resultMap>
 
@@ -17,6 +19,8 @@
         gmt_modified,
         suite_key,
         app_id,
+        app_name,
+        main_color,
         active_message
     </sql>
 
@@ -26,12 +30,16 @@
                 gmt_modified,
                 suite_key,
                 app_id,
+                app_name,
+                main_color,
                 active_message
         )values(
                 now(),
                 now(),
                 #{suiteKey},
                 #{appId},
+                #{appName},
+                #{mainColor},
                 #{activeMessage}
         )
     </insert>

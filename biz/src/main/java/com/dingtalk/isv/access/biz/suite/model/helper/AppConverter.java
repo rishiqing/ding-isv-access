@@ -20,6 +20,8 @@ public class AppConverter {
        appVO.setAppId(appDO.getAppId());
        appVO.setSuiteKey(appDO.getSuiteKey());
        appVO.setActiveMessage(appDO.getActiveMessage());
+       appVO.setAppName(appDO.getAppName());
+       appVO.setMainColor(appDO.getMainColor());
        return appVO;
    }
 
@@ -34,6 +36,8 @@ public class AppConverter {
         appDO.setAppId(appVO.getAppId());
         appDO.setSuiteKey(appVO.getSuiteKey());
         appDO.setActiveMessage(appVO.getActiveMessage());
+        appDO.setAppName(appVO.getAppName());
+        appDO.setMainColor(appVO.getMainColor());
         return appDO;
     }
 }

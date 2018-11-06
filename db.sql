@@ -670,4 +670,11 @@ ALTER TABLE `isv_order_event`
 
 # add 2018-10-30 兼容钉钉新版本，需要加suiteId
 ALTER TABLE `isv_suite`
-  ADD COLUMN `suite_id`  varchar(64) NULL COMMENT '钉钉中的suiteId'
+  ADD COLUMN `suite_id`  varchar(64) NULL COMMENT '钉钉中的suiteId';
+
+# add 2018-11-06 新增app字段
+ALTER TABLE `isv_app`
+  ADD COLUMN `app_name`  varchar(32) NULL COMMENT '应用的名称',
+  ADD COLUMN `main_color`  varchar(16) NULL COMMENT '应用的主色调，用于显示';
+
+

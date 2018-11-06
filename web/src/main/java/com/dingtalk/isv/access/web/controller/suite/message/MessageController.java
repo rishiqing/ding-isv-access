@@ -188,6 +188,16 @@ public class MessageController {
         ));
         try{
             String msgType = RSQ_DEFAULT_MESSAGE_TYPE;
+            JSONObject msgcontent = json.getJSONObject("textcard");
+            //  针对文集、笔记、邀请类型的通知，不发送钉钉通知
+            if("corpus".equals(json.getString("from"))
+                    || "invite".equals(json.getString("from"))
+                    || "summary".equals(json.getString("from"))){
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("errcode", 0);
+
+                return httpResult.getSuccess(map);
+            }
             //Long appId = json.getLong("agent_id");
 
             List<String> userIdList = null;
@@ -197,14 +207,14 @@ public class MessageController {
             }
             //  安全起见，toAllUser接口不开放
             Boolean toAllUser = false;
-            JSONObject msgcontent = json.getJSONObject("textcard");
 
             //  根据appId查询到suiteKey
             Long appId = Long.valueOf(isvGlobal.get("appId"));
             ServiceResult<AppVO> appVOSr = appManageService.getAppByAppId(appId);
-            String suiteKey = appVOSr.getResult().getSuiteKey();
+            AppVO appVO = appVOSr.getResult();
+            String suiteKey = appVO.getSuiteKey();
 
-            MessageBody message = MessageUtil.parseRsqOAMessage(msgcontent);
+            MessageBody message = MessageUtil.parseRsqOAMessage(msgcontent, appVO);
             ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
             if(!sr.isSuccess()){
                 return httpResult.getFailure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());

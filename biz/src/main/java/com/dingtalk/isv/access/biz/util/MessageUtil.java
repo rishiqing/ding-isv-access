@@ -3,6 +3,7 @@ package com.dingtalk.isv.access.biz.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.open.client.api.model.corp.MessageBody;
 import org.jsoup.Jsoup;
 
@@ -101,25 +102,59 @@ public class MessageUtil {
      * @param json
      * @return
      */
-    public static MessageBody parseRsqOAMessage(JSONObject json){
+    public static MessageBody parseRsqOAMessage(JSONObject json, AppVO app){
         MessageBody.OABody oaBody = new MessageBody.OABody();
         String url = json.getString("url");
         String title = json.getString("title");
         String desc = json.getString("description");
         String btntxt = json.getString("btntxt");
+        String from, type, receiverName, todoDate;
 
         oaBody.setMessage_url(url);
 
         MessageBody.OABody.Head head = new MessageBody.OABody.Head();
-        head.setText(RISHIQING);
-        head.setBgcolor(DEFAULT_HEAD_BG);
+        head.setText(app.getAppName());
+        head.setBgcolor(app.getMainColor());
         oaBody.setHead(head);
 
         MessageBody.OABody.Body body = new MessageBody.OABody.Body();
-        body.setTitle(title);
+        body.setTitle(Jsoup.parse(desc).body().text());
+
+        List<MessageBody.OABody.Body.Form> formList = new ArrayList<MessageBody.OABody.Body.Form>();
+
+        MessageBody.OABody.Body.Form titleItem = new MessageBody.OABody.Body.Form();
+        titleItem.setKey("任务: ");
+        titleItem.setValue(title);
+        formList.add(titleItem);
+
+        if(json.containsKey("from")){
+            from = json.getString("from");
+        }
+        if(json.containsKey("type")){
+            type = json.getString("type");
+        }
+        if(json.containsKey("receiverName")){
+            receiverName = json.getString("receiverName");
+            MessageBody.OABody.Body.Form receiverItem = new MessageBody.OABody.Body.Form();
+            receiverItem.setKey("成员: ");
+            receiverItem.setValue(receiverName);
+            formList.add(receiverItem);
+        }
+        if(json.containsKey("todoDate")){
+            todoDate = json.getString("todoDate");
+            MessageBody.OABody.Body.Form todoDateItem = new MessageBody.OABody.Body.Form();
+            todoDateItem.setKey("日期: ");
+            todoDateItem.setValue(todoDate.substring(0, 10));
+            formList.add(todoDateItem);
+        }
+        MessageBody.OABody.Body.Form btnItem = new MessageBody.OABody.Body.Form();
+        btnItem.setKey("点击查看>>");
+        btnItem.setValue("");
+        formList.add(btnItem);
 
         //  desc可能为富文本，从中提取出文字
-        body.setContent(Jsoup.parse(desc).body().text());
+//        body.setContent(Jsoup.parse(desc).body().text());
+        body.setForm(formList);
 
         oaBody.setBody(body);
         return oaBody;
