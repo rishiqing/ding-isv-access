@@ -110,7 +110,9 @@ public class MessageUtil {
         String btntxt = json.getString("btntxt");
         String from, type, receiverName, todoDate;
 
-        oaBody.setMessage_url(url);
+        //  对url做修正处理，暂时这样实现
+        String newUrl = url.replace("backauth", "dingtalk/workbei");
+        oaBody.setMessage_url(newUrl);
 
         MessageBody.OABody.Head head = new MessageBody.OABody.Head();
         head.setText(app.getAppName());
