@@ -208,7 +208,7 @@ public class RsqAccountService {
      * @param staffDO
      * @return
      */
-    public ServiceResult<Void> createRsqTeamStaff(String suiteKey, StaffDO staffDO) {
+    public ServiceResult<StaffDO> createRsqTeamStaff(String suiteKey, StaffDO staffDO) {
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                 LogFormatter.KeyValue.getNew("corpId", staffDO.getCorpId()),
@@ -218,7 +218,7 @@ public class RsqAccountService {
 
             //  如果staffDO的rsqUserId存在，则不重新发送请求创建
             if(null != staffDO.getRsqUserId()){
-                return ServiceResult.success(null);
+                return ServiceResult.success(staffDO);
             }
 
             String userId = staffDO.getUserId();
@@ -263,7 +263,7 @@ public class RsqAccountService {
             staffDO.setRsqPassword(generateRsqPassword(user.getUsername()));
 
             corpStaffDao.updateRsqInfo(staffDO);
-            return ServiceResult.success(null);
+            return ServiceResult.success(staffDO);
 
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
@@ -277,6 +277,42 @@ public class RsqAccountService {
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", staffDO.getCorpId()),
                     LogFormatter.KeyValue.getNew("userID", staffDO.getUserId())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
+     * 移出公司员工
+     * @param suiteKey
+     * @param corpId            钉钉公司id
+     * @param removeUserIds     目前公司里存在的用户字符串
+     * @return
+     */
+    public ServiceResult<Void> removeResignedStaff(String suiteKey, String corpId, String removeUserIds) {
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("removeUserIds", removeUserIds)
+        ));
+        try {
+            CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
+            SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+
+            ServiceResult rsqUserSr = rsqAccountRequestHelper.removeResignedStaff(suiteDO, corpDO, removeUserIds);
+            if(!rsqUserSr.isSuccess()){
+                return ServiceResult.failure(rsqUserSr.getCode(),rsqUserSr.getMessage());
+            }
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("removeUserIds", removeUserIds)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("removeUserIds", removeUserIds)
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
         }
@@ -505,10 +541,21 @@ public class RsqAccountService {
             ServiceResult<List<StaffVO>> listSr = staffManageService.getStaffListByCorpId(corpId);
             List<StaffVO> list = listSr.getResult();
 
+            StringBuilder existUserIdsSb = new StringBuilder();
             Iterator it = list.iterator();
             while(it.hasNext()){
                 StaffVO staffVO = (StaffVO)it.next();
-                ServiceResult staffSr = this.createRsqTeamStaff(suiteKey, StaffConverter.staffVO2StaffDO(staffVO));
+                ServiceResult<StaffDO> staffSr = this.createRsqTeamStaff(suiteKey, StaffConverter.staffVO2StaffDO(staffVO));
+                if(!staffSr.isSuccess()){
+                    return ServiceResult.failure(staffSr.getCode(),staffSr.getMessage());
+                }
+                StaffDO staffDO = staffSr.getResult();
+                existUserIdsSb.append(staffDO.getRsqUserId());
+                existUserIdsSb.append(",");
+            }
+            String existUserIds = existUserIdsSb.toString();
+            if(!"".equals(existUserIds)){
+                ServiceResult staffSr = this.removeResignedStaff(suiteKey,corpId,existUserIds);
                 if(!staffSr.isSuccess()){
                     return ServiceResult.failure(staffSr.getCode(),staffSr.getMessage());
                 }
@@ -624,13 +671,13 @@ public class RsqAccountService {
                 return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
             }
 
-            //3  更新企业部门的管理员状态
+            //4  更新企业部门的管理员状态
             ServiceResult<Void> rsqAdminSr = this.updateAllCorpAdmin(suiteKey, corpId);
             if(!rsqAdminSr.isSuccess()){
                 return ServiceResult.failure(rsqAdminSr.getCode(),rsqAdminSr.getMessage());
             }
 
-            //4  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
+            //5  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
             jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
             return ServiceResult.success(null);
 
