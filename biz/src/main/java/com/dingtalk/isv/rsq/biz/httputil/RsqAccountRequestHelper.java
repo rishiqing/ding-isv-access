@@ -240,6 +240,36 @@ public class RsqAccountRequestHelper {
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
     }
+    /**
+     * 移除离职的员工
+     * @param suiteDO
+     * @param userIds   公司里员工id字符串（','拼接）
+     * @return
+     */
+    public ServiceResult<Void> removeResignedStaff(SuiteDO suiteDO, CorpDO corpDO, String userIds){
+        try {
+            String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/removeUser?token=" + suiteDO.getRsqAppToken();
+
+            JSONObject params = new JSONObject();
+            params.put("teamId", corpDO.getRsqId());
+            params.put("userIds", userIds);
+
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            JSONObject jsonObject = JSON.parseObject(sr);
+
+            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            }
+
+            return ServiceResult.success(null);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("userIds", userIds)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
 
     /**
      * 更新用户
