@@ -83,4 +83,11 @@
 			WHERE suite_key=#{suiteKey} AND corp_id=#{corpId}
 		 ]]>
     </select>
+
+    <delete id="deleteCorpChargeStatusBySuiteKeyAndCorpId">
+        delete from isv_corp_charge_status
+        <![CDATA[
+        WHERE suite_key=#{suiteKey} and corp_id=#{corpId}
+        ]]>
+    </delete>
 </mapper>
