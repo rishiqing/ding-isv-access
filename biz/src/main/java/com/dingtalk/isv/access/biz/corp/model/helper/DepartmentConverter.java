@@ -57,6 +57,7 @@ public class DepartmentConverter {
             return null;
         }
         DepartmentVO departmentVO = new DepartmentVO();
+        departmentVO.setId(departmentDO.getId());
         departmentVO.setDeptId(departmentDO.getDeptId());
         departmentVO.setGmtCreate(departmentDO.getGmtCreate());
         departmentVO.setGmtModified(departmentDO.getGmtModified());

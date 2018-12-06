@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.CorpVO;
+import com.dingtalk.isv.access.api.model.corp.DepartmentVO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
@@ -81,6 +82,40 @@ public class RsqAccountRequestHelper {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
                     LogFormatter.KeyValue.getNew("corpDO", corpDO.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    /**
+     * 同步部门
+     * @param suiteDO
+     * @param corpDO
+     * @param departmentMap
+     * @return
+     */
+    public ServiceResult<RsqDepartment> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
+        try {
+            String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncDepartment?token=" + suiteDO.getRsqAppToken();
+            Map params = new HashMap<String, String>();
+            params.put("appName", suiteDO.getRsqAppName());
+            params.put("departments", departmentMap);
+            params.put("teamId", corpDO.getRsqId());
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            JSONObject jsonObject = JSON.parseObject(sr);
+
+            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            }
+
+            RsqDepartment department = RsqDepartmentConverter.JSON2RsqDepartment(jsonObject);
+
+            return ServiceResult.success(department);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                    LogFormatter.KeyValue.getNew("departmentVOs", departmentMap.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
