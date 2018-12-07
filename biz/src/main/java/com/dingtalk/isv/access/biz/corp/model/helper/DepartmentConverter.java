@@ -139,8 +139,8 @@ public class DepartmentConverter {
 
     public static ArrayList<DepartmentDO> JSON2DepartmentVOList(JSONObject jsonObject){
         ArrayList<DepartmentDO> list = new ArrayList<DepartmentDO>();
-        if(jsonObject.containsKey("departmentCreateList")){
-            for(Object a: jsonObject.getJSONArray("departmentCreateList")){
+        if(jsonObject.containsKey("departmentUpdateList")){
+            for(Object a: jsonObject.getJSONArray("departmentUpdateList")){
                 JSONObject jo = (JSONObject)a;
                 DepartmentDO departmentDO = new DepartmentDO();
                 departmentDO.setId(Long.parseLong(jo.getString("id")));

@@ -206,6 +206,16 @@
         where corp_id=#{corpId} and user_id=#{userId}
     </update>
 
+    <update id="updateRsqInfoById">
+        update isv_corp_staff set
+            gmt_modified=now(),
+            rsq_user_id=#{rsqUserId},
+            rsq_username=#{rsqUsername},
+            rsq_password=#{rsqPassword},
+            rsq_login_token=#{rsqLoginToken}
+        where id=#{id}
+    </update>
+
     <update id="updateUnionId">
         update isv_corp_staff set gmt_modified=now(), union_id=#{unionId} where corp_id=#{corpId} and user_id=#{userId}
     </update>

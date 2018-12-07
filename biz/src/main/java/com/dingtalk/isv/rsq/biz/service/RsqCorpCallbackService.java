@@ -543,8 +543,10 @@ public class RsqCorpCallbackService {
             }else{
                 //  suiteKey
                 SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+                // 公司
+                CorpDO corpDO = corpDao.getCorpByCorpId(staffVO.getCorpId());
                 //  提交更新
-                ServiceResult<Void> rsqUserSr = rsqAccountRequestHelper.removeUser(suiteDO, StaffConverter.staffVO2StaffDO(staffVO));
+                ServiceResult<Void> rsqUserSr = rsqAccountRequestHelper.removeUser(suiteDO, corpDO, StaffConverter.staffVO2StaffDO(staffVO));
 
                 if(!rsqUserSr.isSuccess()){
                     return ServiceResult.failure(rsqUserSr.getCode(),rsqUserSr.getMessage());
