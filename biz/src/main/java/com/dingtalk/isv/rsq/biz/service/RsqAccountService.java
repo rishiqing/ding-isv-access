@@ -156,11 +156,15 @@ public class RsqAccountService {
             // 公司
             CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
 
-            ServiceResult syncSr = rsqAccountRequestHelper.syncDepartment(suiteDO, corpDO, department);
+            ServiceResult<ArrayList<DepartmentDO>> syncSr = rsqAccountRequestHelper.syncDepartment(suiteDO, corpDO, department);
             if(!syncSr.isSuccess()){
                 return ServiceResult.failure(syncSr.getCode(), syncSr.getMessage());
             }
+            ArrayList<DepartmentDO> departmentDOs = syncSr.getResult();
 
+            for(DepartmentDO departmentDO: departmentDOs){
+                corpDepartmentDao.updateRsqInfoById(departmentDO);
+            }
             return ServiceResult.success(null);
         } catch (Exception e){
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,

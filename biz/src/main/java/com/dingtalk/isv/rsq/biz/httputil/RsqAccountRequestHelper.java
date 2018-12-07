@@ -8,6 +8,7 @@ import com.dingtalk.isv.access.api.model.corp.DepartmentVO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.corp.model.helper.DepartmentConverter;
 import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
 import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
@@ -94,7 +95,7 @@ public class RsqAccountRequestHelper {
      * @param departmentMap
      * @return
      */
-    public ServiceResult<RsqDepartment> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
+    public ServiceResult<ArrayList<DepartmentDO>> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
         try {
             String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncDepartment?token=" + suiteDO.getRsqAppToken();
             Map params = new HashMap<String, String>();
@@ -108,9 +109,9 @@ public class RsqAccountRequestHelper {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
             }
 
-            RsqDepartment department = RsqDepartmentConverter.JSON2RsqDepartment(jsonObject);
+            ArrayList<DepartmentDO> departmentVOs = DepartmentConverter.JSON2DepartmentVOList(jsonObject);
 
-            return ServiceResult.success(department);
+            return ServiceResult.success(departmentVOs);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
