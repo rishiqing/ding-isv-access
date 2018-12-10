@@ -140,6 +140,48 @@ public class RsqAccountService {
     }
 
     /**
+     * 同步部门
+     * @param suiteKey
+     * @param corpId
+     * @param department
+     * @return
+     */
+    public ServiceResult<Void> syncDepartment(String suiteKey, String corpId, LinkedHashMap<String,Object> department){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+            // 公司
+            CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
+
+            ServiceResult<ArrayList<DepartmentDO>> syncSr = rsqAccountRequestHelper.syncDepartment(suiteDO, corpDO, department);
+            if(!syncSr.isSuccess()){
+                return ServiceResult.failure(syncSr.getCode(), syncSr.getMessage());
+            }
+            ArrayList<DepartmentDO> departmentDOs = syncSr.getResult();
+
+            for(DepartmentDO departmentDO: departmentDOs){
+                corpDepartmentDao.updateRsqInfoById(departmentDO);
+            }
+            return ServiceResult.success(null);
+        } catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
      * 创建部门，分为以下几步：
      * 1  根据corpId和deptId查询是否有记录，是否department的rsqId存在，则直接返回department
      * 2  如果记录不存在或者rsqId不存在，则发送到日事清服务器请求创建
@@ -577,6 +619,100 @@ public class RsqAccountService {
     }
 
     /**
+     * 将一个公司的所有员工同步到日事清
+     * @param suiteKey
+     * @param corpId
+     * @return
+     */
+    public ServiceResult<Void> syncAllCorpStaff(String suiteKey, String corpId){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                LogFormatter.KeyValue.getNew("corpId", corpId)
+        ));
+        try {
+            // 获取员工列表
+            List<StaffDO> staffDOs = corpStaffDao.getStaffListByCorpId(corpId);
+            // 公司信息
+            CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
+
+            SuiteDO suiteDO = suiteDao.getSuiteByKey(suiteKey);
+
+            ServiceResult sr = this.syncAllStaff(suiteDO,corpDO,staffDOs);
+            if(!sr.isSuccess()){
+                return ServiceResult.failure(sr.getCode(),sr.getMessage());
+            }
+            return ServiceResult.success(null);
+        } catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
+                    LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
+     * 同步所有员工
+     * @param suiteDO
+     * @param corpDO
+     * @param staffDOs
+     * @return
+     */
+    public ServiceResult<Void> syncAllStaff(SuiteDO suiteDO,CorpDO corpDO,List<StaffDO> staffDOs){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                LogFormatter.KeyValue.getNew("corpId", staffDOs.toString())
+        ));
+        try {
+            ArrayList<LinkedHashMap<String,Object>> users = new ArrayList<LinkedHashMap<String,Object>>();
+            for(StaffDO staffDO: staffDOs){
+                LinkedHashMap<String,Object> map = new LinkedHashMap<String,Object>();
+                map.put("id", staffDO.getId());
+                map.put("outerId", corpDO.getCorpId() + "--" + staffDO.getUserId());
+                map.put("unionId", staffDO.getUnionId());
+                map.put("name", staffDO.getName());
+                JSONArray rsqIdArray = convertRsqDepartment(corpDO.getCorpId(), staffDO.getDepartment());
+                map.put("department", rsqIdArray);
+                map.put("isAdmin", staffDO.getAdmin());
+                map.put("rsqUserId", staffDO.getRsqUserId());
+                users.add(map);
+            }
+            // 返回的数据
+            ServiceResult<ArrayList<StaffDO>> syncSr = rsqAccountRequestHelper.syncAllStaff(suiteDO, corpDO, users);
+            staffDOs = syncSr.getResult();
+
+            // 更新员工信息
+            for(StaffDO staffDO: staffDOs){
+                staffDO.setRsqPassword(generateRsqPassword(staffDO.getRsqUsername()));
+                corpStaffDao.updateRsqInfoById(staffDO);
+            }
+
+            return ServiceResult.success(null);
+        } catch (Exception e){
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                    LogFormatter.KeyValue.getNew("staffVOs", staffDOs.toString())
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                    LogFormatter.KeyValue.getNew("staffVOs", staffDOs.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+        }
+    }
+
+    /**
      * 设置corpId中的所有管理员
      * @param suiteKey
      * @param corpId
@@ -649,35 +785,46 @@ public class RsqAccountService {
                 LogFormatter.KeyValue.getNew("corpId", corpId)
         ));
         try {
-            //1  创建日事清企业
+            //1  同步日事清企业
             ServiceResult<CorpVO> corpSr = this.createRsqTeam(suiteKey, corpId);
             if(!corpSr.isSuccess()){
                 return ServiceResult.failure(corpSr.getCode(),corpSr.getMessage());
             }
             checkOrderCharge(suiteKey, corpId);
-            //2  创建企业部门
+
+            //2  同步企业部门
+            //根部门
             ServiceResult<DepartmentVO> rootSr = deptManageService.getDepartmentByCorpIdAndDeptId(corpId, 1L);
             if(!rootSr.isSuccess()){
                 return ServiceResult.failure(rootSr.getCode(),rootSr.getMessage());
             }
-            ServiceResult<Void> rsqDeptSr = this.createRecursiveSubDepartment(suiteKey, DepartmentConverter.DepartmentVO2DepartmentDO(rootSr.getResult()));
-            if(!rsqDeptSr.isSuccess()){
-                return ServiceResult.failure(rsqDeptSr.getCode(),rsqDeptSr.getMessage());
+            ServiceResult<LinkedHashMap<String,Object>> departmentSr = this.assembleDepartment(corpId,rootSr.getResult());
+            if(!departmentSr.isSuccess()){
+                return ServiceResult.failure(departmentSr.getCode(),departmentSr.getMessage());
+            }
+            ServiceResult syncDeptSr = this.syncDepartment(suiteKey, corpId, departmentSr.getResult());
+            if(!syncDeptSr.isSuccess()){
+                return ServiceResult.failure(syncDeptSr.getCode(),syncDeptSr.getMessage());
             }
 
-            //3  新建企业部门成员
-            ServiceResult<Void> rsqDeptStaffSr = this.createAllCorpStaff(suiteKey, corpId);
-            if(!rsqDeptStaffSr.isSuccess()){
-                return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
+//            //3  新建企业部门成员
+//            ServiceResult<Void> rsqDeptStaffSr = this.createAllCorpStaff(suiteKey, corpId);
+//            if(!rsqDeptStaffSr.isSuccess()){
+//                return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
+//            }
+            //3  同步企业部门成员
+            ServiceResult<Void> syncStaffSr = this.syncAllCorpStaff(suiteKey, corpId);
+            if(!syncStaffSr.isSuccess()){
+                return ServiceResult.failure(syncStaffSr.getCode(),syncStaffSr.getMessage());
             }
 
-            //4  更新企业部门的管理员状态
-            ServiceResult<Void> rsqAdminSr = this.updateAllCorpAdmin(suiteKey, corpId);
-            if(!rsqAdminSr.isSuccess()){
-                return ServiceResult.failure(rsqAdminSr.getCode(),rsqAdminSr.getMessage());
-            }
+//            //4  更新企业部门的管理员状态
+//            ServiceResult<Void> rsqAdminSr = this.updateAllCorpAdmin(suiteKey, corpId);
+//            if(!rsqAdminSr.isSuccess()){
+//                return ServiceResult.failure(rsqAdminSr.getCode(),rsqAdminSr.getMessage());
+//            }
 
-            //5  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
+            //4  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
             jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
             return ServiceResult.success(null);
 
@@ -691,6 +838,57 @@ public class RsqAccountService {
                     "系统异常",
                     LogFormatter.KeyValue.getNew("suiteKey", suiteKey),
                     LogFormatter.KeyValue.getNew("corpId", corpId)
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
+
+        }
+    }
+    /**
+     * 组装部门组织架构
+     */
+    public ServiceResult<LinkedHashMap<String,Object>> assembleDepartment(String corpId,DepartmentVO departmentVO){
+        bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
+                LogFormatter.KeyValue.getNew("corpusId", corpId),
+                LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
+        ));
+        try {
+            // 部门下所有子部门
+            ServiceResult<List<DepartmentVO>> deptListSr = deptManageService.getDepartmentListByCorpIdAndParentId(corpId, departmentVO.getDeptId());
+            if(!deptListSr.isSuccess()){
+                return ServiceResult.failure(deptListSr.getCode(),deptListSr.getMessage());
+            }
+            List<DepartmentVO> deptList = deptListSr.getResult();
+            // 当前部门Map
+            LinkedHashMap<String,Object> departmentMap = new LinkedHashMap<String,Object>();
+            departmentMap.put("id", departmentVO.getId());
+            departmentMap.put("name", departmentVO.getName());
+            departmentMap.put("deptId", departmentVO.getDeptId());
+            departmentMap.put("parentId", departmentVO.getParentId()==null?0:departmentVO.getParentId());
+            departmentMap.put("rsqId", departmentVO.getRsqId());
+            departmentMap.put("outerId", departmentVO.getCorpId() + "--" + departmentVO.getDeptId());
+            departmentMap.put("orderNum", departmentVO.getOrder());
+            ArrayList<LinkedHashMap> child = new ArrayList<LinkedHashMap>();
+            departmentMap.put("child", child);
+
+            // 组装子部门
+            for (DepartmentVO childDepartmentVO: deptList){
+                ServiceResult<LinkedHashMap<String,Object>> childListSr = assembleDepartment(corpId,childDepartmentVO);
+                if(!childListSr.isSuccess()){
+                    return ServiceResult.failure(childListSr.getCode(),childListSr.getMessage());
+                }
+                child.add(childListSr.getResult());
+            }
+            return ServiceResult.success(departmentMap);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("corpusId", corpId),
+                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
+            ), e);
+            mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    "系统异常",
+                    LogFormatter.KeyValue.getNew("corpusId", corpId),
+                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
 

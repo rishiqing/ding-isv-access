@@ -1,5 +1,7 @@
 package com.dingtalk.isv.access.web.controller.db;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.suite.AppVO;
 import com.dingtalk.isv.access.api.service.corp.StaffManageService;
@@ -16,11 +18,16 @@ import com.dingtalk.isv.access.biz.order.dao.OrderSpecItemDao;
 import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
 import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.order.model.helper.OrderModelConverter;
+import com.dingtalk.isv.access.biz.suite.dao.AppDao;
+import com.dingtalk.isv.access.biz.suite.dao.CorpAppDao;
 import com.dingtalk.isv.access.biz.suite.dao.SuiteDao;
+import com.dingtalk.isv.access.biz.suite.model.AppDO;
+import com.dingtalk.isv.access.biz.suite.model.CorpAppDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
 import com.dingtalk.isv.access.biz.util.MessageUtil;
 import com.dingtalk.isv.common.code.ServiceResultCode;
 import com.dingtalk.isv.common.log.format.LogFormatter;
+import com.dingtalk.isv.common.model.HttpResult;
 import com.dingtalk.isv.common.model.ServiceResult;
 import com.dingtalk.isv.rsq.biz.event.mq.RsqSyncMessage;
 import com.dingtalk.isv.rsq.biz.httputil.RsqAccountRequestHelper;
@@ -138,22 +145,25 @@ public class DbManageController {
      */
     @RequestMapping(value = "/admin/message/push", method = {RequestMethod.POST})
     @ResponseBody
-    public String syncAllCorpAdmin(
+    public String pushMessage(
             @RequestParam(value = "suiteKey") String suiteKey,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
             @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
             @RequestBody JSONObject json
     ) {
         try{
-            Long fromId = id == null ? corpNumberMin : id;
-            Long toId = id == null ? corpNumberMax : id;
+            Long fromId = corpNumberMin == null ? 0 : corpNumberMin;
+            Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             for(long i = fromId; i < toId + 1; i++){
-                manualPostMessage(suiteKey, i, json);
+                try{
+                    manualPostMessage(suiteKey, i, json);
+                }catch (Exception e){
+                    bizLogger.error("error in message push: " + i, e);
+                }
             }
             return "success";
         }catch (Exception e){
-            bizLogger.error("error in charge trial", e);
+            bizLogger.error("error in message push", e);
             return "fail";
         }
     }
@@ -184,20 +194,89 @@ public class DbManageController {
      */
     @RequestMapping(value = "/admin/charge/trial", method = {RequestMethod.POST})
     @ResponseBody
-    public String syncAllCorpAdmin(
+    public String chargeTrial(
             @RequestParam(value = "suiteKey") String suiteKey,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "corpNumberMin", required = false) Long corpNumberMin,
             @RequestParam(value = "corpNumberMax", required = false) Long corpNumberMax,
             @RequestParam(value = "expireDate", required = false) Long expireDate
     ) {
         try{
-            Long fromId = id == null ? corpNumberMin : id;
-            Long toId = id == null ? corpNumberMax : id;
+            Long fromId = corpNumberMin == null ? 0 : corpNumberMin;
+            Long toId = corpNumberMax == null ? 0 : corpNumberMax;
             expireDate = expireDate == null ? new Date().getTime() + 30L * 24L * 3600L * 1000L : expireDate;
             for(long i = fromId; i < toId + 1; i++){
-                manualCharge(suiteKey, i, expireDate);
+                try{
+                    manualCharge(suiteKey, i, expireDate);
+                }catch (Exception e){
+                    bizLogger.error("error in charge trial: " + i, e);
+                }
             }
+            return "success";
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return "fail";
+        }
+    }
+
+    @Resource
+    private HttpResult httpResult;
+    @Autowired
+    private AppDao appDao;
+    @RequestMapping(value = "/admin/corp/search", method = {RequestMethod.POST})
+    @ResponseBody
+    public Map<String, Object> searchCorp(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "token") String token,
+            @RequestBody JSONObject json
+    ) {
+        try{
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            AppDO appDO = appDao.getAppByAppId(appId);
+            String dbSuiteKey = appDO.getSuiteKey();
+            SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
+            String dbToken = suite.getToken();
+            if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
+                return new HashMap<String, Object>();
+            }
+            JSONArray nameList = json.getJSONArray("corpNameList");
+            Map<String, Object> nameMap = new HashMap<String, Object>();
+            for(Object name : nameList){
+                List<CorpDO> dbList = corpDao.getCorpListByCorpName((String)name);
+                List<Map> corpMapList = new ArrayList<Map>();
+                for(CorpDO corp : dbList){
+                    Map<String, String> corpMap = new HashMap<String, String>();
+                    corpMap.put("rsqId", corp.getRsqId());
+                    corpMap.put("corpId", corp.getCorpId());
+                    corpMap.put("corpName", corp.getCorpName());
+                    corpMapList.add(corpMap);
+                }
+                nameMap.put((String)name, corpMapList);
+            }
+            return httpResult.getSuccess(nameMap);
+        }catch (Exception e){
+            bizLogger.error("error in charge trial", e);
+            return new HashMap<String, Object>();
+        }
+    }
+
+    @RequestMapping(value = "/admin/corp/backToFree", method = {RequestMethod.POST})
+    @ResponseBody
+    public String chargeTrial(
+            @RequestParam(value = "suiteKey") String suiteKey,
+            @RequestParam(value = "token") String token,
+            @RequestBody JSONObject json
+    ) {
+        try{
+            Long appId = Long.valueOf(isvGlobal.get("appId"));
+            AppDO appDO = appDao.getAppByAppId(appId);
+            String dbSuiteKey = appDO.getSuiteKey();
+            SuiteDO suite = suiteDao.getSuiteByKey(dbSuiteKey);
+            String dbToken = suite.getToken();
+            if(!dbSuiteKey.equals(suiteKey) || !dbToken.equals(token)){
+                return "fail";
+            }
+            String corpId = json.getString("corpId");
+            corpChargeStatusDao.deleteCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corpId);
             return "success";
         }catch (Exception e){
             bizLogger.error("error in charge trial", e);
@@ -242,12 +321,12 @@ public class DbManageController {
 
         //  安全起见，toAllUser接口不开放
         Boolean toAllUser = false;
-        JSONObject msgcontent = json.getJSONObject("msgcontent");
         Long appId = Long.valueOf(isvGlobal.get("appId"));
 
+        String msgString = json.toJSONString().replace("$CORPID$", corpId).replace("$APPID$", isvGlobal.get("appId"));
 
-        MessageBody message = MessageUtil.parseMessage(msgcontent);
-        ServiceResult sr = sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
+        MessageBody message = MessageUtil.parseMessage(JSONObject.parseObject(msgString));
+        sendMessageService.sendCorpMessageAsync(suiteKey, corpId, appId, msgType, toAllUser, userIdList, null, message);
     }
 
     private void manualCharge(String suiteKey, Long id, Long expireMills){
@@ -257,6 +336,10 @@ public class DbManageController {
         }
         // 已经存在充值记录的不给充值
         if(null != corpChargeStatusDao.getCorpChargeStatusBySuiteKeyAndCorpId(suiteKey, corp.getCorpId())){
+            return;
+        }
+        // rsqId为null的不充值
+        if(corp.getRsqId() == null){
             return;
         }
         String corpId = corp.getCorpId();
