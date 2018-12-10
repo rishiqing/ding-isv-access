@@ -55,5 +55,12 @@ public interface CorpDepartmentDao {
 	 */
 	public void updateRsqInfo(DepartmentDO departmentDO);
 
+	/**
+	 * 通过id更新第三方应用id信息
+	 * @param departmentDO
+	 * @return
+	 */
+	public void updateRsqInfoById(DepartmentDO departmentDO);
+
 }
 

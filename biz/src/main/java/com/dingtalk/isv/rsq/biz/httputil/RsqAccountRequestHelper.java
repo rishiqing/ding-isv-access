@@ -3,10 +3,11 @@ package com.dingtalk.isv.rsq.biz.httputil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dingtalk.isv.access.api.model.corp.CorpVO;
 import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
+import com.dingtalk.isv.access.biz.corp.model.helper.DepartmentConverter;
+import com.dingtalk.isv.access.biz.corp.model.helper.StaffConverter;
 import com.dingtalk.isv.access.biz.order.model.OrderRsqPushEventDO;
 import com.dingtalk.isv.access.biz.order.model.OrderSpecItemDO;
 import com.dingtalk.isv.access.biz.suite.model.SuiteDO;
@@ -81,6 +82,40 @@ public class RsqAccountRequestHelper {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
                     LogFormatter.KeyValue.getNew("corpDO", corpDO.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    /**
+     * 同步部门
+     * @param suiteDO
+     * @param corpDO
+     * @param departmentMap
+     * @return
+     */
+    public ServiceResult<ArrayList<DepartmentDO>> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
+        try {
+            String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncDepartment?token=" + suiteDO.getRsqAppToken();
+            Map params = new HashMap<String, String>();
+            params.put("appName", suiteDO.getRsqAppName());
+            params.put("departments", departmentMap);
+            params.put("teamId", corpDO.getRsqId());
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            JSONObject jsonObject = JSON.parseObject(sr);
+
+            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            }
+
+            ArrayList<DepartmentDO> departmentVOs = DepartmentConverter.JSON2DepartmentVOList(jsonObject);
+
+            return ServiceResult.success(departmentVOs);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                    LogFormatter.KeyValue.getNew("departmentVOs", departmentMap.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }
@@ -353,11 +388,12 @@ public class RsqAccountRequestHelper {
      * @param staffDO
      * @return
      */
-    public ServiceResult<Void> removeUser(SuiteDO suiteDO, StaffDO staffDO){
+    public ServiceResult<Void> removeUser(SuiteDO suiteDO,CorpDO corpDO, StaffDO staffDO){
         try {
             String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/userLeaveTeam?token=" + suiteDO.getRsqAppToken();
             Map params = new HashMap<String, String>();
             params.put("id", staffDO.getRsqUserId());
+            params.put("teamId", corpDO.getRsqId());
 
             String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
             JSONObject jsonObject = JSON.parseObject(sr);
@@ -371,6 +407,39 @@ public class RsqAccountRequestHelper {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
                     LogFormatter.KeyValue.getNew("staffDO", staffDO.toString())
+            ), e);
+            return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+        }
+    }
+
+    /**
+     * 同步所有用户
+     * @param suiteDO
+     * @param corpDO
+     * @param users
+     * @return
+     */
+    public ServiceResult<ArrayList<StaffDO>> syncAllStaff(SuiteDO suiteDO,CorpDO corpDO,List users){
+        try {
+            String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncUser?token=" + suiteDO.getRsqAppToken();
+            Map params = new HashMap<String, String>();
+            params.put("users", users);
+            params.put("teamId", corpDO.getRsqId());
+
+            String sr = httpRequestHelper.httpPostJson(url, JSON.toJSONString(params));
+            JSONObject jsonObject = JSON.parseObject(sr);
+
+            if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
+                return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
+            }
+            ArrayList<StaffDO> staffDOs = StaffConverter.JSON2StaffVOList(jsonObject);
+
+            return ServiceResult.success(staffDOs);
+        } catch (Exception e) {
+            bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
+                    LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
+                    LogFormatter.KeyValue.getNew("corpDO", corpDO.toString()),
+                    LogFormatter.KeyValue.getNew("staffs", users.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
         }

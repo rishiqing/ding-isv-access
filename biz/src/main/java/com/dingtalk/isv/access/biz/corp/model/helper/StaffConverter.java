@@ -3,6 +3,7 @@ package com.dingtalk.isv.access.biz.corp.model.helper;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.StaffVO;
+import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffDO;
 import com.dingtalk.isv.access.biz.corp.model.StaffResult;
 import com.dingtalk.open.client.api.model.corp.CorpAdmin;
@@ -207,5 +208,21 @@ public class StaffConverter {
         staffDO.setAdmin(true);
         staffDO.setSysLevel(corpAdmin.getSys_level());
         return staffDO;
+    }
+
+
+    public static ArrayList<StaffDO> JSON2StaffVOList(JSONObject jsonObject){
+        ArrayList<StaffDO> list = new ArrayList<StaffDO>();
+        if(jsonObject.containsKey("userUpdateList")){
+            for(Object a: jsonObject.getJSONArray("userUpdateList")){
+                JSONObject jo = (JSONObject)a;
+                StaffDO staffDO = new StaffDO();
+                staffDO.setId(Long.parseLong(jo.getString("id")));
+                staffDO.setRsqUserId(jo.getString("rsqUserId"));
+                staffDO.setRsqUsername(jo.getString("rsqUsername"));
+                list.add(staffDO);
+            }
+        }
+        return list;
     }
 }

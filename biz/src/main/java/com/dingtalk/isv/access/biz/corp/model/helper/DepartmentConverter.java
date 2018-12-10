@@ -1,12 +1,10 @@
 package com.dingtalk.isv.access.biz.corp.model.helper;
 
-import com.dingtalk.isv.access.api.model.corp.CorpVO;
+import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.isv.access.api.model.corp.DepartmentVO;
-import com.dingtalk.isv.access.biz.corp.model.CorpDO;
 import com.dingtalk.isv.access.biz.corp.model.DepartmentDO;
 import com.dingtalk.open.client.api.model.corp.Department;
 import com.dingtalk.open.client.api.model.corp.DepartmentDetail;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +55,7 @@ public class DepartmentConverter {
             return null;
         }
         DepartmentVO departmentVO = new DepartmentVO();
+        departmentVO.setId(departmentDO.getId());
         departmentVO.setDeptId(departmentDO.getDeptId());
         departmentVO.setGmtCreate(departmentDO.getGmtCreate());
         departmentVO.setGmtModified(departmentDO.getGmtModified());
@@ -138,4 +137,17 @@ public class DepartmentConverter {
         return voList;
     }
 
+    public static ArrayList<DepartmentDO> JSON2DepartmentVOList(JSONObject jsonObject){
+        ArrayList<DepartmentDO> list = new ArrayList<DepartmentDO>();
+        if(jsonObject.containsKey("departmentUpdateList")){
+            for(Object a: jsonObject.getJSONArray("departmentUpdateList")){
+                JSONObject jo = (JSONObject)a;
+                DepartmentDO departmentDO = new DepartmentDO();
+                departmentDO.setId(Long.parseLong(jo.getString("id")));
+                departmentDO.setRsqId(jo.getString("rsqId"));
+                list.add(departmentDO);
+            }
+        }
+        return list;
+    }
 }

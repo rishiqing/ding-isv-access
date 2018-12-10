@@ -136,4 +136,8 @@
         update isv_corp_dept set rsq_id=#{rsqId} where corp_id=#{corpId} and dept_id=#{deptId}
     </update>
 
+    <update id="updateRsqInfoById">
+        update isv_corp_dept set rsq_id=#{rsqId} where id=#{id}
+    </update>
+
 </mapper>

@@ -61,6 +61,12 @@ public interface CorpStaffDao {
 	 * @return
 	 */
 	public void updateRsqInfo(StaffDO staffDO);
+	/**
+	 * 通过id更新第三方应用id的信息
+	 * @param staffDO
+	 * @return
+	 */
+	public void updateRsqInfoById(StaffDO staffDO);
 
 	/**
 	 * 保存用户的删除信息，当用户被删除后，为保存用户与日事清的关联信息，需要将用于移入删除表
