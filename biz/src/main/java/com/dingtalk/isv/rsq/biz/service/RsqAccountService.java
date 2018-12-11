@@ -156,14 +156,10 @@ public class RsqAccountService {
             // 公司
             CorpDO corpDO = corpDao.getCorpByCorpId(corpId);
 
-            ServiceResult<ArrayList<DepartmentDO>> syncSr = rsqAccountRequestHelper.syncDepartment(suiteDO, corpDO, department);
-            if(!syncSr.isSuccess()){
-                return ServiceResult.failure(syncSr.getCode(), syncSr.getMessage());
-            }
-            ArrayList<DepartmentDO> departmentDOs = syncSr.getResult();
+            ServiceResult deptSr = rsqAccountRequestHelper.syncDepartment(suiteDO, corpDO, department);
 
-            for(DepartmentDO departmentDO: departmentDOs){
-                corpDepartmentDao.updateRsqInfoById(departmentDO);
+            if(!deptSr.isSuccess()){
+                return ServiceResult.failure(deptSr.getCode(), deptSr.getMessage());
             }
             return ServiceResult.success(null);
         } catch (Exception e){
@@ -470,6 +466,15 @@ public class RsqAccountService {
         }
         return rsqArray;
     }
+    public String convertRsqDepartment(String corpId, Long departmentId){
+        // 获取部门模型
+        DepartmentDO departmentDO = corpDepartmentDao.getDepartmentByCorpIdAndDeptId(corpId, departmentId);
+        String rsqId = departmentDO.getRsqId();
+        if(null == rsqId){
+            return null;
+        }
+        return rsqId;
+    }
 
     /**
      * 将departmentDO同步到日事清，并递归同步其子部门
@@ -583,21 +588,10 @@ public class RsqAccountService {
             ServiceResult<List<StaffVO>> listSr = staffManageService.getStaffListByCorpId(corpId);
             List<StaffVO> list = listSr.getResult();
 
-            StringBuilder existUserIdsSb = new StringBuilder();
             Iterator it = list.iterator();
             while(it.hasNext()){
                 StaffVO staffVO = (StaffVO)it.next();
                 ServiceResult<StaffDO> staffSr = this.createRsqTeamStaff(suiteKey, StaffConverter.staffVO2StaffDO(staffVO));
-                if(!staffSr.isSuccess()){
-                    return ServiceResult.failure(staffSr.getCode(),staffSr.getMessage());
-                }
-                StaffDO staffDO = staffSr.getResult();
-                existUserIdsSb.append(staffDO.getRsqUserId());
-                existUserIdsSb.append(",");
-            }
-            String existUserIds = existUserIdsSb.toString();
-            if(!"".equals(existUserIds)){
-                ServiceResult staffSr = this.removeResignedStaff(suiteKey,corpId,existUserIds);
                 if(!staffSr.isSuccess()){
                     return ServiceResult.failure(staffSr.getCode(),staffSr.getMessage());
                 }
@@ -685,13 +679,9 @@ public class RsqAccountService {
                 users.add(map);
             }
             // 返回的数据
-            ServiceResult<ArrayList<StaffDO>> syncSr = rsqAccountRequestHelper.syncAllStaff(suiteDO, corpDO, users);
-            staffDOs = syncSr.getResult();
-
-            // 更新员工信息
-            for(StaffDO staffDO: staffDOs){
-                staffDO.setRsqPassword(generateRsqPassword(staffDO.getRsqUsername()));
-                corpStaffDao.updateRsqInfoById(staffDO);
+            ServiceResult syncSr = rsqAccountRequestHelper.syncAllStaff(suiteDO, corpDO, users);
+            if(!syncSr.isSuccess()){
+                return ServiceResult.failure(syncSr.getCode(),syncSr.getMessage());
             }
 
             return ServiceResult.success(null);
@@ -792,12 +782,23 @@ public class RsqAccountService {
             }
             checkOrderCharge(suiteKey, corpId);
 
-            //2  同步企业部门
-            //根部门
+            //2  创建企业部门
             ServiceResult<DepartmentVO> rootSr = deptManageService.getDepartmentByCorpIdAndDeptId(corpId, 1L);
             if(!rootSr.isSuccess()){
                 return ServiceResult.failure(rootSr.getCode(),rootSr.getMessage());
             }
+            ServiceResult<Void> rsqDeptSr = this.createRecursiveSubDepartment(suiteKey, DepartmentConverter.DepartmentVO2DepartmentDO(rootSr.getResult()));
+            if(!rsqDeptSr.isSuccess()){
+                return ServiceResult.failure(rsqDeptSr.getCode(),rsqDeptSr.getMessage());
+            }
+
+            //3  新建企业部门成员
+            ServiceResult<Void> rsqDeptStaffSr = this.createAllCorpStaff(suiteKey, corpId);
+            if(!rsqDeptStaffSr.isSuccess()){
+                return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
+            }
+
+            //4  同步企业部门
             ServiceResult<LinkedHashMap<String,Object>> departmentSr = this.assembleDepartment(corpId,rootSr.getResult());
             if(!departmentSr.isSuccess()){
                 return ServiceResult.failure(departmentSr.getCode(),departmentSr.getMessage());
@@ -807,24 +808,13 @@ public class RsqAccountService {
                 return ServiceResult.failure(syncDeptSr.getCode(),syncDeptSr.getMessage());
             }
 
-//            //3  新建企业部门成员
-//            ServiceResult<Void> rsqDeptStaffSr = this.createAllCorpStaff(suiteKey, corpId);
-//            if(!rsqDeptStaffSr.isSuccess()){
-//                return ServiceResult.failure(rsqDeptStaffSr.getCode(),rsqDeptStaffSr.getMessage());
-//            }
-            //3  同步企业部门成员
+            //5  同步企业部门成员
             ServiceResult<Void> syncStaffSr = this.syncAllCorpStaff(suiteKey, corpId);
             if(!syncStaffSr.isSuccess()){
                 return ServiceResult.failure(syncStaffSr.getCode(),syncStaffSr.getMessage());
             }
 
-//            //4  更新企业部门的管理员状态
-//            ServiceResult<Void> rsqAdminSr = this.updateAllCorpAdmin(suiteKey, corpId);
-//            if(!rsqAdminSr.isSuccess()){
-//                return ServiceResult.failure(rsqAdminSr.getCode(),rsqAdminSr.getMessage());
-//            }
-
-            //4  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
+            //6  当全部都同步成功后，发到corpAuthSuiteQueue队列中，由第三方异步处理
             jmsTemplate.send(rsqSyncCallBackQueue,new RsqSyncMessage(suiteKey, corpId));
             return ServiceResult.success(null);
 
@@ -863,7 +853,12 @@ public class RsqAccountService {
             departmentMap.put("id", departmentVO.getId());
             departmentMap.put("name", departmentVO.getName());
             departmentMap.put("deptId", departmentVO.getDeptId());
-            departmentMap.put("parentId", departmentVO.getParentId()==null?0:departmentVO.getParentId());
+            // rsq父部门id
+            String rsqParentId = null;
+            if(0!=departmentVO.getParentId()){
+                rsqParentId = convertRsqDepartment(corpId, departmentVO.getParentId());
+            }
+            departmentMap.put("parentId", rsqParentId==null?"0":rsqParentId);
             departmentMap.put("rsqId", departmentVO.getRsqId());
             departmentMap.put("outerId", departmentVO.getCorpId() + "--" + departmentVO.getDeptId());
             departmentMap.put("orderNum", departmentVO.getOrder());

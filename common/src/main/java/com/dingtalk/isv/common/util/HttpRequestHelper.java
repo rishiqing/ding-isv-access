@@ -28,9 +28,9 @@ import java.util.Map;
  */
 public class HttpRequestHelper {
     private static final Logger mainLogger = LoggerFactory.getLogger("OAPI_HTTP_LOGGER");
-    private Integer connectionRequestTimeout = 3000;
-    private Integer socketTimeOut = 3000;
-    private Integer connectTimeout = 3000;
+    private Integer connectionRequestTimeout = 20000;
+    private Integer socketTimeOut = 20000;
+    private Integer connectTimeout = 20000;
 
     public Integer getConnectionRequestTimeout() {
         return connectionRequestTimeout;
