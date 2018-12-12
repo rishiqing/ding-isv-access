@@ -856,7 +856,7 @@ public class RsqAccountService {
             departmentMap.put("deptId", departmentVO.getDeptId());
             // rsq父部门id
             String rsqParentId = null;
-            if(0L!=departmentVO.getParentId()){
+            if(departmentVO.getParentId()!=null && 0L!=departmentVO.getParentId()){
                 rsqParentId = convertRsqDepartment(corpId, departmentVO.getParentId());
             }
             departmentMap.put("parentId", rsqParentId==null?"0":rsqParentId);
