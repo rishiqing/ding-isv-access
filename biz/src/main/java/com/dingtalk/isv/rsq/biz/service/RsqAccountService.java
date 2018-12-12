@@ -833,6 +833,7 @@ public class RsqAccountService {
 
         }
     }
+
     /**
      * 组装部门组织架构
      */
