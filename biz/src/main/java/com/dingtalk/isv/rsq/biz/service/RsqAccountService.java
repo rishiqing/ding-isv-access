@@ -839,7 +839,7 @@ public class RsqAccountService {
     public ServiceResult<LinkedHashMap<String,Object>> assembleDepartment(String corpId,DepartmentVO departmentVO){
         bizLogger.info(LogFormatter.getKVLogData(LogFormatter.LogEvent.START,
                 LogFormatter.KeyValue.getNew("corpusId", corpId),
-                LogFormatter.KeyValue.getNew("departmentId", departmentVO.getId().toString())
+                LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
         ));
         try {
             // 部门下所有子部门
@@ -866,7 +866,9 @@ public class RsqAccountService {
             departmentMap.put("child", child);
 
             // 组装子部门
-            for (DepartmentVO childDepartmentVO: deptList){
+            Iterator it = deptList.iterator();
+            while (it.hasNext()){
+                DepartmentVO childDepartmentVO = (DepartmentVO)it.next();
                 ServiceResult<LinkedHashMap<String,Object>> childListSr = assembleDepartment(corpId,childDepartmentVO);
                 if(!childListSr.isSuccess()){
                     return ServiceResult.failure(childListSr.getCode(),childListSr.getMessage());
@@ -878,12 +880,12 @@ public class RsqAccountService {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常",
                     LogFormatter.KeyValue.getNew("corpusId", corpId),
-                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.getId().toString())
+                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
             ), e);
             mainLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     "系统异常",
                     LogFormatter.KeyValue.getNew("corpusId", corpId),
-                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.getId().toString())
+                    LogFormatter.KeyValue.getNew("departmentId", departmentVO.toString())
             ), e);
             return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(),ServiceResultCode.SYS_ERROR.getErrMsg());
 
