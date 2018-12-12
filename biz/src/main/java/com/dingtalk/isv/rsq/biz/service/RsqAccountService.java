@@ -856,6 +856,8 @@ public class RsqAccountService {
             departmentMap.put("deptId", departmentVO.getDeptId());
             // rsq父部门id
             String rsqParentId = null;
+            bizLogger.warn("departmentVO:"+(departmentVO==null));
+            bizLogger.warn("departmentVO.getParentId()"+(departmentVO.getParentId()));
             if(departmentVO.getParentId()!=null && 0L!=departmentVO.getParentId()){
                 rsqParentId = convertRsqDepartment(corpId, departmentVO.getParentId());
             }
