@@ -94,7 +94,7 @@ public class RsqAccountRequestHelper {
      * @param departmentMap
      * @return
      */
-    public ServiceResult<ArrayList<DepartmentDO>> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
+    public ServiceResult<Void> syncDepartment(SuiteDO suiteDO, CorpDO corpDO, LinkedHashMap<String,Object> departmentMap){
         try {
             String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncDepartment?token=" + suiteDO.getRsqAppToken();
             Map params = new HashMap<String, String>();
@@ -108,9 +108,7 @@ public class RsqAccountRequestHelper {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
             }
 
-            ArrayList<DepartmentDO> departmentVOs = DepartmentConverter.JSON2DepartmentVOList(jsonObject);
-
-            return ServiceResult.success(departmentVOs);
+            return ServiceResult.success(null);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
@@ -419,7 +417,7 @@ public class RsqAccountRequestHelper {
      * @param users
      * @return
      */
-    public ServiceResult<ArrayList<StaffDO>> syncAllStaff(SuiteDO suiteDO,CorpDO corpDO,List users){
+    public ServiceResult<Void> syncAllStaff(SuiteDO suiteDO,CorpDO corpDO,List users){
         try {
             String url = getRsqDomain() + "/task/v2/tokenAuth/autoCreate/syncUser?token=" + suiteDO.getRsqAppToken();
             Map params = new HashMap<String, String>();
@@ -432,9 +430,8 @@ public class RsqAccountRequestHelper {
             if (jsonObject.containsKey("errcode") && 0 != jsonObject.getLong("errcode")) {
                 return ServiceResult.failure(ServiceResultCode.SYS_ERROR.getErrCode(), ServiceResultCode.SYS_ERROR.getErrCode());
             }
-            ArrayList<StaffDO> staffDOs = StaffConverter.JSON2StaffVOList(jsonObject);
 
-            return ServiceResult.success(staffDOs);
+            return ServiceResult.success(null);
         } catch (Exception e) {
             bizLogger.error(LogFormatter.getKVLogData(LogFormatter.LogEvent.END,
                     LogFormatter.KeyValue.getNew("suiteDO", suiteDO.toString()),
