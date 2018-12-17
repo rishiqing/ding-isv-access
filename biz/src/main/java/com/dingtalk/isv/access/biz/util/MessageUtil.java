@@ -25,7 +25,7 @@ public class MessageUtil {
 
         oaBody.setMessage_url(json.getString("message_url"));
         if(json.containsKey("pc_message_url")){
-            //  TODO  未实现
+            oaBody.setPc_message_url(json.getString("pc_message_url"));
         }
 
         if(json.containsKey("head")){
@@ -109,6 +109,9 @@ public class MessageUtil {
         String btntxt = json.getString("btntxt");
 
         oaBody.setMessage_url(url);
+        if(json.containsKey("pc_message_url")){
+            oaBody.setPc_message_url(json.getString("pc_message_url"));
+        }
 
         MessageBody.OABody.Head head = new MessageBody.OABody.Head();
         head.setText(RISHIQING);
