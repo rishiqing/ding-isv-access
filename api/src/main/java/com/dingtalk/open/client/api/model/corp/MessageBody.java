@@ -117,7 +117,7 @@
 /* 116 */       return this.message_url;
 /*     */     }
 /*     */     public String getPc_message_url() {
-/* 116 */       return this.message_url;
+/* 116 */       return this.pc_message_url;
 /*     */    }
 /*     */
 /*     */     public void setMessage_url(String message_url) {
