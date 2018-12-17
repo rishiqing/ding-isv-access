@@ -109,15 +109,23 @@
 /*     */   public static class OABody extends MessageBody
 /*     */   {
 /*     */     private String message_url;
+/*     */     private String pc_message_url;
 /*     */     private Head head;
 /*     */     private Body body;
 /*     */     
 /*     */     public String getMessage_url() {
 /* 116 */       return this.message_url;
 /*     */     }
-/*     */     
+/*     */     public String getPc_message_url() {
+/* 116 */       return this.pc_message_url;
+/*     */    }
+/*     */
 /*     */     public void setMessage_url(String message_url) {
 /* 120 */       this.message_url = message_url;
+/*     */     }
+/*     */
+/*     */     public void setPc_message_url(String pc_message_url) {
+/*     */       this.pc_message_url = pc_message_url;
 /*     */     }
 /*     */     
 /*     */     public Head getHead() {

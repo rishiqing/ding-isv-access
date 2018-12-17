@@ -833,6 +833,7 @@ public class RsqAccountService {
 
         }
     }
+
     /**
      * 组装部门组织架构
      */
@@ -855,7 +856,9 @@ public class RsqAccountService {
             departmentMap.put("deptId", departmentVO.getDeptId());
             // rsq父部门id
             String rsqParentId = null;
-            if(0!=departmentVO.getParentId()){
+//            bizLogger.warn("departmentVO:"+(departmentVO==null));
+//            bizLogger.warn("departmentVO.getParentId()"+(departmentVO.getParentId()));
+            if(departmentVO.getParentId()!=null && 0L!=departmentVO.getParentId()){
                 rsqParentId = convertRsqDepartment(corpId, departmentVO.getParentId());
             }
             departmentMap.put("parentId", rsqParentId==null?"0":rsqParentId);
@@ -866,7 +869,9 @@ public class RsqAccountService {
             departmentMap.put("child", child);
 
             // 组装子部门
-            for (DepartmentVO childDepartmentVO: deptList){
+            Iterator it = deptList.iterator();
+            while (it.hasNext()){
+                DepartmentVO childDepartmentVO = (DepartmentVO)it.next();
                 ServiceResult<LinkedHashMap<String,Object>> childListSr = assembleDepartment(corpId,childDepartmentVO);
                 if(!childListSr.isSuccess()){
                     return ServiceResult.failure(childListSr.getCode(),childListSr.getMessage());
